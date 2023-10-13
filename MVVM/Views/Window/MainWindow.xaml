@@ -1,0 +1,72 @@
+﻿<Window x:Class="BlockifyLauncher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BlockifyLauncher"
+        mc:Ignorable="d" WindowStyle="None" Loaded="LoadingMainWindow" AllowsTransparency="True"
+        Width="1280" Height="720" Title="Blockify Launcher">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource WindowBorderHeaderStyle}" MouseDown="HeaderMouse">
+            <Grid>
+                <Label Content="{DynamicResource WindowTitle}" Foreground="#5A5A5A" FontSize="12" Margin="0,-5"
+                       VerticalAlignment="Center" FontWeight="ExtraBlack"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Height="Auto" Width="25" Style="{StaticResource HeaderButton}" Content="─" FontSize="20"
+                            Click="MainWindowsMinimals"/>
+                    <Button Height="Auto" Width="40" Style="{StaticResource HeaderButton}" Content="⨉" FontSize="16" Name="Exit"
+                            Click="MainWindowsClose"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Style="{StaticResource WindowBorderStyle}" Grid.Row="1">
+
+            <Grid Margin="60,46">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto" MaxHeight="128"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="1" Style="{StaticResource PanelBorder}" Height="60" Margin="100,20,100,0">
+                    <Grid Margin="41,10,11,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Orientation="Horizontal" >
+                            <Label Content="Name : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
+                                   Margin="0,0,10,0"/>
+                            <TextBox Width="120" Height="Auto" Style="{StaticResource CustomTextBox}"/>
+                            <Label Content="Minecraft version : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
+                                   Margin="16,0,10,0"/>
+                            <ComboBox Width="190" Height="Auto" Style="{StaticResource CustomComboBox}"/>
+                        </StackPanel>
+                        <Button HorizontalAlignment="Right" Content="Start" Grid.Column="2" Name="Start"
+                                Width="280" Height="Auto" Style="{StaticResource CustomButton}"/>
+                    </Grid>
+                </Border>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Frame Content="{Binding ContentPage}"/>
+
+                    
+                </Grid>
+                
+            </Grid>
+            
+        </Border>
+    </Grid>
+</Window>
