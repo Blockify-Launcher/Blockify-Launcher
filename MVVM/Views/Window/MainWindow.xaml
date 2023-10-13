@@ -3,9 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel"
         xmlns:local="clr-namespace:BlockifyLauncher"
         mc:Ignorable="d" WindowStyle="None" Loaded="LoadingMainWindow" AllowsTransparency="True"
         Width="1280" Height="720" Title="Blockify Launcher">
+
+    <Window.DataContext>
+        <viewModel:CurrentViewModel/>
+    </Window.DataContext>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -60,7 +66,7 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <Frame Content="{Binding ContentPage}"/>
+                    <Frame Content="{Binding CurrentView}"/>
 
                     
                 </Grid>
