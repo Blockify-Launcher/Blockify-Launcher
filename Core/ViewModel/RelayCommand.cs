@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace BlockifyLauncher.Core.ViewModel
 {
-    public class RelayCommand
+    public class RelayCommand : ICommand
     {
         private readonly Action<object> _execute;
         private readonly Func<object, bool> _canExecute;
@@ -20,7 +20,7 @@ namespace BlockifyLauncher.Core.ViewModel
             }
         }
 
-        public RelayCommand(Action<object> execute, Func<object, bool> canExecute)
+        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
         {
             _execute = execute;
             _canExecute = canExecute;

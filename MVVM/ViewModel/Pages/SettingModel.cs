@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BlockifyLauncher.MVVM.ViewModel.Pages
+﻿namespace BlockifyLauncher.MVVM.ViewModel.Pages
 {
-    internal class SettingModel
+    public class SettingModel
     {
     }
 }

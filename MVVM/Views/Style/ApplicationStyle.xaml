@@ -75,7 +75,7 @@
                             <Rectangle Opacity="0.7">
                                 <Rectangle.Fill>
                                     <LinearGradientBrush StartPoint="0 -0.5" EndPoint="0 1">
-                                        <GradientStop Color="#000" Offset="0.4"/>
+                                        <GradientStop Color="#90000000" Offset="0.3"/>
                                         <GradientStop Color="#680090" Offset="0.8"/>
                                     </LinearGradientBrush>
                                 </Rectangle.Fill>
