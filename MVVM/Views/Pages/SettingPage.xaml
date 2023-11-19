@@ -1,0 +1,17 @@
+﻿<Page x:Class="BlockifyLauncher.MVVM.Views.Pages.SettingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
+      xmlns:media="using:Microsoft.UI.Xaml.Media"
+      mc:Ignorable="d" 
+      d:DesignHeight="555" d:DesignWidth="1100"
+      Title="SettingPage">
+
+    <Grid>
+        <Border Background="#50262626" Margin="5" CornerRadius="30" 
+                BorderBrush="#805A5A5A" BorderThickness="1">
+        </Border>
+    </Grid>
+</Page>

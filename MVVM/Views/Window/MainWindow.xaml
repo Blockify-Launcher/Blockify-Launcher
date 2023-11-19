@@ -3,9 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel"
         xmlns:local="clr-namespace:BlockifyLauncher"
-        mc:Ignorable="d" WindowStyle="None" Loaded="LoadingMainWindow" AllowsTransparency="True"
-        Width="1280" Height="720" Title="Blockify Launcher">
+        mc:Ignorable="d" WindowStyle="None" Loaded="LoadingMainWindow"
+        Width="1280" Height="720" Title="Blockify Launcher" AllowsTransparency="True"
+        MinHeight="540" MinWidth="1010">
+
+    <Window.DataContext>
+        <viewModel:CurrentViewModel/>
+    </Window.DataContext>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -15,7 +22,7 @@
         <Border Style="{StaticResource WindowBorderHeaderStyle}" MouseDown="HeaderMouse">
             <Grid>
                 <Label Content="{DynamicResource WindowTitle}" Foreground="#5A5A5A" FontSize="12" Margin="0,-5"
-                       VerticalAlignment="Center" FontWeight="ExtraBlack"/>
+                       VerticalAlignment="Center" FontWeight="Regular"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Height="Auto" Width="25" Style="{StaticResource HeaderButton}" Content="─" FontSize="20"
                             Click="MainWindowsMinimals"/>
@@ -27,46 +34,147 @@
 
         <Border Style="{StaticResource WindowBorderStyle}" Grid.Row="1">
 
-            <Grid Margin="60,46">
+            <Grid Margin="22,20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto" MaxHeight="128"/>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="1" Style="{StaticResource PanelBorder}" Height="60" Margin="100,20,100,0">
+                <Border Grid.Row="1" Style="{StaticResource PanelBorder}" Height="55" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Grid Margin="41,10,11,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        
-                        <StackPanel Orientation="Horizontal" >
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,100,0" >
                             <Label Content="Name : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
                                    Margin="0,0,10,0"/>
-                            <TextBox Width="120" Height="Auto" Style="{StaticResource CustomTextBox}"/>
+                            <TextBox Width="190" Height="Auto" Style="{StaticResource CustomTextBox}"/>
                             <Label Content="Minecraft version : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
                                    Margin="16,0,10,0"/>
-                            <ComboBox Width="190" Height="Auto" Style="{StaticResource CustomComboBox}"/>
+                            <ComboBox Width="190" Height="Auto" Style="{StaticResource CustomComboBox}" x:Name="MinecraftVerisonComboBox"/>
                         </StackPanel>
                         <Button HorizontalAlignment="Right" Content="Start" Grid.Column="2" Name="Start"
-                                Width="280" Height="Auto" Style="{StaticResource CustomButton}"/>
+                                Width="190" Height="Auto" Style="{StaticResource CustomButton}"/>
                     </Grid>
                 </Border>
 
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="100"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <Frame Content="{Binding ContentPage}"/>
+                    <Border Width="75" Height="180" CornerRadius="35" HorizontalAlignment="Left">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#121212"/>
+                                <Setter Property="BorderBrush" Value="#505a5a5a"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                            </Style>
+                        </Border.Style>
 
-                    
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <RadioButton Height="66" Width="66" Margin="0,-15,0,0"
+                                         Command="{Binding MainCommand}" Cursor="Hand">
+                                <RadioButton.Style>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="Background" Value="#242424"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="RadioButton">
+                                                    <Border Background="{TemplateBinding Background}" CornerRadius="50">
+                                                        <Image Source="pack://application:,,,/image/Home_white.png" Height="30"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                            <Image.Effect>
+                                                                <DropShadowEffect BlurRadius="25" Opacity="0.5" ShadowDepth="6"/>
+                                                            </Image.Effect>
+                                                        </Image>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#FF484848"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <LinearGradientBrush StartPoint="0 0" EndPoint="1 0">
+                                                            <GradientStop Color="#009046" Offset="0.0"/>
+                                                            <GradientStop Color="#009006" Offset="1.0"/>
+                                                        </LinearGradientBrush>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </RadioButton.Style>
+                            </RadioButton>
+
+                            <RadioButton Height="66" Width="66" Margin="0,0,0,-15" Grid.Row="1"
+                                         Command="{Binding SettingCommand}" Cursor="Hand">
+                                <RadioButton.Style>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="Background" Value="#242424"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="RadioButton">
+                                                    <Border Background="{TemplateBinding Background}" CornerRadius="50">
+                                                        <Image Source="pack://application:,,,/image/Setting_white.png" Height="30"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                            <Image.Effect>
+                                                                <DropShadowEffect BlurRadius="25" Opacity="0.5" ShadowDepth="6"/>
+                                                            </Image.Effect>
+                                                        </Image>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#FF484848"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <LinearGradientBrush StartPoint="0 0" EndPoint="1 0">
+                                                            <GradientStop Color="#009046" Offset="0.0"/>
+                                                            <GradientStop Color="#009006" Offset="1.0"/>
+                                                        </LinearGradientBrush>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </RadioButton.Style>
+                            </RadioButton>
+                        </Grid>
+                    </Border>
+
+                    <Frame Content="{Binding CurrentView}" Grid.Column="1" NavigationUIVisibility="Hidden"/>
+
+
                 </Grid>
-                
+
             </Grid>
-            
+
         </Border>
+        <Grid Grid.Row="1" Opacity="0.1">
+            <Thumb Name="BottomLeftThumb" DragDelta="Thumb_DragDelta"  Height="4" Width="4" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW"/>
+            <Thumb Name="BottomRightThumb" DragDelta="Thumb_DragDelta" Height="4" Width="4" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE"/>
+
+            <Thumb Name="LeftThumb" DragDelta="Thumb_DragDelta" Width="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE"/>
+            <Thumb Name="RightThumb" DragDelta="Thumb_DragDelta" Width="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE"/>
+            <Thumb Name="BottomThumb" DragDelta="Thumb_DragDelta" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS"/>
+        </Grid>
     </Grid>
 </Window>
