@@ -4,3 +4,5 @@
         <ResourceDictionary Source="Theme/BlurryUserControl.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
+    
+ <<!-- ts -->
