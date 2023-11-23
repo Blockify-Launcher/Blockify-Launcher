@@ -14,7 +14,6 @@ namespace BlockifyLauncher.MVVM.Views.Style.Effect
 
         private Rectangle _blur;
 
-        private Point _anchorPoint;
         private Size _containerSize;
         private Point _difference;
         private double _scaleX;

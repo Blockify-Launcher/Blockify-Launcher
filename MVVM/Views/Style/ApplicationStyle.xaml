@@ -71,7 +71,7 @@
                 <VisualBrush>
                     <VisualBrush.Visual>
                         <Grid>
-                            <Image Source="pack://application:,,,/Image/wallpaper.jpg" Stretch="Fill"/>
+                            <Image Source="pack://application:,,,/Image/wallpaper.jpg" Stretch="Fill" x:Name="InnerBlurContainer"/>
                             <Rectangle Opacity="0.7">
                                 <Rectangle.Fill>
                                     <LinearGradientBrush StartPoint="0 -0.5" EndPoint="0 1">

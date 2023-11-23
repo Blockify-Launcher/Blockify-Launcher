@@ -21,9 +21,11 @@ namespace BlockifyLauncher.MVVM.Views.Pages
     /// </summary>
     public partial class MainPage : Page
     {
+
         public MainPage()
         {
             InitializeComponent();
+            BlurBackground.BlurContainer = Properties.Settings.InnerBlurContainerName as Grid;
         }
     }
 }

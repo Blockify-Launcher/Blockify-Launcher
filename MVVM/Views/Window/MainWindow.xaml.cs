@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
@@ -11,9 +12,12 @@ namespace BlockifyLauncher
         public MainWindow()
         {
             InitializeComponent();
+
             this.Resources.Add("WindowTitle", this.Title);
             
             this.homeRadioButton.IsChecked = true;
+
+            Properties.Settings.InnerBlurContainerName = WindowBlurContainer;
 
             this.Width = Properties.Settings.Default.WidthProgram;
             this.Height = Properties.Settings.Default.HeightProgram;

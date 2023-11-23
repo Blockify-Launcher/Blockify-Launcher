@@ -46,5 +46,13 @@ namespace BlockifyLauncher.Properties {
                 this["HeightProgram"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Windows.Controls.Grid WinMainGridName {
+            get {
+                return ((global::System.Windows.Controls.Grid)(this["WinMainGridName"]));
+            }
+        }
     }
 }

@@ -9,7 +9,9 @@ namespace BlockifyLauncher.Properties {
     //  Событие SettingsLoaded возникает после загрузки значений параметров.
     //  Событие SettingsSaving возникает перед сохранением значений параметров.
     internal sealed partial class Settings {
-        
+
+        public static object InnerBlurContainerName { get; set; }
+
         public Settings() {
             // // Для добавления обработчиков событий для сохранения и изменения параметров раскомментируйте приведенные ниже строки:
             //

@@ -13,7 +13,7 @@
         <viewModel:CurrentViewModel/>
     </Window.DataContext>
 
-    <Grid>
+    <Grid x:Name="WindowBlurContainer">
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
             <RowDefinition Height="*"/>
@@ -35,7 +35,7 @@
 
         <Border Style="{StaticResource WindowBorderStyle}" Grid.Row="1">
 
-            <Grid Margin="22,20">
+            <Grid Margin="22,20"> 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto" MaxHeight="128"/>
