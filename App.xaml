@@ -10,6 +10,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="MVVM/Views/Style/ApplicationStyle.xaml"/>
                 <ResourceDictionary Source="MVVM/Views/Style/CustomElement.xaml"/>
+                <ResourceDictionary Source="MVVM/Views/Style/Effect/Generic/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type viewModel_Pages:MainModel}">

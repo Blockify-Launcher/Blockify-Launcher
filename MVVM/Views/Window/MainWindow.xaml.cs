@@ -8,20 +8,19 @@ namespace BlockifyLauncher
 {
     public partial class MainWindow : Window
     {
-
         public MainWindow()
         {
             InitializeComponent();
-            MessageBox.Show($"{Properties.Settings.Default.WidthProgram} x {Properties.Settings.Default.HeightProgram}");
+            this.Resources.Add("WindowTitle", this.Title);
+            
+            this.homeRadioButton.IsChecked = true;
+
             this.Width = Properties.Settings.Default.WidthProgram;
             this.Height = Properties.Settings.Default.HeightProgram;
-            this.Resources.Add("WindowTitle", this.Title);
         }
 
         private void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
-            // Size memorization.
-            
 
             this.MinecraftVerisonComboBox.Items.Add("Version 1.17.1");
             this.MinecraftVerisonComboBox.Items.Add("Version 1.17");

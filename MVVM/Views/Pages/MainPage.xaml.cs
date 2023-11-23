@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlockifyLauncher.MVVM.Views.Style.Effect;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
