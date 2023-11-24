@@ -25,7 +25,10 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         public MainPage()
         {
             InitializeComponent();
-            BlurBackground.BlurContainer = Properties.Settings.InnerBlurContainerName as Grid;
+
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            Blur_WindowBlur.BlurContainer       = mainWindow.MainBorder;
+            Blur_WindowBlur_Two.BlurContainer   = mainWindow.MainBorder;
         }
     }
 }

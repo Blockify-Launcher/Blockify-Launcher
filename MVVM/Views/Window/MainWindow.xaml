@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel"
+        xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
         xmlns:local="clr-namespace:BlockifyLauncher"
         mc:Ignorable="d" WindowStyle="None" Loaded="LoadingMainWindow"
         Width="1280" Height="720" Title="Blockify Launcher" AllowsTransparency="True"
@@ -13,7 +14,8 @@
         <viewModel:CurrentViewModel/>
     </Window.DataContext>
 
-    <Grid x:Name="WindowBlurContainer">
+        
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
             <RowDefinition Height="*"/>
@@ -33,7 +35,7 @@
             </Grid>
         </Border>
 
-        <Border Style="{StaticResource WindowBorderStyle}" Grid.Row="1">
+        <Border Grid.Row="1" x:Name="WindowBlurContainer">
 
             <Grid Margin="22,20"> 
                 <Grid.RowDefinitions>
@@ -41,6 +43,10 @@
                     <RowDefinition Height="Auto" MaxHeight="128"/>
                 </Grid.RowDefinitions>
 
+                <Border Style="{StaticResource WindowBorderStyle}" Margin="-22,-20" Grid.RowSpan="10"
+                        x:Name="InnerBlurContainer"/>
+                
+                
                 <Border Grid.Row="1" Style="{StaticResource PanelBorder}" Height="55" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Grid Margin="41,10,11,10">
                         <Grid.ColumnDefinitions>
@@ -67,6 +73,7 @@
                         <ColumnDefinition Width="100"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
+
 
                     <Grid>
                         <Grid.RowDefinitions>
@@ -169,9 +176,11 @@
                         </Border>
                     </Grid>
 
+
+
+
                     <Frame Content="{Binding CurrentView}" Grid.Column="1" NavigationUIVisibility="Hidden"
                            Margin="0,0,0,50"/>
-
 
                 </Grid>
 
@@ -186,5 +195,7 @@
             <Thumb Name="RightThumb" DragDelta="Thumb_DragDelta" Width="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE"/>
             <Thumb Name="BottomThumb" DragDelta="Thumb_DragDelta" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS"/>
         </Grid>
+        <!--<controls:WindowBlur VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BlurContainer="{Binding ElementName=WindowBlurContainer}" 
+            BlurRadius="45" Magnification="0.25" Grid.Row="1" Background="Transparent" x:Name="Blur_WindowBlur"/> -->
     </Grid>
 </Window>

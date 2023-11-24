@@ -5,13 +5,17 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
       xmlns:media="using:Microsoft.UI.Xaml.Media"
+      xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
       mc:Ignorable="d" 
       d:DesignHeight="555" d:DesignWidth="1100"
       Title="SettingPage">
 
     <Grid>
-        <Border Background="#50262626" Margin="5" CornerRadius="30" 
-                BorderBrush="#805A5A5A" BorderThickness="1">
-        </Border>
+        <controls:WindowBlur Margin="5" BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur">
+            <Border Background="#C0121212" CornerRadius="30" 
+                    BorderBrush="#3F5A5A5A" BorderThickness="1">
+                
+            </Border>
+        </controls:WindowBlur>
     </Grid>
 </Page>

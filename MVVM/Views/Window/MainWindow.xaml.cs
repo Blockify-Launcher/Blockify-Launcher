@@ -9,6 +9,8 @@ namespace BlockifyLauncher
 {
     public partial class MainWindow : Window
     {
+        public Border MainBorder { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -17,7 +19,7 @@ namespace BlockifyLauncher
             
             this.homeRadioButton.IsChecked = true;
 
-            Properties.Settings.InnerBlurContainerName = WindowBlurContainer;
+            this.MainBorder = InnerBlurContainer;
 
             this.Width = Properties.Settings.Default.WidthProgram;
             this.Height = Properties.Settings.Default.HeightProgram;
@@ -25,11 +27,9 @@ namespace BlockifyLauncher
 
         private void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
-
-            this.MinecraftVerisonComboBox.Items.Add("Version 1.17.1");
-            this.MinecraftVerisonComboBox.Items.Add("Version 1.17");
-            this.MinecraftVerisonComboBox.Items.Add("Version 1.18.1");
-            this.MinecraftVerisonComboBox.Items.Add("Version 1.18");
+            for (int i = 0; i < 10; i++)
+                this.MinecraftVerisonComboBox.Items.Add("Version 1.17.1");
+            
             MinecraftVerisonComboBox.SelectedIndex = 0;
         }
 
