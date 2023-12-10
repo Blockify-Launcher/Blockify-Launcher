@@ -5,6 +5,8 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
+using CmlLib.Core;
+
 namespace BlockifyLauncher
 {
     public partial class MainWindow : Window
@@ -25,12 +27,20 @@ namespace BlockifyLauncher
             this.Height = Properties.Settings.Default.HeightProgram;
         }
 
-        private void LoadingMainWindow(object sender, RoutedEventArgs e)
+        private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
-            for (int i = 0; i < 10; i++)
-                this.MinecraftVerisonComboBox.Items.Add("Version 1.17.1");
-            
-            MinecraftVerisonComboBox.SelectedIndex = 0;
+            try
+            {
+                CMLauncher launcher = new CMLauncher(new MinecraftPath());
+                foreach (var version in await launcher.GetAllVersionsAsync())
+                    MinecraftVerisonComboBox.Items.Add(version.Name);
+                MinecraftVerisonComboBox.SelectedIndex = 0;
+            } 
+            catch (Exception ex)
+            {
+                new MessageBox(ex.Message, "Error").ShowDialog();
+            }
+            new MessageBox("Просто тест message box", "Error").ShowDialog();
         }
 
         private void MainWindowsClose(object sender, RoutedEventArgs e)
