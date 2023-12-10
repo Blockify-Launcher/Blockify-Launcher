@@ -94,6 +94,14 @@
       <DependentUpon>MessageBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
+    <Page Include="Image\FormImagePack.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Image\MessageBox\ImagePack.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MVVM\Views\Pages\MainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -183,14 +191,10 @@
     <Folder Include="MVVM\Model\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image\Home_black.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Image\Setting_white.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Image\Home_white.png" />
-    <Resource Include="Image\Setting_black.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Image\icon__launcher.ico" />
@@ -199,8 +203,6 @@
     <Resource Include="MVVM\Views\Window\Info.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image\MessageBox\Info.png" />
-    <Content Include="Image\MessageBox\Info.svg" />
     <Resource Include="MVVM\Views\Window\Info.svg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

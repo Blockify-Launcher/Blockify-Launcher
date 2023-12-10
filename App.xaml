@@ -11,6 +11,9 @@
                 <ResourceDictionary Source="MVVM/Views/Style/ApplicationStyle.xaml"/>
                 <ResourceDictionary Source="MVVM/Views/Style/CustomElement.xaml"/>
                 <ResourceDictionary Source="MVVM/Views/Style/Effect/Generic/Generic.xaml"/>
+                
+                <ResourceDictionary Source="Image/MessageBox/ImagePack.xaml"/>
+                <ResourceDictionary Source="Image/FormImagePack.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type viewModel_Pages:MainModel}">

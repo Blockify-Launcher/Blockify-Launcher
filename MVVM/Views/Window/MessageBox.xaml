@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BlockifyLauncher"
         mc:Ignorable="d" WindowStyle="None" Height="150" Width="400" AllowsTransparency="True"
-        Topmost="True" Background="#02FFFFFF"  BorderBrush="#3F5A5A5A" BorderThickness="1">
+        Topmost="True" Background="#02FFFFFF"  BorderBrush="#3F5A5A5A" BorderThickness="1"
+        Loaded="MessageBobLoading">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -22,9 +23,9 @@
 
         <Grid Grid.Row="1">
             <Border Background="#7F121212">
-                <StackPanel Orientation="Horizontal" Margin="10,0">
-                    <!--svgc:SvgViewbox Source="pack://application:,,,/Image/MessageBox/Info.svg" Height="45" Width="45"-->
-                    <Label x:Name="MessageContent" Content="Not Content!" FontWeight="DemiBold" Foreground="White" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" Margin="20,0">
+                    <Image x:Name="ImageMessage" Height="45"/>
+                    <Label x:Name="MessageContent" Margin="20,0" Content="Not Content!" FontWeight="DemiBold" Foreground="White" VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
         </Grid>

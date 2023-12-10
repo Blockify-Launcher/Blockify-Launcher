@@ -91,7 +91,7 @@
         <Setter Property="Background" Value="{StaticResource PanelColor}"/>
         <Setter Property="CornerRadius" Value="30"/>
     </Style>
-        
+
     <Style x:Key="WindowBorderHeaderStyle" TargetType="Border">
         <Setter Property="Background" Value="#1F1F1F"/>
     </Style>

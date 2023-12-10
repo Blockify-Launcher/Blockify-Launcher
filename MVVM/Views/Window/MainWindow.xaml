@@ -107,7 +107,7 @@
                                                 <Setter.Value>
                                                     <ControlTemplate TargetType="RadioButton">
                                                         <Border Background="{TemplateBinding Background}" CornerRadius="50">
-                                                            <Image Source="pack://application:,,,/image/Home_white.png" Height="30"
+                                                            <Image Source="{StaticResource HomeDrawingImage}" Height="30"
                                                                    HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                 <Image.Effect>
                                                                     <DropShadowEffect BlurRadius="25" Opacity="0.5" ShadowDepth="6"/>
@@ -144,7 +144,7 @@
                                                 <Setter.Value>
                                                     <ControlTemplate TargetType="RadioButton">
                                                         <Border Background="{TemplateBinding Background}" CornerRadius="50">
-                                                            <Image Source="pack://application:,,,/image/Setting_white.png" Height="30"
+                                                            <Image Source="{StaticResource SettingDrawingImage}" Height="30"
                                                                    HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                 <Image.Effect>
                                                                     <DropShadowEffect BlurRadius="25" Opacity="0.5" ShadowDepth="6"/>

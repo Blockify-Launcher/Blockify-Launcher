@@ -38,9 +38,8 @@ namespace BlockifyLauncher
             } 
             catch (Exception ex)
             {
-                new MessageBox(ex.Message, "Error").ShowDialog();
+                new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
             }
-            new MessageBox("Просто тест message box", "Error").ShowDialog();
         }
 
         private void MainWindowsClose(object sender, RoutedEventArgs e)
