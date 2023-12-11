@@ -1,33 +1,45 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+
+using CmlLib.Core;
 
 namespace BlockifyLauncher
 {
     public partial class MainWindow : Window
     {
+        public Border MainBorder { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
-            MessageBox.Show($"{Properties.Settings.Default.WidthProgram} x {Properties.Settings.Default.HeightProgram}");
+
+            this.Resources.Add("WindowTitle", this.Title);
+            
+            this.homeRadioButton.IsChecked = true;
+
+            this.MainBorder = InnerBlurContainer;
+
             this.Width = Properties.Settings.Default.WidthProgram;
             this.Height = Properties.Settings.Default.HeightProgram;
-            this.Resources.Add("WindowTitle", this.Title);
         }
 
-        private void LoadingMainWindow(object sender, RoutedEventArgs e)
+        private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
-            // Size memorization.
-            
-
-            this.MinecraftVerisonComboBox.Items.Add("Version 1.17.1");
-            this.MinecraftVerisonComboBox.Items.Add("Version 1.17");
-            this.MinecraftVerisonComboBox.Items.Add("Version 1.18.1");
-            this.MinecraftVerisonComboBox.Items.Add("Version 1.18");
-            MinecraftVerisonComboBox.SelectedIndex = 0;
+            try
+            {
+                CMLauncher launcher = new CMLauncher(new MinecraftPath());
+                foreach (var version in await launcher.GetAllVersionsAsync())
+                    MinecraftVerisonComboBox.Items.Add(version.Name);
+                MinecraftVerisonComboBox.SelectedIndex = 0;
+            } 
+            catch (Exception ex)
+            {
+                new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
+            }
         }
 
         private void MainWindowsClose(object sender, RoutedEventArgs e)

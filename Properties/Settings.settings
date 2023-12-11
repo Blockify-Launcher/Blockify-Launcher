@@ -8,5 +8,8 @@
     <Setting Name="HeightProgram" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">720</Value>
     </Setting>
+    <Setting Name="WinMainGridName" Type="System.Windows.Controls.Grid" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

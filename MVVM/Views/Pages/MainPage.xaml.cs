@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlockifyLauncher.MVVM.Views.Style.Effect;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,14 @@ namespace BlockifyLauncher.MVVM.Views.Pages
     /// </summary>
     public partial class MainPage : Page
     {
+
         public MainPage()
         {
             InitializeComponent();
+
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            Blur_WindowBlur.BlurContainer       = mainWindow.MainBorder;
+            Blur_WindowBlur_Two.BlurContainer   = mainWindow.MainBorder;
         }
     }
 }

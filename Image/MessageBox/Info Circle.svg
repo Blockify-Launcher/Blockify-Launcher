@@ -1,0 +1,13 @@
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="20" height="20" fill="#1E1E1E"/>
+<g id="Two tone">
+<rect x="-938" y="-279" width="1688" height="552" rx="40" fill="black"/>
+<g id="Iconly/Two-tone/Info Circle">
+<g id="Info Circle">
+<path id="Stroke 1" fill-rule="evenodd" clip-rule="evenodd" d="M9.99988 0.750244C15.1089 0.750244 19.2499 4.89224 19.2499 10.0002C19.2499 15.1082 15.1089 19.2502 9.99988 19.2502C4.89188 19.2502 0.749878 15.1082 0.749878 10.0002C0.749878 4.89224 4.89188 0.750244 9.99988 0.750244Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Stroke 3" opacity="0.4" d="M9.995 6.20435V10.6233" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Stroke 5" opacity="0.4" d="M9.995 13.7961H10.005" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+</svg>

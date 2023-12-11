@@ -71,12 +71,12 @@
                 <VisualBrush>
                     <VisualBrush.Visual>
                         <Grid>
-                            <Image Source="pack://application:,,,/Image/wallpaper.jpg" Stretch="Fill"/>
+                            <Image Source="pack://application:,,,/Image/wallpaper.jpg" Stretch="Fill" x:Name="InnerBlurContainer"/>
                             <Rectangle Opacity="0.7">
                                 <Rectangle.Fill>
                                     <LinearGradientBrush StartPoint="0 -0.5" EndPoint="0 1">
-                                        <GradientStop Color="#90000000" Offset="0.3"/>
-                                        <GradientStop Color="#680090" Offset="0.8"/>
+                                        <GradientStop Color="#7F000000" Offset="0.0"/>
+                                        <GradientStop Color="#B2680090" Offset="1.0"/>
                                     </LinearGradientBrush>
                                 </Rectangle.Fill>
                             </Rectangle>
@@ -91,7 +91,7 @@
         <Setter Property="Background" Value="{StaticResource PanelColor}"/>
         <Setter Property="CornerRadius" Value="30"/>
     </Style>
-        
+
     <Style x:Key="WindowBorderHeaderStyle" TargetType="Border">
         <Setter Property="Background" Value="#1F1F1F"/>
     </Style>

@@ -4,10 +4,37 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
+      xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="MainPage">
+
     <Grid>
-            
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="70*"/>
+        </Grid.RowDefinitions>
+
+        <controls:WindowBlur BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur">
+            <Border CornerRadius="15" Background="#C0121212" BorderBrush="#3F5A5A5A" BorderThickness="1">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                </StackPanel>
+            </Border>
+        </controls:WindowBlur>
+
+
+        <controls:WindowBlur Grid.Row="1" Margin="0,20,0,0"
+                BlurRadius="25" Magnification="0.15" Background="Transparent" x:Name="Blur_WindowBlur_Two">
+            <Border  Background="#C0121212" CornerRadius="15"
+                 BorderBrush="#3F5A5A5A" BorderThickness="1">
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" >
+                    <Border Width="250" VerticalAlignment="Stretch" Margin="10,20" Style="{StaticResource CustomItemNews}"/>
+                    <Border Width="250" VerticalAlignment="Stretch" Margin="10,20" Style="{StaticResource CustomItemNews}"/>
+                    <Border Width="250" VerticalAlignment="Stretch" Margin="10,20" Style="{StaticResource CustomItemNews}"/>
+                    <Border Width="250" VerticalAlignment="Stretch" Margin="10,20" Style="{StaticResource CustomItemNews}"/>
+                </StackPanel>
+            </Border>
+        </controls:WindowBlur>
     </Grid>
 </Page>
