@@ -14,7 +14,41 @@
         <controls:WindowBlur Margin="5" BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur">
             <Border Background="#C0121212" CornerRadius="30" 
                     BorderBrush="#3F5A5A5A" BorderThickness="1">
-                
+                <Grid>
+                    <StackPanel Margin="10">
+                        <StackPanel Orientation="Horizontal" Margin="10,0,0,5">
+                            <Image Source="{StaticResource DisplayDrawingImage}" Height="20"/>
+                            <Label Content="Display" Foreground="White" FontWeight="DemiBold" HorizontalAlignment="Center"/>
+                            <Rectangle Fill="White" Height="1" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                        <Rectangle Fill="#3F5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
+                        <StackPanel Orientation="Horizontal" Margin="10,10">
+                            <Label Content="Width" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox Height="35" Width="190" Style="{StaticResource CustomTextBox}" BorderBrush="#3F5A5A5A" BorderThickness="1" Tag="Width"/>
+                            <Label Content="⨉" VerticalAlignment="Center" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                            <Label Content="Height" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox Height="35" Width="190" Style="{StaticResource CustomTextBox}" BorderBrush="#3F5A5A5A" BorderThickness="1" Tag="Height"/>
+                            <Button HorizontalAlignment="Right" Content="Apply" Grid.Column="2" Name="Start" 
+                                    Width="100" Height="35" Style="{StaticResource CustomButton}" Margin="15,0"/>
+                        </StackPanel>
+                        <CheckBox Content="FullScrean" Style="{StaticResource CustomCheckBox}" Foreground="#FFF" FontSize="20" Margin="10,10"/>
+                        <Rectangle Fill="#4C5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
+                        <StackPanel Orientation="Horizontal" Margin="10,5">
+                            <Image Source="{StaticResource KeyDrawingImage}" Height="20"/>
+                            <Label Content="System" Foreground="White" FontWeight="DemiBold" HorizontalAlignment="Center"/>
+                            <Rectangle Fill="White" Height="1" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                        <Rectangle Fill="#3F5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
+                        <StackPanel Orientation="Horizontal" Margin="10,5">
+                            <Label Content="Max memory RAM" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Slider x:Name="Slider" Width="150" VerticalAlignment="Center" Margin="15,0" Minimum="100" Maximum="1000" />
+                            <Label Content="{Binding ElementName=Slider, Path=Value, StringFormat={}{0}}" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    
+                    
+                </Grid>
             </Border>
         </controls:WindowBlur>
     </Grid>

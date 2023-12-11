@@ -191,12 +191,6 @@
     <Folder Include="MVVM\Model\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image\Setting_white.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Home_white.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Image\icon__launcher.ico" />
   </ItemGroup>
   <ItemGroup>

@@ -47,6 +47,11 @@ namespace BlockifyLauncher.MVVM.Views.Pages
 
             Display screadFormat { get; set; }
 
+            public void GetSetting()
+            {
+
+            }
+
             public Setting()
             {
 

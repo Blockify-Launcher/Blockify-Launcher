@@ -58,7 +58,8 @@
                         <StackPanel Orientation="Horizontal" Margin="0,0,100,0" >
                             <Label Content="Name : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
                                    Margin="0,0,10,0"/>
-                            <TextBox Width="190" Height="Auto" Style="{StaticResource CustomTextBox}"/>
+                            <TextBox Width="190" Height="Auto" Style="{StaticResource CustomTextBox}"
+                                     BorderBrush="#3F5A5A5A" BorderThickness="1" Tag="UserName"/>
                             <Label Content="Minecraft version : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
                                    Margin="16,0,10,0"/>
                             <ComboBox Width="190" Height="Auto" Style="{StaticResource CustomComboBox}" x:Name="MinecraftVerisonComboBox"/>
