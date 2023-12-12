@@ -42,7 +42,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             CmlLib.Core.Auth.MSession       Session; 
 
             public MinecraftPath       minecraftPath;
-            string              JavaPath;
+            string                     JavaPath;
 
             public Display screadFormat;
 

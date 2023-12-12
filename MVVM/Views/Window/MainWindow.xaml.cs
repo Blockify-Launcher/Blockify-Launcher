@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-
+using System.Windows.Media.Animation;
 using CmlLib.Core;
+using CmlLib.Core.Downloader;
 
 namespace BlockifyLauncher
 {
@@ -16,6 +18,9 @@ namespace BlockifyLauncher
         public MainWindow()
         {
             InitializeComponent();
+
+            /* This code would increase download speed. */
+            System.Net.ServicePointManager.DefaultConnectionLimit = 256;
 
             this.Resources.Add("WindowTitle", this.Title);
             
@@ -40,6 +45,28 @@ namespace BlockifyLauncher
             {
                 new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
             }
+        }
+
+        private void LauncherProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        {
+            // Console.WriteLine("{0}%", e.ProgressPercentage);
+        }
+
+        private void LauncherFileChanged(DownloadFileChangedEventArgs e)
+        {
+            /*
+             
+                Console.WriteLine("FileKind: " + e.FileKind.ToString());
+                Console.WriteLine("FileName: " + e.FileName);
+                Console.WriteLine("TotalFileCount: " + e.TotalFileCount);
+                Console.WriteLine("ProgressedFiles: " + e.ProgressedFileCount);
+             
+             */
+        }
+
+        private void ButtonClickStartGame(object sender, RoutedEventArgs e)
+        {
+                ProgressBarLoad.Value = 60;
         }
 
         private void MainWindowsClose(object sender, RoutedEventArgs e)
