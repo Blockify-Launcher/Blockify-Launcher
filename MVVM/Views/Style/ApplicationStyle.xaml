@@ -12,7 +12,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="20">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="20" 
+                            BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
                         <Label Content="{TemplateBinding Content}" FontWeight="Bold" FontSize="16"
                                HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFF"/>
                     </Border>
@@ -24,11 +25,23 @@
                 <Setter Property="Opacity" Value="0.8"/>
             </Trigger>
             <Trigger Property="Name" Value="Start">
+                <Setter Property="BorderBrush" Value="Transparent"/>
                 <Setter Property="Background">
                     <Setter.Value>
                         <LinearGradientBrush StartPoint="0 0" EndPoint="1 0">
                             <GradientStop Color="#009046" Offset="0.0"/>
                             <GradientStop Color="#009006" Offset="1.0"/>
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+            <Trigger Property="Tag" Value="CustomBut">
+                <Setter Property="BorderBrush" Value="#B2FFFFFF"/>
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush StartPoint="0 0" EndPoint="1 0">
+                            <GradientStop Color="#127D9F" Offset="0.0"/>
+                            <GradientStop Color="#09750E" Offset="1.0"/>
                         </LinearGradientBrush>
                     </Setter.Value>
                 </Setter>

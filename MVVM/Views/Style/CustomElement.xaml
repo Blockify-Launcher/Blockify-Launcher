@@ -2,8 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Style TargetType="{x:Type ComboBox}" x:Key="CustomComboBox">
         <Style.Setters>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="FrameworkElement.OverridesDefaultStyle" Value="True"/>
-            <Setter Property="Cursor" Value="IBeam"/>
             <Setter Property="Background" Value="#1F1F1F"/>
             <Setter Property="Foreground" Value="#FFF"/>
             <Setter Property="Template">
@@ -12,29 +12,28 @@
                         <Grid>
                             <ToggleButton Name="ToggleButton" Focusable="false" ClickMode="Press" Background="{TemplateBinding Background}"
                                           IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
-                                          Content="{TemplateBinding SelectionBoxItem}" Foreground="{TemplateBinding Foreground}">
+                                          Content="{TemplateBinding SelectionBoxItem}" Foreground="{TemplateBinding Foreground}" BorderBrush="{TemplateBinding BorderBrush}" 
+                                          BorderThickness="{TemplateBinding BorderThickness}">
                                 <ToggleButton.Template>
                                     <ControlTemplate TargetType="ToggleButton">
-                                        <Border Background="{TemplateBinding Background}" CornerRadius="20"
-                                                    Height="{TemplateBinding Height}" Width="{TemplateBinding Width}">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="20" BorderBrush="{TemplateBinding BorderBrush}" 
+                                                BorderThickness="{TemplateBinding BorderThickness}" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}">
                                             <Grid VerticalAlignment="Center">
                                                 <Label HorizontalAlignment="Left" Content="{TemplateBinding Content}" Width="Auto" MaxWidth="150"
-                                                       Margin="9,0,0,3" FontSize="16" Foreground="{TemplateBinding Foreground}"/>
-                                                <Button Height="19" Width="19" Cursor="Hand" HorizontalAlignment="Right" Margin="13,0">
-                                                    <Button.Style>
-                                                        <Style TargetType="Button">
-                                                            <Setter Property="Template">
-                                                                <Setter.Value>
-                                                                    <ControlTemplate TargetType="Button">
-                                                                        <Border Height="{TemplateBinding Height}" Width="{TemplateBinding Width}" Background="Transparent">
-                                                                            <Image Source="pack://application:,,,/Image/ArrowDown.png"/>
-                                                                        </Border>
-                                                                    </ControlTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Style>
-                                                    </Button.Style>
-                                                </Button>
+                                                       Margin="3,0,0,3" FontSize="16" Foreground="{TemplateBinding Foreground}"/>
+                                                <Image Height="15" Width="15" Cursor="Hand" HorizontalAlignment="Right" Margin="13,0">
+                                                    <Image.Source>
+                                                        <DrawingImage>
+                                                            <DrawingImage.Drawing>
+                                                                <DrawingGroup ClipGeometry="M0,0 V9 H13 V0 H0 Z">
+                                                                    <DrawingGroup Opacity="1">
+                                                                        <GeometryDrawing Brush="#FFFFFFFF" Geometry="F1 M13,9z M0,0z M0.357499,1.13217C0.588824,0.896206,0.950808,0.874755,1.20589,1.06782L1.27897,1.13217 6.49999,6.45812 11.721,1.13217C11.9523,0.896206,12.3143,0.874755,12.5694,1.06782L12.6425,1.13217C12.8738,1.36813,12.8948,1.73738,12.7056,1.99758L12.6425,2.07212 6.96072,7.86783C6.7294,8.10379,6.36741,8.12525,6.11233,7.93218L6.03925,7.86783 0.357499,2.07212C0.103042,1.81256,0.103042,1.39173,0.357499,1.13217z" />
+                                                                    </DrawingGroup>
+                                                                </DrawingGroup>
+                                                            </DrawingImage.Drawing>
+                                                        </DrawingImage>
+                                                    </Image.Source>
+                                                </Image>
                                             </Grid>
                                         </Border>
                                     </ControlTemplate>
@@ -53,7 +52,7 @@
                                    Focusable="False" PopupAnimation="Slide">
 
                                 <Grid Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                                    <Border x:Name="DropDownBorder" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="#50888888"/>
+                                    <Border x:Name="DropDownBorder" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="#50888888" CornerRadius="20"/>
                                     <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True" Foreground="#FFF">
                                         <ItemsPresenter/>
                                     </ScrollViewer>
@@ -83,6 +82,11 @@
                 </Setter.Value>
             </Setter>
         </Style.Setters>
+        <Style.Triggers>
+            <Trigger Property="Tag" Value="SettingComboBox">
+                <Setter Property="BorderBrush" Value="#725B5B5B"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="{x:Type TextBox}" x:Key="CustomTextBox">
@@ -95,9 +99,8 @@
                         <Border Background="{TemplateBinding Background}" CornerRadius="20"
                                 Height="{TemplateBinding Height}" Width="{TemplateBinding Width}"
                                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <Label Content="{TemplateBinding Text}" Foreground="#FFF" FontSize="16"
-                                   HorizontalAlignment="Left" VerticalAlignment="Center" Name="TextBox_Text"
-                                   Margin="22,0"/>
+                            <Label Content="{TemplateBinding Text}" Foreground="#FFF" FontSize="16" Margin="2,0,0,0"
+                                   HorizontalAlignment="Left" VerticalAlignment="Center" Name="TextBox_Text"/>
                         </Border>
 
                         <!--<ControlTemplate.Triggers>

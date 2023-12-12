@@ -41,7 +41,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             CmlLib.Core.Version.MVersion    Version;
             CmlLib.Core.Auth.MSession       Session; 
 
-            MinecraftPath       MinecraftPath;
+            public MinecraftPath       minecraftPath;
             string              JavaPath;
 
             public Display screadFormat;
@@ -59,6 +59,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
 
             public Setting()
             {
+                minecraftPath = new MinecraftPath();
                 screadFormat = new Display();
             }
 
@@ -93,13 +94,16 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         private void LoadingPages(object sender, RoutedEventArgs e)
         {
             settingLauncher.RamMB = MinMemoryRam;
+            this.JavaVersion.Items.Add("Default");
             this.SliderRam.Minimum = MinMemoryRam;
             this.SliderRam.Maximum = MaxMemoryRam;
+            MinecraftPath_TextBox.Text = settingLauncher.minecraftPath.ToString();
 
             this.SliderRam.Value = MinMemoryRam; // TODO : Подключить из подгрузки конфига 
             this.WidthScrean.Text = 925.ToString();
             this.HeightScrean.Text = 530.ToString();
             this.FullScreanCheckBox.IsChecked = true;
+            this.JavaVersion.SelectedIndex = 0;
         }
 
         private void SliderRAMValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
