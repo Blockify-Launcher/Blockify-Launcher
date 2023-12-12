@@ -32,6 +32,15 @@ namespace BlockifyLauncher.MVVM.Views.Components
         public static readonly DependencyProperty ValueProperty =
             DependencyProperty.Register("Value", typeof(double), typeof(LoaderComponent), new PropertyMetadata(null));
 
+        public string Activ 
+        {
+            get { return (string)GetValue(ActivProperty); }
+            set { SetValue(ActivProperty, value); }
+        }
+
+        public static readonly DependencyProperty ActivProperty =
+            DependencyProperty.Register("Activ", typeof(string), typeof(LoaderComponent), new PropertyMetadata(string.Empty));
+
         public LoaderComponent()
         {
             InitializeComponent();

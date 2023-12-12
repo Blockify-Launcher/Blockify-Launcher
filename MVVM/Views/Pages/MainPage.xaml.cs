@@ -30,5 +30,29 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             Blur_WindowBlur.BlurContainer       = mainWindow.MainBorder;
             Blur_WindowBlur_Two.BlurContainer   = mainWindow.MainBorder;
         }
+
+        private void ResizeStackPanelNew(object sender, SizeChangedEventArgs e)
+        {
+            if(e.WidthChanged)
+            {
+                int MaxWidth = (int)this.DesiredSize.Width;
+                StackPanelNews.Children.Clear();
+                for (int Width_Panel = 0; Width_Panel + 250 < MaxWidth; Width_Panel += 270)
+                {
+                    StackPanelNews.Children.Add(new Border()
+                    {
+                        Width = 250,
+                        VerticalAlignment = VerticalAlignment.Stretch,
+                        Margin = new Thickness(10, 20, 10, 20),
+                        Style = FindResource("CustomItemNews") as System.Windows.Style
+                    });
+                }
+            }
+        }
+
+        private void LoadingMainPage(object sender, RoutedEventArgs e)
+        {
+            
+        }
     }
 }

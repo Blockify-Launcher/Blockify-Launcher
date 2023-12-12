@@ -178,9 +178,6 @@
                         </Border>
                     </Grid>
 
-
-
-
                     <Frame Content="{Binding CurrentView}" Grid.Column="1" NavigationUIVisibility="Hidden"
                            Margin="0,0,0,50"/>
 
@@ -200,8 +197,5 @@
 
         <component:LoaderComponent Title="Title" Description="Minecraft.jar" Grid.Row="1" VerticalAlignment="Bottom"
                                    Margin="80" x:Name="ProgressBarLoad"/>
-
-        <!--<controls:WindowBlur VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BlurContainer="{Binding ElementName=WindowBlurContainer}" 
-            BlurRadius="45" Magnification="0.25" Grid.Row="1" Background="Transparent" x:Name="Blur_WindowBlur"/> -->
     </Grid>
 </Window>

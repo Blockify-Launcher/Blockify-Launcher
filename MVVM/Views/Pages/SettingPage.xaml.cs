@@ -28,6 +28,32 @@ namespace BlockifyLauncher.MVVM.Views.Pages
     /// </summary>
     public partial class SettingPage : Page
     {
+        class MyMinecraftPath : MinecraftPath
+        {
+            public MyMinecraftPath(string p)
+            {
+                BasePath = NormalizePath(p);
+
+                Library = NormalizePath(BasePath + "/libs");
+                Versions = NormalizePath(BasePath + "/vers");
+                Resource = NormalizePath(BasePath + "/resources");
+
+                Runtime = NormalizePath(BasePath + "/java");
+                Assets = NormalizePath(BasePath + "/assets");
+
+                CreateDirs();
+            }
+
+            public override string GetVersionJarPath(string id)
+                => NormalizePath($"{Versions}/{id}/client.jar");
+
+            public override string GetVersionJsonPath(string id)
+                => NormalizePath($"{Versions}/{id}/client.json");
+
+            public override string GetAssetObjectPath(string assetId)
+                => NormalizePath($"{Assets}/files");
+        }
+
         public struct Display
         {
             public int ScreenWidth; 
@@ -38,11 +64,11 @@ namespace BlockifyLauncher.MVVM.Views.Pages
 
         public class Setting
         {
-            CmlLib.Core.Version.MVersion    Version;
-            CmlLib.Core.Auth.MSession       Session; 
+            public CmlLib.Core.Version.MVersion    Version;
+            public CmlLib.Core.Auth.MSession       Session; 
 
             public MinecraftPath       minecraftPath;
-            string                     JavaPath;
+            public string              JavaPath;
 
             public Display screadFormat;
 
@@ -79,7 +105,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
 
         private int MinMemoryRam = 1024;
         private int MaxMemoryRam;
-        private Setting settingLauncher = new Setting();
+        public static Setting settingLauncher = new Setting();
 
         public SettingPage()
         {

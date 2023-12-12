@@ -104,21 +104,34 @@
     <Style x:Key="PanelBorder" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource PanelColor}"/>
         <Setter Property="CornerRadius" Value="30"/>
+    </Style>
+
+    <Style x:Key="ProcessBarBorder" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource PanelColor}"/>
         <Style.Triggers>
-            <MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition Property="Name" Value="Loading"/>
-                    <Condition Property="Visibility" Value="Visible"/>
-                </MultiTrigger.Conditions>
-                <MultiTrigger.EnterActions>
+            <Trigger Property="Tag" Value="None">
+                <Setter Property="Opacity" Value="0"/>
+            </Trigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="Use">
+                <DataTrigger.EnterActions>
                     <BeginStoryboard>
                         <Storyboard>
                             <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                 From="0" To="100" Duration="0:2:0"/>
+                                                 From="0" To="1" Duration="0:0:1"/>
                         </Storyboard>
                     </BeginStoryboard>
-                </MultiTrigger.EnterActions>
-            </MultiTrigger>
+                </DataTrigger.EnterActions>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="Close">
+                <DataTrigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 From="1" To="0" Duration="0:0:1"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.EnterActions>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 

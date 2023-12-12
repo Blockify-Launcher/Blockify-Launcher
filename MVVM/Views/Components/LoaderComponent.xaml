@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Components"
              mc:Ignorable="d" 
              d:DesignHeight="50" d:DesignWidth="240">
-    <Border Style="{StaticResource PanelBorder}" BorderBrush="#725B5B5B" BorderThickness="1"
+    <Border Style="{StaticResource ProcessBarBorder}" BorderBrush="#725B5B5B" BorderThickness="1" Tag="{Binding Activ}"
         Height="50" Width="200" Panel.ZIndex="111" Grid.Row="1" CornerRadius="25" Name="Loading" Visibility="Visible">
         <Grid>
             <Grid.ColumnDefinitions>

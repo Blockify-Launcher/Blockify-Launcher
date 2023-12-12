@@ -8,6 +8,11 @@ using System.Windows.Input;
 using System.Windows.Media.Animation;
 using CmlLib.Core;
 using CmlLib.Core.Downloader;
+using Newtonsoft.Json.Linq;
+
+using BlockifyLauncher.MVVM.Views.Pages;
+using CmlLib.Core.Auth;
+using CmlLib.Core.Version;
 
 namespace BlockifyLauncher
 {
@@ -18,9 +23,6 @@ namespace BlockifyLauncher
         public MainWindow()
         {
             InitializeComponent();
-
-            /* This code would increase download speed. */
-            System.Net.ServicePointManager.DefaultConnectionLimit = 256;
 
             this.Resources.Add("WindowTitle", this.Title);
             
@@ -34,6 +36,7 @@ namespace BlockifyLauncher
 
         private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
+            this.ProgressBarLoad.Activ = "None";
             try
             {
                 CMLauncher launcher = new CMLauncher(new MinecraftPath());
@@ -47,26 +50,52 @@ namespace BlockifyLauncher
             }
         }
 
+        private async void ButtonClickStartGame(object sender, RoutedEventArgs e)
+        {
+            /* This code would increase download speed. */
+            System.Net.ServicePointManager.DefaultConnectionLimit = 256;
+
+            MinecraftPath pathMin = SettingPage.settingLauncher.minecraftPath;
+            CMLauncher cMLauncher = new CMLauncher(pathMin);
+            cMLauncher.ProgressChanged += LauncherProgressChanged;
+            cMLauncher.FileChanged += LauncherFileChanged;
+
+            System.Diagnostics.Process process = await cMLauncher.CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(),
+                new MLaunchOption()
+                {
+                    StartVersion    = MVersion(new CMLauncher(new MinecraftPath()).GetVersion("1.17.1")), // TODO Error version connect.
+                    Session         = MSession.GetOfflineSession("tester123"),
+
+                    MaximumRamMb    = SettingPage.settingLauncher.RamMB,
+                    JavaPath        = SettingPage.settingLauncher.JavaPath,
+                    JVMArguments    = new string[] { },
+
+                    VersionType = "BlockifyLauncher",
+                    GameLauncherName = "BlockifyLauncher",
+                    GameLauncherVersion = "1",
+
+                    ScreenWidth     = SettingPage.settingLauncher.screadFormat.ScreenWidth,
+                    ScreenHeight    = SettingPage.settingLauncher.screadFormat.ScreenHeight,
+                    FullScreen      = SettingPage.settingLauncher.screadFormat.FullScrean
+
+                }, checkAndDownload: false);
+            process.Start();
+        }
+
+        private void LauncherFileChanged(DownloadFileChangedEventArgs e) 
+        {
+            ProgressBarLoad.Description = e.FileName;
+        }
+
         private void LauncherProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {
-            // Console.WriteLine("{0}%", e.ProgressPercentage);
-        }
-
-        private void LauncherFileChanged(DownloadFileChangedEventArgs e)
-        {
-            /*
-             
-                Console.WriteLine("FileKind: " + e.FileKind.ToString());
-                Console.WriteLine("FileName: " + e.FileName);
-                Console.WriteLine("TotalFileCount: " + e.TotalFileCount);
-                Console.WriteLine("ProgressedFiles: " + e.ProgressedFileCount);
-             
-             */
-        }
-
-        private void ButtonClickStartGame(object sender, RoutedEventArgs e)
-        {
-                ProgressBarLoad.Value = 60;
+            var obj = sender as CMLauncher;
+            ProgressBarLoad.Title = obj.VersionLoader.ToString();
+            ProgressBarLoad.Value = e.ProgressPercentage;
+            if (99 < ProgressBarLoad.Value)
+                ProgressBarLoad.Activ = "Close";
+            else if (ProgressBarLoad.Activ == "None")
+                ProgressBarLoad.Activ = "Use";
         }
 
         private void MainWindowsClose(object sender, RoutedEventArgs e)
