@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using BlockifyLauncher.MVVM.Views.Pages;
 using CmlLib.Core.Auth;
 using CmlLib.Utils;
+using System.Drawing.Printing;
 
 namespace BlockifyLauncher
 {
@@ -37,6 +38,7 @@ namespace BlockifyLauncher
 
         private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
+            this.UserName.Text = Properties.Settings.Default.UserName;
             this.ProgressBarLoad.Activ = "None";
             try
             {
@@ -61,13 +63,9 @@ namespace BlockifyLauncher
 
             ProgressBarLoad.Activ = "Use";
 
-
-            //cMLauncher.ProgressChanged += LauncherProgressChanged;
-            //cMLauncher.FileChanged += LauncherFileChanged;
-
             var process = await launcher.CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(), new MLaunchOption
             {
-                Session     = MSession.GetOfflineSession("Palma"),
+                Session     = SettingPage.settingLauncher.Session,
                 MaximumRamMb = SettingPage.settingLauncher.RamMB,
 
                 //JavaPath = SettingPage.settingLauncher.javaPath,
@@ -83,8 +81,8 @@ namespace BlockifyLauncher
             });
 
             var processUtil = new ProcessUtil(process);
-            ProgressBarLoad.Activ = "Сlose";
             processUtil.StartWithEvents();
+            ProgressBarLoad.Activ = "Сlose";
         }
 
         private void LauncherFileChanged(DownloadFileChangedEventArgs e) 
@@ -97,16 +95,13 @@ namespace BlockifyLauncher
             });
         }
 
-        /*private void LauncherProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        private void TextChangedUserName(object sender, TextChangedEventArgs e)
         {
-            var obj = sender as CMLauncher;
-            ProgressBarLoad.Title = obj.VersionLoader.ToString();
-            ProgressBarLoad.Value = e.ProgressPercentage;
-            if (99 < ProgressBarLoad.Value)
-                ProgressBarLoad.Activ = "Close";
-            else if (ProgressBarLoad.Activ == "None")
-                ProgressBarLoad.Activ = "Use";
-        }*/
+            TextBox text = sender as TextBox;
+
+            Properties.Settings.Default.UserName = text.Text;
+            Properties.Settings.Default.Save();
+        }
 
         private void MainWindowsClose(object sender, RoutedEventArgs e)
         {

@@ -99,7 +99,6 @@ namespace BlockifyLauncher.MVVM.Views.Pages
                 minecraftPath = new MinecraftPath();
             }
 
-
             public void SetDisplay(int W, int H)
             {
                 screadFormat.ScreenWidth = W;
