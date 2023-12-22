@@ -1,19 +1,15 @@
-﻿using System;
-using System.Threading;
+﻿using BlockifyLauncher.MVVM.Views.Pages;
+using CmlLib.Core;
+using CmlLib.Core.Auth;
+using CmlLib.Core.Downloader;
+using CmlLib.Utils;
+
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Media.Animation;
-using CmlLib.Core;
-using CmlLib.Core.Downloader;
-using Newtonsoft.Json.Linq;
-
-using BlockifyLauncher.MVVM.Views.Pages;
-using CmlLib.Core.Auth;
-using CmlLib.Utils;
-using System.Drawing.Printing;
 
 namespace BlockifyLauncher
 {
@@ -27,7 +23,7 @@ namespace BlockifyLauncher
             InitializeComponent();
 
             this.Resources.Add("WindowTitle", this.Title);
-            
+
             this.homeRadioButton.IsChecked = true;
 
             this.MainBorder = InnerBlurContainer;
@@ -49,7 +45,7 @@ namespace BlockifyLauncher
                 MinecraftVerisonComboBox.SelectedIndex = 0;
 
                 this.launcher.FileChanged += LauncherFileChanged;
-            } 
+            }
             catch (Exception ex)
             {
                 new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
@@ -63,31 +59,33 @@ namespace BlockifyLauncher
 
             ProgressBarLoad.Activ = "Use";
 
-            var process = await launcher.CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(), new MLaunchOption
-            {
-                Session     = SettingPage.settingLauncher.Session,
-                MaximumRamMb = SettingPage.settingLauncher.RamMB,
+            var process = await launcher.CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(),
+                new MLaunchOption
+                {
+                    Session = MSession.GetOfflineSession(UserName.Text),
+                    MaximumRamMb = SettingPage.settingLauncher.RamMB,
 
-                //JavaPath = SettingPage.settingLauncher.javaPath,
-                JVMArguments = new string[] { },
+                    //JavaPath = SettingPage.settingLauncher.javaPath,
+                    //JVMArguments = new string[] { },
 
-                VersionType = "BlockifyLauncher",
-                GameLauncherName = "BlockifyLauncher",
-                GameLauncherVersion = "1",
+                    VersionType = "BlockifyLauncher",
+                    GameLauncherName = "BlockifyLauncher",
+                    GameLauncherVersion = "1",
 
-                ScreenWidth = SettingPage.settingLauncher.screadFormat.ScreenWidth,
-                ScreenHeight = SettingPage.settingLauncher.screadFormat.ScreenHeight,
-                FullScreen = SettingPage.settingLauncher.screadFormat.FullScrean,
-            });
+                    ScreenWidth = SettingPage.settingLauncher.screadFormat.ScreenWidth,
+                    ScreenHeight = SettingPage.settingLauncher.screadFormat.ScreenHeight,
+                    FullScreen = SettingPage.settingLauncher.screadFormat.FullScrean,
+                });
 
             var processUtil = new ProcessUtil(process);
             processUtil.StartWithEvents();
             ProgressBarLoad.Activ = "Сlose";
         }
 
-        private void LauncherFileChanged(DownloadFileChangedEventArgs e) 
+        private void LauncherFileChanged(DownloadFileChangedEventArgs e)
         {
-            Dispatcher.Invoke((System.Windows.Forms.MethodInvoker)delegate () {
+            Dispatcher.Invoke((System.Windows.Forms.MethodInvoker)delegate ()
+            {
                 ProgressBarLoad.Title = e.FileName;
                 ProgressBarLoad.Description = e.FileKind.ToString();
                 ProgressBarLoad.Maximum = e.TotalFileCount;
@@ -105,6 +103,9 @@ namespace BlockifyLauncher
 
         private void MainWindowsClose(object sender, RoutedEventArgs e)
         {
+            Properties.Settings.Default.WidthProgram = (int)this.Width;
+            Properties.Settings.Default.HeightProgram = (int)this.Height;
+
             Properties.Settings.Default.Save();
             Application.Current.Shutdown();
         }

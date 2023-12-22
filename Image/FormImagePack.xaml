@@ -102,4 +102,35 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
+
+    <DrawingImage x:Key="CategoryDrawingImage">
+        <DrawingImage.Drawing>
+            <DrawingGroup ClipGeometry="M0,0 V20 H20 V0 H0 Z">
+                <GeometryDrawing Geometry="F0 M20,20z M0,0z M1,4.5C1,1.87479 1.02811,1 4.5,1 7.97189,1 8,1.87479 8,4.5 8,7.12521 8.01107,8 4.5,8 0.988927,8 1,7.12521 1,4.5z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FFFFFFFF" Thickness="1.5" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" MiterLimit="1" />
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Geometry="F0 M20,20z M0,0z M12,4.5C12,1.87479 12.0281,1 15.5,1 18.9719,1 19,1.87479 19,4.5 19,7.12521 19.0111,8 15.5,8 11.9889,8 12,7.12521 12,4.5z">
+                    <GeometryDrawing.Pen>
+                        <Pen Thickness="1.5" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" MiterLimit="1">
+                            <Pen.Brush>
+                                <SolidColorBrush Color="#FFFFFFFF" Opacity="0.4" />
+                            </Pen.Brush>
+                        </Pen>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Geometry="F0 M20,20z M0,0z M1,15.5C1,12.8748 1.02811,12 4.5,12 7.97189,12 8,12.8748 8,15.5 8,18.1252 8.01107,19 4.5,19 0.988927,19 1,18.1252 1,15.5z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FFFFFFFF" Thickness="1.5" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" MiterLimit="1" />
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Geometry="F0 M20,20z M0,0z M12,15.5C12,12.8748 12.0281,12 15.5,12 18.9719,12 19,12.8748 19,15.5 19,18.1252 19.0111,19 15.5,19 11.9889,19 12,18.1252 12,15.5z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FFFFFFFF" Thickness="1.5" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" MiterLimit="1" />
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
 </ResourceDictionary>
