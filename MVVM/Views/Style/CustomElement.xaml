@@ -91,6 +91,9 @@
 
     <Style TargetType="{x:Type TextBox}" x:Key="CustomTextBox">
         <Style.Setters>
+            <Setter Property="Foreground" Value="#FFF"/>
+            <Setter Property="FontSize" Value="16"/>
+            
             <Setter Property="Cursor" Value="IBeam"/>
             <Setter Property="Background" Value="#1F1F1F"/>
             <Setter Property="Template">
@@ -99,10 +102,13 @@
                         <Border Background="{TemplateBinding Background}" CornerRadius="20"
                                 Height="{TemplateBinding Height}" Width="{TemplateBinding Width}"
                                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <Label Content="{TemplateBinding Text}" Foreground="#FFF" FontSize="16" Margin="2,0,0,0"
-                                   HorizontalAlignment="Left" VerticalAlignment="Center" Name="TextBox_Text"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="2,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                         </Border>
 
+                        <!-- TODO : Tag implementation for TextBox -->
+                        <!--
+                        <Label Content="{TemplateBinding Text}" Foreground="#FFF" FontSize="16" Margin="2,0,0,0"
+       HorizontalAlignment="Left" VerticalAlignment="Center" Name="TextBox_Text"/> -->
                         <!--<ControlTemplate.Triggers>
                             <Trigger SourceName="TextBox_Text" Property="Content" Value="">
                                 <Setter TargetName="TextBox_Text" Property="Content" Value="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"/>
