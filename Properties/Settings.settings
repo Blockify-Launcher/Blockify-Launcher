@@ -12,19 +12,22 @@
       <Value Profile="(Default)">Palma</Value>
     </Setting>
     <Setting Name="UseRam" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">3668</Value>
     </Setting>
     <Setting Name="ScreenWidth" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">925</Value>
     </Setting>
     <Setting Name="ScreenHeight" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">530</Value>
     </Setting>
     <Setting Name="FullScreanGame" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="GameLauncher" Type="System.String" Scope="User">
       <Value Profile="(Default)">BlockifyLauncher</Value>
+    </Setting>
+    <Setting Name="JavaVersion" Type="System.String" Scope="User">
+      <Value Profile="(Default)">javaw.exe</Value>
     </Setting>
   </Settings>
 </SettingsFile>

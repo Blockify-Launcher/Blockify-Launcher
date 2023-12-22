@@ -113,14 +113,14 @@
                 <Setter Property="Opacity" Value="0"/>
             </Trigger>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="Use">
-                <DataTrigger.EnterActions>
+                <DataTrigger.ExitActions>
                     <BeginStoryboard>
                         <Storyboard>
                             <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                 From="0" To="1" Duration="0:0:1"/>
+                                                From="1" To="0" Duration="0:0:1"/>
                         </Storyboard>
                     </BeginStoryboard>
-                </DataTrigger.EnterActions>
+                </DataTrigger.ExitActions>
             </DataTrigger>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="Close">
                 <DataTrigger.EnterActions>

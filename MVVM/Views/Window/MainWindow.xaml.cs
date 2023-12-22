@@ -12,13 +12,14 @@ using Newtonsoft.Json.Linq;
 
 using BlockifyLauncher.MVVM.Views.Pages;
 using CmlLib.Core.Auth;
-using CmlLib.Core.Version;
+using CmlLib.Utils;
 
 namespace BlockifyLauncher
 {
     public partial class MainWindow : Window
     {
         public Border MainBorder { get; set; }
+        public CMLauncher launcher;
 
         public MainWindow()
         {
@@ -39,10 +40,13 @@ namespace BlockifyLauncher
             this.ProgressBarLoad.Activ = "None";
             try
             {
-                CMLauncher launcher = new CMLauncher(new MinecraftPath());
-                foreach (var version in await launcher.GetAllVersionsAsync())
+                this.launcher = new CMLauncher(SettingPage.settingLauncher.minecraftPath);
+                SettingPage.settingLauncher.CollectionVerion = await launcher.GetAllVersionsAsync();
+                foreach (var version in SettingPage.settingLauncher.CollectionVerion)
                     MinecraftVerisonComboBox.Items.Add(version.Name);
                 MinecraftVerisonComboBox.SelectedIndex = 0;
+
+                this.launcher.FileChanged += LauncherFileChanged;
             } 
             catch (Exception ex)
             {
@@ -55,39 +59,45 @@ namespace BlockifyLauncher
             /* This code would increase download speed. */
             System.Net.ServicePointManager.DefaultConnectionLimit = 256;
 
-            MinecraftPath pathMin = SettingPage.settingLauncher.minecraftPath;
-            CMLauncher cMLauncher = new CMLauncher(pathMin);
-            cMLauncher.ProgressChanged += LauncherProgressChanged;
-            cMLauncher.FileChanged += LauncherFileChanged;
+            ProgressBarLoad.Activ = "Use";
 
-            System.Diagnostics.Process process = await cMLauncher.CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(),
-                new MLaunchOption()
-                {
-                    StartVersion    = MVersion(new CMLauncher(new MinecraftPath()).GetVersion("1.17.1")), // TODO Error version connect.
-                    Session         = MSession.GetOfflineSession("tester123"),
 
-                    MaximumRamMb    = SettingPage.settingLauncher.RamMB,
-                    JavaPath        = SettingPage.settingLauncher.JavaPath,
-                    JVMArguments    = new string[] { },
+            //cMLauncher.ProgressChanged += LauncherProgressChanged;
+            //cMLauncher.FileChanged += LauncherFileChanged;
 
-                    VersionType = "BlockifyLauncher",
-                    GameLauncherName = "BlockifyLauncher",
-                    GameLauncherVersion = "1",
+            var process = await launcher.CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(), new MLaunchOption
+            {
+                Session     = MSession.GetOfflineSession("Palma"),
+                MaximumRamMb = SettingPage.settingLauncher.RamMB,
 
-                    ScreenWidth     = SettingPage.settingLauncher.screadFormat.ScreenWidth,
-                    ScreenHeight    = SettingPage.settingLauncher.screadFormat.ScreenHeight,
-                    FullScreen      = SettingPage.settingLauncher.screadFormat.FullScrean
+                //JavaPath = SettingPage.settingLauncher.javaPath,
+                JVMArguments = new string[] { },
 
-                }, checkAndDownload: false);
-            process.Start();
+                VersionType = "BlockifyLauncher",
+                GameLauncherName = "BlockifyLauncher",
+                GameLauncherVersion = "1",
+
+                ScreenWidth = SettingPage.settingLauncher.screadFormat.ScreenWidth,
+                ScreenHeight = SettingPage.settingLauncher.screadFormat.ScreenHeight,
+                FullScreen = SettingPage.settingLauncher.screadFormat.FullScrean,
+            });
+
+            var processUtil = new ProcessUtil(process);
+            ProgressBarLoad.Activ = "Сlose";
+            processUtil.StartWithEvents();
         }
 
         private void LauncherFileChanged(DownloadFileChangedEventArgs e) 
         {
-            ProgressBarLoad.Description = e.FileName;
+            Dispatcher.Invoke((System.Windows.Forms.MethodInvoker)delegate () {
+                ProgressBarLoad.Title = e.FileName;
+                ProgressBarLoad.Description = e.FileKind.ToString();
+                ProgressBarLoad.Maximum = e.TotalFileCount;
+                ProgressBarLoad.Value = e.ProgressedFileCount;
+            });
         }
 
-        private void LauncherProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        /*private void LauncherProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {
             var obj = sender as CMLauncher;
             ProgressBarLoad.Title = obj.VersionLoader.ToString();
@@ -96,7 +106,7 @@ namespace BlockifyLauncher
                 ProgressBarLoad.Activ = "Close";
             else if (ProgressBarLoad.Activ == "None")
                 ProgressBarLoad.Activ = "Use";
-        }
+        }*/
 
         private void MainWindowsClose(object sender, RoutedEventArgs e)
         {

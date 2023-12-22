@@ -61,7 +61,7 @@ namespace BlockifyLauncher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3668")]
         public int UseRam {
             get {
                 return ((int)(this["UseRam"]));
@@ -73,7 +73,7 @@ namespace BlockifyLauncher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("925")]
         public int ScreenWidth {
             get {
                 return ((int)(this["ScreenWidth"]));
@@ -85,7 +85,7 @@ namespace BlockifyLauncher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("530")]
         public int ScreenHeight {
             get {
                 return ((int)(this["ScreenHeight"]));
@@ -116,6 +116,18 @@ namespace BlockifyLauncher.Properties {
             }
             set {
                 this["GameLauncher"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("javaw.exe")]
+        public string JavaVersion {
+            get {
+                return ((string)(this["JavaVersion"]));
+            }
+            set {
+                this["JavaVersion"] = value;
             }
         }
     }

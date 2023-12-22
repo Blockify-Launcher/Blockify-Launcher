@@ -20,6 +20,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows.Media.Animation;
+using System.Resources;
+using CmlLib.Core.Auth;
+using System.Text.RegularExpressions;
+using CmlLib.Core.Installer;
 
 namespace BlockifyLauncher.MVVM.Views.Pages
 {
@@ -62,13 +66,17 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             public bool FullScrean;
         }
 
+        /// <summary>
+        /// Project settings.
+        /// </summary>
         public class Setting
         {
+            public CmlLib.Core.Version.MVersionCollection CollectionVerion;
             public CmlLib.Core.Version.MVersion    Version;
             public CmlLib.Core.Auth.MSession       Session; 
 
             public MinecraftPath       minecraftPath;
-            public string              JavaPath;
+            public string              javaPath;
 
             public Display screadFormat;
 
@@ -77,16 +85,18 @@ namespace BlockifyLauncher.MVVM.Views.Pages
                 get { return _RamMb; } 
                 set { _RamMb = 1024 < value ? value : 1024; } 
             }
-
-            public void GetSetting()
-            {
-
-            }
-
             public Setting()
             {
+                javaPath = Properties.Settings.Default.JavaVersion;
+
+                Session = MSession.GetOfflineSession(Properties.Settings.Default.UserName);
+                RamMB   = Properties.Settings.Default.UseRam;
+
+                screadFormat.ScreenWidth    = Properties.Settings.Default.ScreenWidth;
+                screadFormat.ScreenHeight   = Properties.Settings.Default.ScreenHeight;
+                screadFormat.FullScrean     = Properties.Settings.Default.FullScreanGame;
+
                 minecraftPath = new MinecraftPath();
-                screadFormat = new Display();
             }
 
 
@@ -94,17 +104,25 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             {
                 screadFormat.ScreenWidth = W;
                 screadFormat.ScreenHeight = H;
+
+                Properties.Settings.Default.ScreenWidth = W;
+                Properties.Settings.Default.ScreenHeight = H;
             }
 
-            public void SetFullScrean(bool fullScr) => 
+            public void SetFullScrean(bool fullScr)
+            {
                 screadFormat.FullScrean = fullScr;
+                Properties.Settings.Default.FullScreanGame = fullScr;
+            }
 
-            public void SetMemoryRAM(int RAM) => 
+            public void SetMemoryRAM(int RAM)
+            {
                 RamMB = RAM;
+                Properties.Settings.Default.UseRam = RAM;
+            }
         }
 
         private int MinMemoryRam = 1024;
-        private int MaxMemoryRam;
         public static Setting settingLauncher = new Setting();
 
         public SettingPage()
@@ -114,29 +132,53 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
             Blur_WindowBlur.BlurContainer = mainWindow.MainBorder;
 
-            MaxMemoryRam = (int)getMaxRam();
         }
 
         private void LoadingPages(object sender, RoutedEventArgs e)
         {
-            settingLauncher.RamMB = MinMemoryRam;
-            this.JavaVersion.Items.Add("Default");
+            this.JavaVersion.Items.Add("javaw.exe");
+
+            this.SliderRam.Value = settingLauncher.RamMB;
             this.SliderRam.Minimum = MinMemoryRam;
-            this.SliderRam.Maximum = MaxMemoryRam;
+            this.SliderRam.Maximum = (int)getMaxRam();
+
             MinecraftPath_TextBox.Text = settingLauncher.minecraftPath.ToString();
 
-            this.SliderRam.Value = MinMemoryRam; // TODO : Подключить из подгрузки конфига 
-            this.WidthScrean.Text = 925.ToString();
-            this.HeightScrean.Text = 530.ToString();
-            this.FullScreanCheckBox.IsChecked = true;
+            this.WidthScrean.Text = settingLauncher.screadFormat.ScreenWidth.ToString();
+            this.HeightScrean.Text = settingLauncher.screadFormat.ScreenHeight.ToString();
+            this.FullScreanCheckBox.IsChecked = settingLauncher.screadFormat.FullScrean;
             this.JavaVersion.SelectedIndex = 0;
         }
+
+        private static readonly Regex onlyNumbers = new Regex("[^0-9.-]+");
+        private static bool IsTextAllowed(string text)
+        {
+            return !onlyNumbers.IsMatch(text);
+        }
+
+        private void NumsPreviewTextInput(object sender, TextCompositionEventArgs e) =>
+            e.Handled = !IsTextAllowed(e.Text);
+
+        private void ApplySettingScrean(object sender, RoutedEventArgs e)
+        {
+            if (settingLauncher.screadFormat.FullScrean != FullScreanCheckBox.IsChecked)
+                settingLauncher.SetFullScrean(FullScreanCheckBox.IsChecked.Value);
+            if (settingLauncher.screadFormat.ScreenWidth.ToString() != WidthScrean.Text ||
+                settingLauncher.screadFormat.ScreenHeight.ToString() != HeightScrean.Text)
+                settingLauncher.SetDisplay(
+                    Convert.ToInt32(WidthScrean.Text), Convert.ToInt32(HeightScrean.Text));
+            Properties.Settings.Default.Save();
+        }
+
+        private void ButtonSaveRAMValue(object sender, RoutedEventArgs e) =>
+            Properties.Settings.Default.Save();
 
         private void SliderRAMValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             try
             {
-                settingLauncher.SetMemoryRAM(Convert.ToInt32((sender as Slider)?.Value ?? 1024));
+                settingLauncher.SetMemoryRAM(Convert.ToInt32((sender as Slider).Value));
+                Properties.Settings.Default.Save();
             }
             catch (Exception ex)
             {

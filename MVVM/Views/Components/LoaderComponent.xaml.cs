@@ -32,6 +32,15 @@ namespace BlockifyLauncher.MVVM.Views.Components
         public static readonly DependencyProperty ValueProperty =
             DependencyProperty.Register("Value", typeof(double), typeof(LoaderComponent), new PropertyMetadata(null));
 
+        public double Maximum
+        {
+            get { return (double)GetValue(MaximumProperty); }
+            set { SetValue(MaximumProperty, value); }
+        }
+
+        public static readonly DependencyProperty MaximumProperty =
+            DependencyProperty.Register("Maximum", typeof(double), typeof(LoaderComponent), new PropertyMetadata(null));
+
         public string Activ 
         {
             get { return (string)GetValue(ActivProperty); }

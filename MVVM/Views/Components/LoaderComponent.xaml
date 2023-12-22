@@ -5,9 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Components"
              mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="240">
+             d:DesignHeight="50" d:DesignWidth="280">
     <Border Style="{StaticResource ProcessBarBorder}" BorderBrush="#725B5B5B" BorderThickness="1" Tag="{Binding Activ}"
-        Height="50" Width="200" Panel.ZIndex="111" Grid.Row="1" CornerRadius="25" Name="Loading" Visibility="Visible">
+        Height="50" Width="240" Panel.ZIndex="111" Grid.Row="1" CornerRadius="25" Name="Loading" Visibility="Visible">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="60"/>
@@ -15,7 +15,8 @@
                 <ColumnDefinition Width="50"/>
             </Grid.ColumnDefinitions>
 
-            <ProgressBar Style="{StaticResource RoundProgressBarStyle}" Value="{Binding Value}" Margin="-4,3,3,3" Background="#1F1F1F">
+            <ProgressBar Style="{StaticResource RoundProgressBarStyle}" Value="{Binding Value}" Margin="-4,3,3,3" Background="#1F1F1F"
+                         Maximum="{Binding Maximum}">
                 <ProgressBar.Foreground>
                     <LinearGradientBrush StartPoint="0 0" EndPoint="1 0">
                         <GradientStop Color="#590090" Offset="0.0"/>
