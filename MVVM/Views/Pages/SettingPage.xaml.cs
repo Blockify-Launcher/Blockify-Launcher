@@ -1,29 +1,10 @@
-﻿using CmlLib.Core;
-using CmlLib.Core.Files;
-using CmlLib.Utils;
+﻿using BlockifyLauncher.MVVM.Views.Pages.Func.Setting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Management;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.TextFormatting;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Windows.Media.Animation;
-using System.Resources;
-using CmlLib.Core.Auth;
-using System.Text.RegularExpressions;
-using CmlLib.Core.Installer;
 
 namespace BlockifyLauncher.MVVM.Views.Pages
 {
@@ -32,93 +13,13 @@ namespace BlockifyLauncher.MVVM.Views.Pages
     /// </summary>
     public partial class SettingPage : Page
     {
-        class MyMinecraftPath : MinecraftPath
-        {
-            public MyMinecraftPath(string p)
-            {
-                BasePath = NormalizePath(p);
-
-                Library = NormalizePath(BasePath + "/libs");
-                Versions = NormalizePath(BasePath + "/vers");
-                Resource = NormalizePath(BasePath + "/resources");
-
-                Runtime = NormalizePath(BasePath + "/java");
-                Assets = NormalizePath(BasePath + "/assets");
-
-                CreateDirs();
-            }
-
-            public override string GetVersionJarPath(string id)
-                => NormalizePath($"{Versions}/{id}/client.jar");
-
-            public override string GetVersionJsonPath(string id)
-                => NormalizePath($"{Versions}/{id}/client.json");
-
-            public override string GetAssetObjectPath(string assetId)
-                => NormalizePath($"{Assets}/files");
-        }
 
         public struct Display
         {
-            public int ScreenWidth; 
+            public int ScreenWidth;
             public int ScreenHeight;
 
             public bool FullScrean;
-        }
-
-        /// <summary>
-        /// Project settings.
-        /// </summary>
-        public class Setting
-        {
-            public CmlLib.Core.Version.MVersionCollection CollectionVerion;
-            public CmlLib.Core.Version.MVersion    Version;
-            public CmlLib.Core.Auth.MSession       Session; 
-
-            public MinecraftPath       minecraftPath;
-            public string              javaPath;
-
-            public Display screadFormat;
-
-            private int _RamMb;
-            public  int RamMB {
-                get { return _RamMb; } 
-                set { _RamMb = 1024 < value ? value : 1024; } 
-            }
-            public Setting()
-            {
-                javaPath = Properties.Settings.Default.JavaVersion;
-
-                Session = MSession.GetOfflineSession(Properties.Settings.Default.UserName);
-                RamMB   = Properties.Settings.Default.UseRam;
-
-                screadFormat.ScreenWidth    = Properties.Settings.Default.ScreenWidth;
-                screadFormat.ScreenHeight   = Properties.Settings.Default.ScreenHeight;
-                screadFormat.FullScrean     = Properties.Settings.Default.FullScreanGame;
-
-                minecraftPath = new MinecraftPath();
-            }
-
-            public void SetDisplay(int W, int H)
-            {
-                screadFormat.ScreenWidth = W;
-                screadFormat.ScreenHeight = H;
-
-                Properties.Settings.Default.ScreenWidth = W;
-                Properties.Settings.Default.ScreenHeight = H;
-            }
-
-            public void SetFullScrean(bool fullScr)
-            {
-                screadFormat.FullScrean = fullScr;
-                Properties.Settings.Default.FullScreanGame = fullScr;
-            }
-
-            public void SetMemoryRAM(int RAM)
-            {
-                RamMB = RAM;
-                Properties.Settings.Default.UseRam = RAM;
-            }
         }
 
         private int MinMemoryRam = 1024;
@@ -127,7 +28,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         public SettingPage()
         {
             InitializeComponent();
-            
+
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
             Blur_WindowBlur.BlurContainer = mainWindow.MainBorder;
 
@@ -192,7 +93,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             try
             {
                 MEMORYSTATUSEX memoryStatus = new MEMORYSTATUSEX();
-                if(GlobalMemoryStatusEx(memoryStatus))
+                if (GlobalMemoryStatusEx(memoryStatus))
                     maxMemory = memoryStatus.ullTotalPhys;
             }
             catch (Exception e)

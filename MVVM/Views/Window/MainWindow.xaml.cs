@@ -5,6 +5,7 @@ using CmlLib.Core.Downloader;
 using CmlLib.Utils;
 
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,17 +40,45 @@ namespace BlockifyLauncher
             try
             {
                 this.launcher = new CMLauncher(SettingPage.settingLauncher.minecraftPath);
-                SettingPage.settingLauncher.CollectionVerion = await launcher.GetAllVersionsAsync();
-                foreach (var version in SettingPage.settingLauncher.CollectionVerion)
-                    MinecraftVerisonComboBox.Items.Add(version.Name);
-                MinecraftVerisonComboBox.SelectedIndex = 0;
-
+                await InitializeVersionsAsync();
                 this.launcher.FileChanged += LauncherFileChanged;
             }
             catch (Exception ex)
             {
-                new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
+                HandleException(ex);
             }
+        }
+
+        private async Task InitializeVersionsAsync()
+        {
+            SettingPage.settingLauncher.CollectionVerion = await launcher.GetAllVersionsAsync();
+            foreach (var version in SettingPage.settingLauncher.CollectionVerion)
+                MinecraftVerisonComboBox.Items.Add(version.Name);
+            MinecraftVerisonComboBox.SelectedIndex = 0;
+        }
+
+        private void HandleException(Exception ex) =>
+            new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
+
+        private string GameLauncherName = "BlockifyLauncher";
+        private string GameLauncherVersion = "1";
+        private async Task<Process> StartGame()
+        {
+            Process process = await launcher.CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(),
+                new MLaunchOption
+                {
+                    Session = MSession.GetOfflineSession(UserName.Text),
+                    MaximumRamMb = SettingPage.settingLauncher.RamMB,
+
+                    VersionType = this.GameLauncherName,
+                    GameLauncherName = this.GameLauncherName,
+                    GameLauncherVersion = this.GameLauncherVersion,
+
+                    ScreenWidth = SettingPage.settingLauncher.screadFormat.ScreenWidth,
+                    ScreenHeight = SettingPage.settingLauncher.screadFormat.ScreenHeight,
+                    FullScreen = SettingPage.settingLauncher.screadFormat.FullScrean,
+                });
+            return process ?? new Process();
         }
 
         private async void ButtonClickStartGame(object sender, RoutedEventArgs e)
@@ -59,25 +88,7 @@ namespace BlockifyLauncher
 
             ProgressBarLoad.Activ = "Use";
 
-            var process = await launcher.CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(),
-                new MLaunchOption
-                {
-                    Session = MSession.GetOfflineSession(UserName.Text),
-                    MaximumRamMb = SettingPage.settingLauncher.RamMB,
-
-                    //JavaPath = SettingPage.settingLauncher.javaPath,
-                    //JVMArguments = new string[] { },
-
-                    VersionType = "BlockifyLauncher",
-                    GameLauncherName = "BlockifyLauncher",
-                    GameLauncherVersion = "1",
-
-                    ScreenWidth = SettingPage.settingLauncher.screadFormat.ScreenWidth,
-                    ScreenHeight = SettingPage.settingLauncher.screadFormat.ScreenHeight,
-                    FullScreen = SettingPage.settingLauncher.screadFormat.FullScrean,
-                });
-
-            var processUtil = new ProcessUtil(process);
+            var processUtil = new ProcessUtil(await StartGame());
             processUtil.StartWithEvents();
             ProgressBarLoad.Activ = "Сlose";
         }
@@ -172,7 +183,7 @@ namespace BlockifyLauncher
                         default:
                             break;
                     }
-                    Task.Delay(100);
+                    Task.Delay(100).Wait();
                     new Properties.Settings().SettingsSavingSizeForms((int)this.Width, (int)this.Height);
                 }
                 catch (Exception)
