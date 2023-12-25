@@ -1,4 +1,11 @@
-﻿using System;
+﻿using BlockifyLauncher.MVVM.Views.Pages;
+using CmlLib.Core;
+using CmlLib.Core.Auth;
+using CmlLib.Core.Downloader;
+using CmlLib.Utils;
+
+using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,13 +17,14 @@ namespace BlockifyLauncher
     public partial class MainWindow : Window
     {
         public Border MainBorder { get; set; }
+        public CMLauncher launcher;
 
         public MainWindow()
         {
             InitializeComponent();
 
             this.Resources.Add("WindowTitle", this.Title);
-            
+
             this.homeRadioButton.IsChecked = true;
 
             this.MainBorder = InnerBlurContainer;
@@ -25,16 +33,90 @@ namespace BlockifyLauncher
             this.Height = Properties.Settings.Default.HeightProgram;
         }
 
-        private void LoadingMainWindow(object sender, RoutedEventArgs e)
+        private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
-            for (int i = 0; i < 10; i++)
-                this.MinecraftVerisonComboBox.Items.Add("Version 1.17.1");
-            
+            this.UserName.Text = Properties.Settings.Default.UserName;
+            this.ProgressBarLoad.Activ = "None";
+            try
+            {
+                this.launcher = new CMLauncher(SettingPage.settingLauncher.minecraftPath);
+                await InitializeVersionsAsync();
+                this.launcher.FileChanged += LauncherFileChanged;
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
+            }
+        }
+
+        private async Task InitializeVersionsAsync()
+        {
+            SettingPage.settingLauncher.CollectionVerion = await launcher.GetAllVersionsAsync();
+            foreach (var version in SettingPage.settingLauncher.CollectionVerion)
+                MinecraftVerisonComboBox.Items.Add(version.Name);
             MinecraftVerisonComboBox.SelectedIndex = 0;
+        }
+
+        private void HandleException(Exception ex) =>
+            new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
+
+        private string GameLauncherName = "BlockifyLauncher";
+        private string GameLauncherVersion = "1";
+        private async Task<Process> StartGame()
+        {
+            Process process = await launcher.CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(),
+                new MLaunchOption
+                {
+                    Session = MSession.GetOfflineSession(UserName.Text),
+                    MaximumRamMb = SettingPage.settingLauncher.RamMB,
+
+                    VersionType = this.GameLauncherName,
+                    GameLauncherName = this.GameLauncherName,
+                    GameLauncherVersion = this.GameLauncherVersion,
+
+                    ScreenWidth = SettingPage.settingLauncher.screadFormat.ScreenWidth,
+                    ScreenHeight = SettingPage.settingLauncher.screadFormat.ScreenHeight,
+                    FullScreen = SettingPage.settingLauncher.screadFormat.FullScrean,
+                });
+            return process ?? new Process();
+        }
+
+        private async void ButtonClickStartGame(object sender, RoutedEventArgs e)
+        {
+            /* This code would increase download speed. */
+            System.Net.ServicePointManager.DefaultConnectionLimit = 256;
+
+            ProgressBarLoad.Activ = "Use";
+
+            var processUtil = new ProcessUtil(await StartGame());
+            processUtil.StartWithEvents();
+            ProgressBarLoad.Activ = "Сlose";
+        }
+
+        private void LauncherFileChanged(DownloadFileChangedEventArgs e)
+        {
+            Dispatcher.Invoke((System.Windows.Forms.MethodInvoker)delegate ()
+            {
+                ProgressBarLoad.Title = e.FileName;
+                ProgressBarLoad.Description = e.FileKind.ToString();
+                ProgressBarLoad.Maximum = e.TotalFileCount;
+                ProgressBarLoad.Value = e.ProgressedFileCount;
+            });
+        }
+
+        private void TextChangedUserName(object sender, TextChangedEventArgs e)
+        {
+            TextBox text = sender as TextBox;
+
+            Properties.Settings.Default.UserName = text.Text;
+            Properties.Settings.Default.Save();
         }
 
         private void MainWindowsClose(object sender, RoutedEventArgs e)
         {
+            Properties.Settings.Default.WidthProgram = (int)this.Width;
+            Properties.Settings.Default.HeightProgram = (int)this.Height;
+
             Properties.Settings.Default.Save();
             Application.Current.Shutdown();
         }
@@ -101,7 +183,7 @@ namespace BlockifyLauncher
                         default:
                             break;
                     }
-                    Task.Delay(100);
+                    Task.Delay(100).Wait();
                     new Properties.Settings().SettingsSavingSizeForms((int)this.Width, (int)this.Height);
                 }
                 catch (Exception)
