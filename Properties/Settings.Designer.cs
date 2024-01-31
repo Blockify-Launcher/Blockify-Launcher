@@ -12,7 +12,7 @@ namespace BlockifyLauncher.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -44,6 +44,90 @@ namespace BlockifyLauncher.Properties {
             }
             set {
                 this["HeightProgram"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Palma")]
+        public string UserName {
+            get {
+                return ((string)(this["UserName"]));
+            }
+            set {
+                this["UserName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3668")]
+        public int UseRam {
+            get {
+                return ((int)(this["UseRam"]));
+            }
+            set {
+                this["UseRam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("925")]
+        public int ScreenWidth {
+            get {
+                return ((int)(this["ScreenWidth"]));
+            }
+            set {
+                this["ScreenWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("530")]
+        public int ScreenHeight {
+            get {
+                return ((int)(this["ScreenHeight"]));
+            }
+            set {
+                this["ScreenHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool FullScreanGame {
+            get {
+                return ((bool)(this["FullScreanGame"]));
+            }
+            set {
+                this["FullScreanGame"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("BlockifyLauncher")]
+        public string GameLauncher {
+            get {
+                return ((string)(this["GameLauncher"]));
+            }
+            set {
+                this["GameLauncher"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("javaw.exe")]
+        public string JavaVersion {
+            get {
+                return ((string)(this["JavaVersion"]));
+            }
+            set {
+                this["JavaVersion"] = value;
             }
         }
     }
