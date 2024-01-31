@@ -199,6 +199,6 @@
                                    Margin="80" x:Name="ProgressBarLoad"/>
 
         <component:NotificationElement Title="Title" Description="Description" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center"
-                                       x:Name="NotificationElement" x:FieldModifier="public"/>
+                                       x:Name="NotificationElement" x:FieldModifier="public" Margin="20"/>
     </Grid>
 </Window>

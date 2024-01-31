@@ -28,8 +28,6 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         public SettingPage()
         {
             InitializeComponent();
-
-            
             Blur_WindowBlur.BlurContainer = mainWindow.MainBorder;
 
         }
