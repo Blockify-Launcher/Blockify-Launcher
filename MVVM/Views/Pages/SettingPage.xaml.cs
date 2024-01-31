@@ -23,13 +23,13 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         }
 
         private int MinMemoryRam = 1024;
+        private MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
         public static Setting settingLauncher = new Setting();
-
         public SettingPage()
         {
             InitializeComponent();
 
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            
             Blur_WindowBlur.BlurContainer = mainWindow.MainBorder;
 
         }
@@ -105,6 +105,12 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             return maxMemory / (1024 * 1024);
         }
 
+        private void SaveProperties(string Title = "Save", string Description = "\0")
+        {
+            Properties.Settings.Default.Save();
+            _ = mainWindow.NotificationElement.GetNotification(Title, Description);
+        }
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         private class MEMORYSTATUSEX
         {
@@ -126,5 +132,9 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool GlobalMemoryStatusEx([In, Out] MEMORYSTATUSEX lpBuffer);
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            SaveProperties("Save", "Test description file");
+        }
     }
 }

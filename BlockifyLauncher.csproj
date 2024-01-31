@@ -133,6 +133,9 @@
     <Compile Include="MVVM\Views\Components\LoaderComponent.xaml.cs">
       <DependentUpon>LoaderComponent.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MVVM\Views\Components\NotificationElement.xaml.cs">
+      <DependentUpon>NotificationElement.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MVVM\Views\Converters\RoundProgressPathConverter.cs" />
     <Compile Include="MVVM\Views\Pages\Func\Setting\MyMinecraftPath.cs" />
     <Compile Include="MVVM\Views\Pages\Func\Setting\Setting.cs" />
@@ -153,6 +156,10 @@
     <Page Include="MVVM\Views\Components\LoaderComponent.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MVVM\Views\Components\NotificationElement.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="MVVM\Views\Pages\MainPage.xaml">
       <SubType>Designer</SubType>

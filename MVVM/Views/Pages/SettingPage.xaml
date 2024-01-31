@@ -51,7 +51,8 @@
                             <StackPanel Orientation="Horizontal" Margin="20,5">
                                 <Label Content="Minecraft path" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBox Width="440" Style="{StaticResource CustomTextBox}" BorderBrush="#725B5B5B" x:Name="MinecraftPath_TextBox"/>
-                                <Button Content="Path" Width="100" FontSize="20" Margin="20,0" Cursor="Hand" Style="{StaticResource CustomButton}" Tag="CustomBut"/>
+                                <Button Content="Path" Width="100" FontSize="20" Margin="20,0" Cursor="Hand" Style="{StaticResource CustomButton}" Tag="CustomBut"
+                                        Click="Button_Click"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="20,5"> 
                                 <Label Content="Java version " Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
