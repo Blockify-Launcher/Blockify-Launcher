@@ -2,8 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Style TargetType="{x:Type ComboBox}" x:Key="CustomComboBox">
         <Style.Setters>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="FrameworkElement.OverridesDefaultStyle" Value="True"/>
-            <Setter Property="Cursor" Value="IBeam"/>
             <Setter Property="Background" Value="#1F1F1F"/>
             <Setter Property="Foreground" Value="#FFF"/>
             <Setter Property="Template">
@@ -12,29 +12,28 @@
                         <Grid>
                             <ToggleButton Name="ToggleButton" Focusable="false" ClickMode="Press" Background="{TemplateBinding Background}"
                                           IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
-                                          Content="{TemplateBinding SelectionBoxItem}" Foreground="{TemplateBinding Foreground}">
+                                          Content="{TemplateBinding SelectionBoxItem}" Foreground="{TemplateBinding Foreground}" BorderBrush="{TemplateBinding BorderBrush}" 
+                                          BorderThickness="{TemplateBinding BorderThickness}">
                                 <ToggleButton.Template>
                                     <ControlTemplate TargetType="ToggleButton">
-                                        <Border Background="{TemplateBinding Background}" CornerRadius="20"
-                                                    Height="{TemplateBinding Height}" Width="{TemplateBinding Width}">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="20" BorderBrush="{TemplateBinding BorderBrush}" 
+                                                BorderThickness="{TemplateBinding BorderThickness}" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}">
                                             <Grid VerticalAlignment="Center">
                                                 <Label HorizontalAlignment="Left" Content="{TemplateBinding Content}" Width="Auto" MaxWidth="150"
-                                                       Margin="9,0,0,3" FontSize="16" Foreground="{TemplateBinding Foreground}"/>
-                                                <Button Height="19" Width="19" Cursor="Hand" HorizontalAlignment="Right" Margin="13,0">
-                                                    <Button.Style>
-                                                        <Style TargetType="Button">
-                                                            <Setter Property="Template">
-                                                                <Setter.Value>
-                                                                    <ControlTemplate TargetType="Button">
-                                                                        <Border Height="{TemplateBinding Height}" Width="{TemplateBinding Width}" Background="Transparent">
-                                                                            <Image Source="pack://application:,,,/Image/ArrowDown.png"/>
-                                                                        </Border>
-                                                                    </ControlTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Style>
-                                                    </Button.Style>
-                                                </Button>
+                                                       Margin="3,0,0,3" FontSize="16" Foreground="{TemplateBinding Foreground}"/>
+                                                <Image Height="15" Width="15" Cursor="Hand" HorizontalAlignment="Right" Margin="13,0">
+                                                    <Image.Source>
+                                                        <DrawingImage>
+                                                            <DrawingImage.Drawing>
+                                                                <DrawingGroup ClipGeometry="M0,0 V9 H13 V0 H0 Z">
+                                                                    <DrawingGroup Opacity="1">
+                                                                        <GeometryDrawing Brush="#FFFFFFFF" Geometry="F1 M13,9z M0,0z M0.357499,1.13217C0.588824,0.896206,0.950808,0.874755,1.20589,1.06782L1.27897,1.13217 6.49999,6.45812 11.721,1.13217C11.9523,0.896206,12.3143,0.874755,12.5694,1.06782L12.6425,1.13217C12.8738,1.36813,12.8948,1.73738,12.7056,1.99758L12.6425,2.07212 6.96072,7.86783C6.7294,8.10379,6.36741,8.12525,6.11233,7.93218L6.03925,7.86783 0.357499,2.07212C0.103042,1.81256,0.103042,1.39173,0.357499,1.13217z" />
+                                                                    </DrawingGroup>
+                                                                </DrawingGroup>
+                                                            </DrawingImage.Drawing>
+                                                        </DrawingImage>
+                                                    </Image.Source>
+                                                </Image>
                                             </Grid>
                                         </Border>
                                     </ControlTemplate>
@@ -53,7 +52,7 @@
                                    Focusable="False" PopupAnimation="Slide">
 
                                 <Grid Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                                    <Border x:Name="DropDownBorder" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="#50888888"/>
+                                    <Border x:Name="DropDownBorder" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="#50888888" CornerRadius="20"/>
                                     <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True" Foreground="#FFF">
                                         <ItemsPresenter/>
                                     </ScrollViewer>
@@ -83,10 +82,18 @@
                 </Setter.Value>
             </Setter>
         </Style.Setters>
+        <Style.Triggers>
+            <Trigger Property="Tag" Value="SettingComboBox">
+                <Setter Property="BorderBrush" Value="#725B5B5B"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="{x:Type TextBox}" x:Key="CustomTextBox">
         <Style.Setters>
+            <Setter Property="Foreground" Value="#FFF"/>
+            <Setter Property="FontSize" Value="16"/>
+            
             <Setter Property="Cursor" Value="IBeam"/>
             <Setter Property="Background" Value="#1F1F1F"/>
             <Setter Property="Template">
@@ -95,11 +102,13 @@
                         <Border Background="{TemplateBinding Background}" CornerRadius="20"
                                 Height="{TemplateBinding Height}" Width="{TemplateBinding Width}"
                                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <Label Content="{TemplateBinding Text}" Foreground="#FFF" FontSize="16"
-                                   HorizontalAlignment="Left" VerticalAlignment="Center" Name="TextBox_Text"
-                                   Margin="22,0"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                         </Border>
 
+                        <!-- TODO : Tag implementation for TextBox -->
+                        <!--
+                        <Label Content="{TemplateBinding Text}" Foreground="#FFF" FontSize="16" Margin="2,0,0,0"
+       HorizontalAlignment="Left" VerticalAlignment="Center" Name="TextBox_Text"/> -->
                         <!--<ControlTemplate.Triggers>
                             <Trigger SourceName="TextBox_Text" Property="Content" Value="">
                                 <Setter TargetName="TextBox_Text" Property="Content" Value="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"/>
@@ -167,5 +176,115 @@
                 </Setter.Value>
             </Setter>
         </Style.Setters>
+    </Style>
+
+    <Style x:Key="CircularProgressBarStyle" TargetType="{x:Type ProgressBar}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ProgressBar}">
+                    <Grid>
+                        <Border BorderBrush="#992F2F2F" BorderThickness="{TemplateBinding BorderThickness}" Background="#1F1F1F" CornerRadius="30"/>
+                        <Rectangle x:Name="PART_Track" />
+                        <Grid x:Name="PART_Indicator" ClipToBounds="true" HorizontalAlignment="Left">
+                            <Rectangle x:Name="Indicator" Fill="{TemplateBinding Foreground}" RadiusX="30" RadiusY="30"/>
+                            <Rectangle x:Name="Animation" Fill="{TemplateBinding Foreground}" RenderTransformOrigin="0.5,0.5" RadiusX="30" RadiusY="30">
+                                <Rectangle.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Rectangle.RenderTransform>
+                            </Rectangle>
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ScrollThumbs" TargetType="{x:Type Thumb}">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Grid x:Name="Grid">
+                        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="20" Height="Auto" Fill="Transparent" />
+                        <Border x:Name="ScrollBarRectangle" CornerRadius="3" BorderThickness="1" BorderBrush="#999A9292"
+                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto"
+                                Background="{TemplateBinding Background}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Tag" Value="Horizontal">
+                            <Setter TargetName="ScrollBarRectangle" Property="Width" Value="Auto" />
+                            <Setter TargetName="ScrollBarRectangle" Property="Height" Value="7" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Opacity" Value="0.8"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="{x:Type ScrollBar}">
+        <Setter Property="Margin" Value="-5,0,0,0" />
+        <Setter Property="Stylus.IsFlicksEnabled" Value="false" />
+        <Setter Property="Foreground" Value="#FF8C8C8C" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Width" Value="8" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollBar}">
+                    <Grid x:Name="GridRoot" Width="8" Background="{TemplateBinding Background}">
+                        <Track x:Name="PART_Track" IsDirectionReversed="true" Focusable="false">
+                            <Track.Thumb>
+                                <Thumb x:Name="ScrollBarThumb" Style="{StaticResource ScrollThumbs}">
+                                    <Thumb.Background>
+                                        <LinearGradientBrush>
+                                            <GradientStop Color="#424242" Offset="0.0"/>
+                                            <GradientStop Color="#4E4E4E" Offset="0.5"/>
+                                            <GradientStop Color="#352E33" Offset="1.0"/>
+                                        </LinearGradientBrush>
+                                    </Thumb.Background>
+                                </Thumb>
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton x:Name="PageUp" Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="false" />
+                            </Track.IncreaseRepeatButton>
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton x:Name="PageDown" Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="false" />
+                            </Track.DecreaseRepeatButton>
+                        </Track>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="ScrollBarThumb" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Orientation" Value="Horizontal">
+                            <Setter TargetName="GridRoot" Property="LayoutTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="-90" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="PART_Track" Property="LayoutTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="-90" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Width" Value="Auto" />
+                            <Setter Property="Height" Value="8" />
+                            <Setter TargetName="ScrollBarThumb" Property="Tag" Value="Horizontal" />
+                            <Setter TargetName="PageDown" Property="Command" Value="ScrollBar.PageLeftCommand" />
+                            <Setter TargetName="PageUp" Property="Command" Value="ScrollBar.PageRightCommand" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

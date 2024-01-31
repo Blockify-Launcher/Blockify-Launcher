@@ -6,6 +6,7 @@
         xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel"
         xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
         xmlns:local="clr-namespace:BlockifyLauncher"
+        xmlns:component="clr-namespace:BlockifyLauncher.MVVM.Views.Components"
         mc:Ignorable="d" WindowStyle="None" Loaded="LoadingMainWindow"
         Width="1280" Height="720" Title="Blockify Launcher" AllowsTransparency="True"
         MinHeight="540" MinWidth="1010">
@@ -58,14 +59,14 @@
                         <StackPanel Orientation="Horizontal" Margin="0,0,100,0" >
                             <Label Content="Name : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
                                    Margin="0,0,10,0"/>
-                            <TextBox Width="190" Height="Auto" Style="{StaticResource CustomTextBox}"
-                                     BorderBrush="#3F5A5A5A" BorderThickness="1" Tag="UserName"/>
+                            <TextBox Width="190" Height="Auto" Style="{StaticResource CustomTextBox}" x:Name="UserName"
+                                     BorderBrush="#3F5A5A5A" BorderThickness="1" Tag="UserName" TextChanged="TextChangedUserName"/>
                             <Label Content="Minecraft version : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
                                    Margin="16,0,10,0"/>
                             <ComboBox Width="190" Height="Auto" Style="{StaticResource CustomComboBox}" x:Name="MinecraftVerisonComboBox"/>
                         </StackPanel>
                         <Button HorizontalAlignment="Right" Content="Start" Grid.Column="2" Name="Start"
-                                Width="190" Height="Auto" Style="{StaticResource CustomButton}"/>
+                                Width="190" Height="Auto" Style="{StaticResource CustomButton}" Click="ButtonClickStartGame"/>
                     </Grid>
                 </Border>
 
@@ -177,9 +178,6 @@
                         </Border>
                     </Grid>
 
-
-
-
                     <Frame Content="{Binding CurrentView}" Grid.Column="1" NavigationUIVisibility="Hidden"
                            Margin="0,0,0,50"/>
 
@@ -196,7 +194,11 @@
             <Thumb Name="RightThumb" DragDelta="Thumb_DragDelta" Width="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE"/>
             <Thumb Name="BottomThumb" DragDelta="Thumb_DragDelta" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS"/>
         </Grid>
-        <!--<controls:WindowBlur VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BlurContainer="{Binding ElementName=WindowBlurContainer}" 
-            BlurRadius="45" Magnification="0.25" Grid.Row="1" Background="Transparent" x:Name="Blur_WindowBlur"/> -->
+
+        <component:LoaderComponent Title="Title" Description="Minecraft.jar" Grid.Row="1" VerticalAlignment="Bottom"
+                                   Margin="80" x:Name="ProgressBarLoad"/>
+
+        <component:NotificationElement Title="Title" Description="Description" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center"
+                                       x:Name="NotificationElement" x:FieldModifier="public" Margin="20"/>
     </Grid>
 </Window>
