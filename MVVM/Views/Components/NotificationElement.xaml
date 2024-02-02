@@ -7,20 +7,20 @@
              mc:Ignorable="d" 
              d:DesignHeight="50" d:DesignWidth="200">
     <Grid>
-        <Border Style="{StaticResource PanelBorder}" BorderBrush="#725B5B5B" BorderThickness="1" Tag="{Binding Activ}"
+        <Border Style="{StaticResource PanelBorder}" BorderBrush="#725B5B5B" BorderThickness="1"
     Height="50" Width="200" Panel.ZIndex="111" Grid.Row="1" CornerRadius="25" Name="Loading" Visibility="Visible">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="50"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">
-                    <Label Content="{Binding Title}" Foreground="White" FontWeight="Bold"/>
-                    <Label Content="{Binding Description}" Foreground="#C63C3C3C" Margin="0,-12,0,0" FontSize="6" FontWeight="Medium"/>
+                    <Label Content="{Binding Title}" Foreground="White" FontWeight="Bold" FontSize="14"/>
+                    <Label Content="{Binding Description}" Foreground="#C63C3C3C" Margin="0,-12,0,0" FontSize="10" FontWeight="Medium"/>
                 </StackPanel>
 
-                <Image Height="25" Width="25" Source="{StaticResource FileDrawindImage}"/>
+                <Image Height="25" Width="25" Source="{StaticResource FileDrawindImage}" Margin="10,0,0,0"/>
             </Grid>
         </Border>
     </Grid>

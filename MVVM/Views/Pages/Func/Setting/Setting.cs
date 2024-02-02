@@ -4,10 +4,11 @@ using static BlockifyLauncher.MVVM.Views.Pages.SettingPage;
 namespace BlockifyLauncher.MVVM.Views.Pages.Func.Setting
 {
     /// <summary>
-    /// Project settings.
+    /// Minecraft settings.
     /// </summary>
     public class Setting
     {
+        public CMLauncher launcher;
         public CmlLib.Core.Version.MVersionCollection CollectionVerion;
         public CmlLib.Core.Version.MVersion Version;
         public CmlLib.Core.Auth.MSession Session;
@@ -59,4 +60,5 @@ namespace BlockifyLauncher.MVVM.Views.Pages.Func.Setting
             Properties.Settings.Default.UseRam = RAM;
         }
     }
+
 }

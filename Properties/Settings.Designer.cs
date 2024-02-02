@@ -130,5 +130,41 @@ namespace BlockifyLauncher.Properties {
                 this["JavaVersion"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int HideLauncher {
+            get {
+                return ((int)(this["HideLauncher"]));
+            }
+            set {
+                this["HideLauncher"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int Language {
+            get {
+                return ((int)(this["Language"]));
+            }
+            set {
+                this["Language"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int VersionDisplay {
+            get {
+                return ((int)(this["VersionDisplay"]));
+            }
+            set {
+                this["VersionDisplay"] = value;
+            }
+        }
     }
 }

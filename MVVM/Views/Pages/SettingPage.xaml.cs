@@ -6,6 +6,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
+using Microsoft.Win32;
+
 namespace BlockifyLauncher.MVVM.Views.Pages
 {
     /// <summary>
@@ -29,7 +31,6 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         {
             InitializeComponent();
             Blur_WindowBlur.BlurContainer = mainWindow.MainBorder;
-
         }
 
         private void LoadingPages(object sender, RoutedEventArgs e)
@@ -46,6 +47,9 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             this.HeightScrean.Text = settingLauncher.screadFormat.ScreenHeight.ToString();
             this.FullScreanCheckBox.IsChecked = settingLauncher.screadFormat.FullScrean;
             this.JavaVersion.SelectedIndex = 0;
+
+            this.ComboBoxDisplayForm.SelectedIndex = new Properties.Settings().GetHideLauncher();
+            this.ComboBoxLauncherLanguage.SelectedIndex = new Properties.Settings().GetLanguage();
         }
 
         private static readonly Regex onlyNumbers = new Regex("[^0-9.-]+");
@@ -57,6 +61,18 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         private void NumsPreviewTextInput(object sender, TextCompositionEventArgs e) =>
             e.Handled = !IsTextAllowed(e.Text);
 
+        private void PathMinecraft(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.InitialDirectory = MinecraftPath_TextBox.Text ?? @"C:\";
+            saveFileDialog.RestoreDirectory = true;
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                new MessageBox(saveFileDialog.FileName, MessageBox.TypeMessage.Error).ShowDialog();
+            }
+        }
+
         private void ApplySettingScrean(object sender, RoutedEventArgs e)
         {
             if (settingLauncher.screadFormat.FullScrean != FullScreanCheckBox.IsChecked)
@@ -65,18 +81,14 @@ namespace BlockifyLauncher.MVVM.Views.Pages
                 settingLauncher.screadFormat.ScreenHeight.ToString() != HeightScrean.Text)
                 settingLauncher.SetDisplay(
                     Convert.ToInt32(WidthScrean.Text), Convert.ToInt32(HeightScrean.Text));
-            Properties.Settings.Default.Save();
+            SaveProperties("Save", "Changing screen settings.");
         }
-
-        private void ButtonSaveRAMValue(object sender, RoutedEventArgs e) =>
-            Properties.Settings.Default.Save();
 
         private void SliderRAMValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             try
             {
                 settingLauncher.SetMemoryRAM(Convert.ToInt32((sender as Slider).Value));
-                Properties.Settings.Default.Save();
             }
             catch (Exception ex)
             {
@@ -103,10 +115,21 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             return maxMemory / (1024 * 1024);
         }
 
-        private void SaveProperties(string Title = "Save", string Description = "\0")
-        {
-            Properties.Settings.Default.Save();
+        private void SaveProperties(string Title = "Save", string Description = "\0") =>
             _ = mainWindow.NotificationElement.GetNotification(Title, Description);
+
+        private void ComboBoxDisplayFormSelect(object sender, SelectionChangedEventArgs e)
+        {
+            new Properties.Settings().SetHideLauncher(
+                ((ComboBox)sender).SelectedIndex
+                );
+        }
+
+        private void ComboBoxLauncherLanguageSelect(object sender, SelectionChangedEventArgs e)
+        {
+            new Properties.Settings().SetLauguage(
+                ((ComboBox)sender).SelectedIndex
+                );
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
@@ -130,9 +153,5 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool GlobalMemoryStatusEx([In, Out] MEMORYSTATUSEX lpBuffer);
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            SaveProperties("Save", "Test description file");
-        }
     }
 }

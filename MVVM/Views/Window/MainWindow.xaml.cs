@@ -17,8 +17,7 @@ namespace BlockifyLauncher
     public partial class MainWindow : Window
     {
         public Border MainBorder { get; set; }
-        public CMLauncher launcher;
-
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -39,9 +38,9 @@ namespace BlockifyLauncher
             this.ProgressBarLoad.Activ = "None";
             try
             {
-                this.launcher = new CMLauncher(SettingPage.settingLauncher.minecraftPath);
+                SettingPage.settingLauncher.launcher = new CMLauncher(SettingPage.settingLauncher.minecraftPath);
                 await InitializeVersionsAsync();
-                this.launcher.FileChanged += LauncherFileChanged;
+                SettingPage.settingLauncher.launcher.FileChanged += LauncherFileChanged;
             }
             catch (Exception ex)
             {
@@ -51,7 +50,8 @@ namespace BlockifyLauncher
 
         private async Task InitializeVersionsAsync()
         {
-            SettingPage.settingLauncher.CollectionVerion = await launcher.GetAllVersionsAsync();
+            MinecraftVerisonComboBox.Items.Clear();
+            SettingPage.settingLauncher.CollectionVerion = await SettingPage.settingLauncher.launcher.GetAllVersionsAsync();
             foreach (var version in SettingPage.settingLauncher.CollectionVerion)
                 MinecraftVerisonComboBox.Items.Add(version.Name);
             MinecraftVerisonComboBox.SelectedIndex = 0;
@@ -64,7 +64,8 @@ namespace BlockifyLauncher
         private string GameLauncherVersion = "1";
         private async Task<Process> StartGame()
         {
-            Process process = await launcher.CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(),
+            Process process = await SettingPage.settingLauncher.launcher
+                .CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(),
                 new MLaunchOption
                 {
                     Session = MSession.GetOfflineSession(UserName.Text),
@@ -91,6 +92,10 @@ namespace BlockifyLauncher
             var processUtil = new ProcessUtil(await StartGame());
             processUtil.StartWithEvents();
             ProgressBarLoad.Activ = "Сlose";
+
+            /*Closing the Launcher after launching minecraft.*/
+            if (new Properties.Settings().GetHideLauncher() == 0)
+                this.Close();
         }
 
         private void LauncherFileChanged(DownloadFileChangedEventArgs e)
@@ -106,18 +111,14 @@ namespace BlockifyLauncher
 
         private void TextChangedUserName(object sender, TextChangedEventArgs e)
         {
-            TextBox text = sender as TextBox;
-
-            Properties.Settings.Default.UserName = text.Text;
-            Properties.Settings.Default.Save();
+            new Properties.Settings().SetUserName(
+                ((TextBox)sender).Text
+                );
         }
 
         private void MainWindowsClose(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.WidthProgram = (int)this.Width;
-            Properties.Settings.Default.HeightProgram = (int)this.Height;
-
-            Properties.Settings.Default.Save();
+            new Properties.Settings().SettingsSavingSizeForms((int)this.Width, (int)this.Height);
             Application.Current.Shutdown();
         }
 
@@ -184,7 +185,6 @@ namespace BlockifyLauncher
                             break;
                     }
                     Task.Delay(100).Wait();
-                    new Properties.Settings().SettingsSavingSizeForms((int)this.Width, (int)this.Height);
                 }
                 catch (Exception)
                 {

@@ -1,33 +1,31 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
 
 namespace BlockifyLauncher.Properties {
-    
-    
-    // Этот класс позволяет обрабатывать определенные события в классе параметров:
-    //  Событие SettingChanging возникает перед изменением значения параметра.
-    //  Событие PropertyChanged возникает после изменения значения параметра.
-    //  Событие SettingsLoaded возникает после загрузки значений параметров.
-    //  Событие SettingsSaving возникает перед сохранением значений параметров.
+    /// <summary>
+    /// Launcher Setting.
+    /// </summary>
     internal sealed partial class Settings {
-
-        public Settings() {
-            // // Для добавления обработчиков событий для сохранения и изменения параметров раскомментируйте приведенные ниже строки:
-            //
-            // this.SettingChanging += this.SettingChangingEventHandler;
-            //
-            // this.SettingsSaving += this.SettingsSavingEventHandler;
-            //
-        }
-        
-        private void SettingChangingEventHandler(object sender, System.Configuration.SettingChangingEventArgs e) {
-            // Добавьте здесь код для обработки события SettingChangingEvent.
-        }
-        
-        private void SettingsSavingEventHandler(object sender, System.ComponentModel.CancelEventArgs e) {
-            // Добавьте здесь код для обработки события SettingsSaving.
+        public Settings()
+        {
+            this.PropertyChanged += PropertyChangedEventHandler;
         }
 
-        public void SettingsSavingSizeForms(int width, int height) 
+        private void PropertyChangedEventHandler(object sender, PropertyChangedEventArgs e) => 
+            this.Save();
+
+        public void SetHideLauncher(int num) => this.HideLauncher = num;
+        public int GetHideLauncher() => this.HideLauncher;
+
+        public void SetLauguage(int num) => this.Language = num;
+        public int GetLanguage() => this.Language;
+
+        public void SetVersionDisplay(int num) => this.VersionDisplay = num;
+        public int GetVersionDisplay() => this.VersionDisplay;
+
+        public void SetUserName(string userName) => this.UserName = userName;
+        public string GetUserName() => this.UserName;
+
+        public void SettingsSavingSizeForms(int width, int height)
         {
             this.WidthProgram = width;
             this.HeightProgram = height;
