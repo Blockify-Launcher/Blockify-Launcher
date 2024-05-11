@@ -1,0 +1,6 @@
+#Folder
+**/obj
+**/bin
+
+#File
+*.diff

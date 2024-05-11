@@ -1,0 +1,100 @@
+﻿<Page x:Class="BlockifyLauncher.MVVM.Views.Pages.SettingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
+      xmlns:media="using:Microsoft.UI.Xaml.Media"
+      xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
+      mc:Ignorable="d" 
+      d:DesignHeight="555" d:DesignWidth="1100"
+      Title="SettingPage" Loaded="LoadingPages">
+
+    <Grid>
+        <controls:WindowBlur Margin="5" BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur">
+            <Border Background="#C0121212" CornerRadius="30" 
+                    BorderBrush="#3F5A5A5A" BorderThickness="1">
+                <Grid>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10,0,0,5">
+                                <Image Source="{StaticResource DisplayDrawingImage}" Height="20"/>
+                                <Label Content="Display" Foreground="White" FontWeight="DemiBold" HorizontalAlignment="Center"/>
+                                <Rectangle Fill="White" Height="1" HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                            <Rectangle Fill="#3F5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
+                            <StackPanel Orientation="Horizontal" Margin="20,10">
+                                <Label Content="Width" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBox x:Name="WidthScrean" Height="35" Width="100" Style="{StaticResource CustomTextBox}" BorderBrush="#3F5A5A5A" BorderThickness="1" Tag="Width"
+                                         PreviewTextInput="NumsPreviewTextInput"/>
+                                <Label Content="⨉" VerticalAlignment="Center" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                <Label Content="Height" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBox x:Name="HeightScrean" Height="35" Width="100" Style="{StaticResource CustomTextBox}" BorderBrush="#3F5A5A5A" BorderThickness="1" Tag="Height"
+                                         PreviewTextInput="NumsPreviewTextInput"/>
+                                <CheckBox x:Name="FullScreanCheckBox" Content="FullScrean" Style="{StaticResource CustomCheckBox}" Foreground="#FFF" FontSize="20" Margin="20,10"/>
+                                <Button HorizontalAlignment="Right" Content="Apply" Grid.Column="2" Tag="CustomBut" Click="ApplySettingScrean"
+                                        Width="100" Height="35" Style="{StaticResource CustomButton}" Margin="15,0"/>
+                            </StackPanel>
+                            <Rectangle Fill="#4C5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
+                            <StackPanel Orientation="Horizontal" Margin="10,5">
+                                <Image Source="{StaticResource KeyDrawingImage}" Height="20"/>
+                                <Label Content="System" Foreground="White" FontWeight="DemiBold" HorizontalAlignment="Center"/>
+                                <Rectangle Fill="White" Height="1" HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                            <Rectangle Fill="#3F5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
+                            <StackPanel Orientation="Horizontal" Margin="20,5">
+                                <Label Content="RAM utilization" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Slider x:Name="SliderRam" Width="150" VerticalAlignment="Center" Margin="15,0" 
+                                        TickFrequency="512" IsSnapToTickEnabled="True" ValueChanged="SliderRAMValueChanged"/>
+                                <Label Content="{Binding ElementName=SliderRam, Path=Value, StringFormat={}{0}}" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="20,5">
+                                <Label Content="Minecraft path" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBox Width="440" Style="{StaticResource CustomTextBox}" BorderBrush="#725B5B5B" x:Name="MinecraftPath_TextBox"/>
+                                <Button Content="Path" Width="100" FontSize="20" Margin="20,0" Cursor="Hand" Style="{StaticResource CustomButton}" Tag="CustomBut"
+                                        Click="PathMinecraft"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="20,5"> 
+                                <Label Content="Java version " Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="JavaVersion" Style="{StaticResource CustomComboBox}" Width="200" Tag="SettingComboBox" Margin="10,0,0,0" BorderThickness="1"/>
+                                <Button Content="Edit" Width="100" FontSize="20" Margin="20,0" Cursor="Hand" Style="{StaticResource CustomButton}" Tag="CustomBut"/>
+                            </StackPanel>
+                            <Rectangle Fill="#4C5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
+                            <StackPanel Orientation="Horizontal" Margin="10,5">
+                                <Image Source="{StaticResource CategoryDrawingImage}" Height="20"/>
+                                <Label Content="Setting Launcher" Foreground="White" FontWeight="DemiBold" HorizontalAlignment="Center"/>
+                                <Rectangle Fill="White" Height="1" HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                            <Rectangle Fill="#3F5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
+                            <StackPanel Orientation="Horizontal" Margin="20,5">
+                                <Label Content="Hide the Launcher " Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <ComboBox Style="{StaticResource CustomComboBox}" Width="200" Tag="SettingComboBox" Margin="10,0,0,0" BorderThickness="1"
+                                          x:Name="ComboBoxDisplayForm" SelectionChanged="ComboBoxDisplayFormSelect">
+                                    <ComboBoxItem Content="hide"/>
+                                    <ComboBoxItem Content="show"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="20,5">
+                                <Label Content="Launcher language " Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <ComboBox Style="{StaticResource CustomComboBox}" Width="200" Tag="SettingComboBox" Margin="10,0,0,0" BorderThickness="1" 
+                                          SelectionChanged="ComboBoxLauncherLanguageSelect" x:Name="ComboBoxLauncherLanguage">
+                                    <ComboBoxItem Content="English"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <Rectangle Fill="#4C5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
+                            <StackPanel>
+                                <Label Margin="20,0" Content="Version list : " Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                <StackPanel Margin="50,5">
+                                    <CheckBox Content="Display Snapshots (&quot;Snapshots&quot;)" Style="{StaticResource CustomCheckBox}" Foreground="#FFF" FontSize="20"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <Rectangle Fill="#3F5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </ScrollViewer>
+
+
+                </Grid>
+            </Border>
+        </controls:WindowBlur>
+    </Grid>
+</Page>
