@@ -1,6 +1,7 @@
 ﻿using BlockifyLib.Launcher.Minecraft.Auth;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace BlockifyLauncher.MVVM.Views.Pages
@@ -18,6 +19,8 @@ namespace BlockifyLauncher.MVVM.Views.Pages
 
             mainWindow = (MainWindow)Application.Current.MainWindow;
 
+            LastPageButton.SetBinding(Button.CommandProperty, new Binding("LastPageCommand"));
+
             SetBlurContainer();
             GetAccount();
         }
@@ -26,13 +29,36 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         private void UpdateElement()
         {
             var box = mainWindow.MinecraftAccountComboBox;
-            int index = box.SelectedIndex;
+            int index = box.SelectedIndex > 0 ? box.SelectedIndex : 0;
+            
             box.Items.Clear();
+
+
             foreach (var us in new Properties.Settings().accountSession.GetAllUserList())
             {
                 box.Items.Add(us.Username);
             }
-            box.SelectedIndex = index >= box.Items.Count ? 0 : index;
+
+            if (box.Items.Count > 0)
+                box.SelectedIndex = index >= box.Items.Count ? 0 : index;
+            else
+                box.Text = "None...";
+            
+
+            box.Items.Add(new Separator()
+            {
+                Style = (System.Windows.Style)
+                        Application.Current.FindResource("MenuSeparatorStyle")
+            });
+
+            var navButton_account = new Button()
+            {
+                Style = (System.Windows.Style)
+                        Application.Current.FindResource("ButtonComboBoxAccount"),
+                Content = "Account Setting"
+            };
+            navButton_account.SetBinding(Button.CommandProperty, new Binding("AccountCommand"));
+            box.Items.Add(navButton_account);
         }
 
         private void SetBlurContainer()

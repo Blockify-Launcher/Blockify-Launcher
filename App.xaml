@@ -4,9 +4,12 @@
              xmlns:local="clr-namespace:BlockifyLauncher"
              xmlns:view_Pages="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
              xmlns:viewModel_Pages="clr-namespace:BlockifyLauncher.MVVM.ViewModel.Pages"
+             xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel"
              StartupUri="MVVM/Views/Window/MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
+            
+            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="MVVM/Views/Style/ApplicationStyle.xaml"/>
                 <ResourceDictionary Source="MVVM/Views/Style/CustomElement.xaml"/>
@@ -14,6 +17,10 @@
                 
                 <ResourceDictionary Source="Image/MessageBox/ImagePack.xaml"/>
                 <ResourceDictionary Source="Image/FormImagePack.xaml"/>
+
+                <ResourceDictionary>
+                    <viewModel:CurrentViewModel x:Key="currentViewModel"/>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type viewModel_Pages:MainModel}">

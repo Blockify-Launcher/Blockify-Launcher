@@ -9,12 +9,7 @@
         xmlns:component="clr-namespace:BlockifyLauncher.MVVM.Views.Components"
         mc:Ignorable="d" WindowStyle="None" Loaded="LoadingMainWindow"
         Width="1280" Height="720" Title="Blockify Launcher" AllowsTransparency="True"
-        MinHeight="540" MinWidth="1010">
-
-    <Window.DataContext>
-        <viewModel:CurrentViewModel/>
-    </Window.DataContext>
-
+        MinHeight="540" MinWidth="1010" DataContext="{StaticResource currentViewModel}">
 
     <Grid>
         <Grid.ColumnDefinitions>

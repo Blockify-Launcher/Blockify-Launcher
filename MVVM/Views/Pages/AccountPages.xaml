@@ -4,11 +4,11 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
-      xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
       xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel"
+      xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="AccountPages" Margin="0, 0, 60, 0">
+      Title="AccountPages" Margin="0, 0, 60, 0" DataContext="{StaticResource currentViewModel}">
 
     <Grid>
         <controls:WindowBlur BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur" Width="500" Height="300">
@@ -20,14 +20,14 @@
                     </Grid.RowDefinitions>
 
                     <Grid VerticalAlignment="Center">
-                        <Button Cursor="Hand" Command="{Binding LastPageCommand}">
+                        <Button x:Name="LastPageButton" Cursor="Hand" HorizontalAlignment="Left" Margin="20,0">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border>
-                                                    <Image Source="{StaticResource Arrow___LeftDrawingImage}" Height="18" HorizontalAlignment="Left" Margin="20,10"/>
+                                                <Border Height="20" Width="Auto">
+                                                    <Image Source="{StaticResource Arrow___LeftDrawingImage}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
                                             </ControlTemplate>
                                         </Setter.Value>
