@@ -97,8 +97,13 @@ namespace BlockifyLauncher.MVVM.Views.Pages.Func.Setting
         private void DeleteUser(int _index) =>
             _session = _session.Where(num => num != _session[_index]).ToArray();
 
-        private void AddUser(SessionStruct newUser) =>
-            _session[_session.Length] = newUser;
+        private void AddUser(SessionStruct newUser)
+        {
+            var _array_session = new SessionStruct[_session.Length + 1];
+            Array.Copy(_session, _array_session, _session.Length);
+            _array_session[^1] = newUser; 
+            _session = _array_session;
+        }
 
         public SessionStruct[] GetAllUserArray() => _session;
         public List<SessionStruct> GetAllUserList()

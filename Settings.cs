@@ -39,6 +39,7 @@ namespace BlockifyLauncher.Properties {
         public void SettingsInitialize()
         {
             this.launcher = new BlockifyLibLauncher(new MinecraftPath()); // TODO : Добавить смену расположения.
+            this.accountSession = new Account();
         }
         
         private void PropertyChangedEventHandler(object sender, PropertyChangedEventArgs e) => 

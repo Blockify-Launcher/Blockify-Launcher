@@ -32,9 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="BlockifyLib">
-      <HintPath>..\BlockLauncher\BlockifyLib\bin\Release\net8.0-windows7.0\BlockifyLib.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\..\..\Desktop\BlockLauncher\BlockifyLib\BlockifyLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

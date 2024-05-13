@@ -43,7 +43,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         private void GetAccount()
         {
             AccountList.Items.Clear();
-            foreach (var us in new Properties.Settings().accountSession.GetAllUserList())
+            foreach (var us in new Properties.Settings().accountSession.GetAllUserArray())
             {
                 var listBoxItem = new ListBoxItem()
                 {

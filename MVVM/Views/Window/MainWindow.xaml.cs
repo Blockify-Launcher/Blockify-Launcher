@@ -9,9 +9,11 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
+using BlockifyLauncher.MVVM.ViewModel;
 using BlockifyLauncher.MVVM.Views.Pages;
 using BlockifyLauncher.MVVM.Views.Pages.Func.Setting;
 using BlockifyLauncher.Properties;
+using System.Windows.Media;
 
 namespace BlockifyLauncher
 {
@@ -58,7 +60,20 @@ namespace BlockifyLauncher
             var account = new Account();    
             foreach (var accountItem in account.GetAllUserArray())
                 MinecraftAccountComboBox.Items.Add(accountItem.Username);
-            MinecraftAccountComboBox.SelectedIndex = 0;
+            if (MinecraftAccountComboBox.Items.Count > 0)
+                MinecraftAccountComboBox.SelectedIndex = 0;
+            else
+                MinecraftAccountComboBox.Text = "None...";
+
+            MinecraftAccountComboBox.Items.Add(new Separator() {
+                Style = (Style)Application.Current.FindResource("MenuSeparatorStyle")
+            });
+
+            MinecraftAccountComboBox.Items.Add(new Button() {
+                Command = new CurrentViewModel().AccountCommand, // TODO : Фиксануть команду перехода
+                Style = (Style)Application.Current.FindResource("ButtonComboBoxAccount"),
+                Content = "Account Setting"
+            });
         }
 
         // Initializa version comboBox
