@@ -11,11 +11,14 @@ using System.Windows.Data;
 
 using BlockifyLauncher.MVVM.Views.Pages.Func.Setting;
 using BlockifyLauncher.Properties;
+using BlockifyLauncher.Core;
 
 namespace BlockifyLauncher
 {
     public partial class MainWindow : Window
     {
+        private DiscordController _discordController;
+
         public Border MainBorder { get; set; }
 
         private Settings setting = new Settings();
@@ -45,6 +48,9 @@ namespace BlockifyLauncher
 
                 MinecraftAccountComboBox.SelectionChanged += MinecraftAccountSelectionChanged;
                 setting.launcher.FileChanged += LauncherFileChanged;
+
+                _discordController = new DiscordController();
+                _discordController.Start();
             }
             catch (Exception ex)
             {

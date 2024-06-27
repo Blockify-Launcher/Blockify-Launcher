@@ -1,8 +1,10 @@
-﻿using BlockifyLib.Launcher.Minecraft.Auth;
+﻿using BlockifyLib.Launcher.Microsoft;
+using BlockifyLib.Launcher.Minecraft.Auth;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace BlockifyLauncher.MVVM.Views.Pages
 {
@@ -12,6 +14,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
     public partial class AccountPages : Page
     {
         private MainWindow mainWindow;
+        private SessionStruct editElement;
 
         public AccountPages()
         {
@@ -91,10 +94,29 @@ namespace BlockifyLauncher.MVVM.Views.Pages
                         }
                     }
                 };
+                ((MenuItem)listBoxItem.ContextMenu.Items[0]).Click += (sender, args) =>
+                    ContextMenuEdit(listBoxItem);
                 ((MenuItem)listBoxItem.ContextMenu.Items[2]).Click += (sender, args) =>
                     ContextMenuDelete(listBoxItem);
                 AccountList.Items.Add(listBoxItem);
             }
+        }
+
+        private void SaveUserAccount(object sender, RoutedEventArgs e)
+        {
+            new Properties.Settings().accountSession.EditUser(editElement.Id, UserNameTextBox.Text);
+            GetAccount();
+
+            Notification("Edit account", $"a new username has been set up \"{UserNameTextBox.Text}\"");
+            UpdateElement();
+        }
+
+        // Edit element contextMenu.
+        private void ContextMenuEdit(ListBoxItem item)
+        {
+            UserNameTextBox.Text = item.Content.ToString();
+            editElement = (SessionStruct)item.Tag;
+            LoginNotPassword.IsChecked = true;
         }
 
         // Delete element contextMenu.
@@ -109,27 +131,11 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         private void ButtonClickAddNewAccount(object sender, RoutedEventArgs e)
         {
             var UserName = UserNameTextBox.Text;
-            if (LoginNotPassword.IsChecked == true)
-            {
-                new Properties.Settings().accountSession.CreateUser(UserName);
-                GetAccount();
-            }
-            else if (LoginMicrosoft.IsChecked == true)
-            {
-                var login = new Login();
+            new Properties.Settings().accountSession.CreateUser(UserName);
+            GetAccount();
 
-                // new CustomWindow(new BlockifyLib.Launcher.Microsoft.Auth.Login(), "Auntification Microsoft").ShowDialog();
-            }
-            else if (LoginMojang.IsChecked == true)
-            {
-                //new CustomWindow("Auntification Mojang").ShowDialog();
-            }
-            else
-            {
-                return; // Close method.
-            }
-            UpdateElement();
             Notification("Create new account", $"a new account has been created with the name \"{UserName}\"");
+            UpdateElement();
         }
 
         private void Notification(string Title, string Description = "None") =>

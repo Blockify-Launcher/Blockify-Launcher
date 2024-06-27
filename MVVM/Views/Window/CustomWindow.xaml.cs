@@ -1,4 +1,5 @@
 ﻿using BlockifyLib.Launcher.Microsoft.Auth;
+using BlockifyLib.Launcher.Minecraft.Auth;
 using System.Windows;
 using System.Windows.Input;
 

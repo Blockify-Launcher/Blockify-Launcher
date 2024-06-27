@@ -23,7 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Image\News\" />
     <Folder Include="Properties\" />
+    <Folder Include="SDK\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +35,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Desktop\BlockLauncher\BlockifyLib\BlockifyLib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BlockifyLib">
+      <HintPath>..\..\..\..\Desktop\BlockLauncher\BlockifyLib\bin\Debug\net8.0-windows7.0\BlockifyLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

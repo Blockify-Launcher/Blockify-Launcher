@@ -1,7 +1,9 @@
 ﻿using BlockifyLib.Launcher.Minecraft.Auth;
 using Newtonsoft.Json;
 using System.Collections;
+using System.Collections.Immutable;
 using System.IO;
+using System.Windows.Media;
 
 namespace BlockifyLauncher.MVVM.Views.Pages.Func.Setting
 {
@@ -65,6 +67,19 @@ namespace BlockifyLauncher.MVVM.Views.Pages.Func.Setting
             for (int i = 0; i < _session.Length; i++)
                 if (_session[i].Id == id)
                     DeleteUser(i);
+        }
+
+        public void EditUser(string id, string userName)
+        {
+            var sessionFromFile = JsonConvert.DeserializeObject<List<SessionStruct>>(File.ReadAllText(filePath + fileName));
+            for (int i = 0; i < sessionFromFile?.Count; i++)
+                if (sessionFromFile[i].Id == id)
+                    sessionFromFile[i].Username = userName;
+            File.WriteAllText(filePath + fileName, JsonConvert.SerializeObject(sessionFromFile, Formatting.Indented));
+
+            for (int i = 0; i < _session.Length; i++)
+                if (_session[i].Id == id)
+                    _session[i].Username = userName;
         }
 
         public void CreateUser(string username)

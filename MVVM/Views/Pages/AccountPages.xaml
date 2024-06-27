@@ -55,7 +55,7 @@
                                      ItemContainerStyle="{StaticResource ListBoxAccount_Item}">
                             </ListBox>
                             <Button Content="Save account" VerticalAlignment="Bottom" Margin="5,0" Grid.Row="1"
-                                    Cursor="Hand" Style="{StaticResource CustomButton}" Tag="CustomBut"/>
+                                    Cursor="Hand" Style="{StaticResource CustomButton}" Tag="CustomBut" Click="SaveUserAccount"/>
                                 
                             <StackPanel>
                             </StackPanel>
@@ -72,7 +72,9 @@
                                 <TextBox x:Name="UserNameTextBox" Style="{StaticResource CustomTextBox}" BorderBrush="#3F5A5A5A"/>
                                 <RadioButton Style="{StaticResource CustomRadioButton}" Content="Login without password" x:Name="LoginNotPassword"/>
                                 <RadioButton Style="{StaticResource CustomRadioButton}" Content="Login through Microsoft" x:Name="LoginMicrosoft"/>
+                                <!--
                                 <RadioButton Style="{StaticResource CustomRadioButton}" Content="Login through Mojang" x:Name="LoginMojang"/>
+                                -->
                             </StackPanel>
 
                             <Button Content="+ Add account" VerticalAlignment="Bottom" Margin="5,0"

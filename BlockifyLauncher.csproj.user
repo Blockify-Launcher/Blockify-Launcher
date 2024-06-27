@@ -9,6 +9,9 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="MVVM\Views\Components\NewsComponent.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\Pages\AccountPages.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -17,6 +20,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="MVVM\Views\Components\NewsComponent.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MVVM\Views\Pages\AccountPages.xaml">
       <SubType>Designer</SubType>
     </Page>
