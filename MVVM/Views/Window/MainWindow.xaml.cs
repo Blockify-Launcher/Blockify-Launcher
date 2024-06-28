@@ -11,7 +11,7 @@ using System.Windows.Data;
 
 using BlockifyLauncher.MVVM.Views.Pages.Func.Setting;
 using BlockifyLauncher.Properties;
-using BlockifyLauncher.Core;
+using BlockifyLauncher.Core.DiscordActivy;
 
 namespace BlockifyLauncher
 {
@@ -22,12 +22,11 @@ namespace BlockifyLauncher
         public Border MainBorder { get; set; }
 
         private Settings setting = new Settings();
-        private Account account;
+        private Account? account;
 
         public MainWindow()
         {
             InitializeComponent();
-            
             this.Resources.Add("WindowTitle", this.Title);
 
             this.homeRadioButton.IsChecked = true;
@@ -40,6 +39,9 @@ namespace BlockifyLauncher
         
         private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
+            // initialization component discord.
+            _discordController = new DiscordController();
+
             this.ProgressBarLoad.Activ = "None";
             try
             {
@@ -48,9 +50,6 @@ namespace BlockifyLauncher
 
                 MinecraftAccountComboBox.SelectionChanged += MinecraftAccountSelectionChanged;
                 setting.launcher.FileChanged += LauncherFileChanged;
-
-                _discordController = new DiscordController();
-                _discordController.Start();
             }
             catch (Exception ex)
             {
@@ -155,6 +154,8 @@ namespace BlockifyLauncher
             process.Start();
 
             ProgressBarLoad.Activ = "Сlose";
+
+            _discordController.UpdateStartGame(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString());
 
             /*Closing the Launcher after launching minecraft.*/
             if (new Properties.Settings().GetHideLauncher() == 0)

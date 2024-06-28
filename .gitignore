@@ -5,3 +5,6 @@
 
 #File
 *.diff
+
+#File json
+**/Core/discord_config.json
