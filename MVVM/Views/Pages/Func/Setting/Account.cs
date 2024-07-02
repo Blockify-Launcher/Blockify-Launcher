@@ -1,7 +1,9 @@
 ﻿using BlockifyLib.Launcher.Minecraft.Auth;
 using Newtonsoft.Json;
 using System.Collections;
+using System.Collections.Immutable;
 using System.IO;
+using System.Windows.Media;
 
 namespace BlockifyLauncher.MVVM.Views.Pages.Func.Setting
 {
@@ -67,6 +69,19 @@ namespace BlockifyLauncher.MVVM.Views.Pages.Func.Setting
                     DeleteUser(i);
         }
 
+        public void EditUser(string id, string userName)
+        {
+            var sessionFromFile = JsonConvert.DeserializeObject<List<SessionStruct>>(File.ReadAllText(filePath + fileName));
+            for (int i = 0; i < sessionFromFile?.Count; i++)
+                if (sessionFromFile[i].Id == id)
+                    sessionFromFile[i].Username = userName;
+            File.WriteAllText(filePath + fileName, JsonConvert.SerializeObject(sessionFromFile, Formatting.Indented));
+
+            for (int i = 0; i < _session.Length; i++)
+                if (_session[i].Id == id)
+                    _session[i].Username = userName;
+        }
+
         public void CreateUser(string username)
         {
             try
@@ -97,8 +112,13 @@ namespace BlockifyLauncher.MVVM.Views.Pages.Func.Setting
         private void DeleteUser(int _index) =>
             _session = _session.Where(num => num != _session[_index]).ToArray();
 
-        private void AddUser(SessionStruct newUser) =>
-            _session[_session.Length] = newUser;
+        private void AddUser(SessionStruct newUser)
+        {
+            var _array_session = new SessionStruct[_session.Length + 1];
+            Array.Copy(_session, _array_session, _session.Length);
+            _array_session[^1] = newUser; 
+            _session = _array_session;
+        }
 
         public SessionStruct[] GetAllUserArray() => _session;
         public List<SessionStruct> GetAllUserList()

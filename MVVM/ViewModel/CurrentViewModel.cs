@@ -55,10 +55,17 @@ namespace BlockifyLauncher.MVVM.ViewModel
             AccountVM = new AccountModel();
         }
 
+        private void GoLastPage()
+        {
+            this.CurrentView = this.LastView;
+        }
+
         public CurrentViewModel()
         {
             LoadingVM();
             this.CurrentView = this.MainVM;
+
+            LastPageCommand = new RelayCommand(o => GoLastPage());
 
             MainCommand = new RelayCommand(o => { CurrentView = MainVM; });
             SettingCommand = new RelayCommand(o => { CurrentView = SettingVM; });
@@ -68,7 +75,6 @@ namespace BlockifyLauncher.MVVM.ViewModel
                 CurrentView = AccountVM;
             });
 
-            LastPageCommand = new RelayCommand(o => { CurrentView = LastView; });
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using BlockifyLib;
-using BlockifyLib.Launcher.Downloader;
+﻿using BlockifyLib.Launcher.Downloader;
 using BlockifyLib.Launcher.Minecraft.Auth;
 using BlockifyLib.Launcher.src;
 
@@ -8,23 +7,26 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Data;
 
-using BlockifyLauncher.MVVM.Views.Pages;
 using BlockifyLauncher.MVVM.Views.Pages.Func.Setting;
 using BlockifyLauncher.Properties;
+using BlockifyLauncher.Core.DiscordActivy;
 
 namespace BlockifyLauncher
 {
     public partial class MainWindow : Window
     {
+        private DiscordController _discordController;
+
         public Border MainBorder { get; set; }
 
         private Settings setting = new Settings();
+        private Account? account;
 
         public MainWindow()
         {
             InitializeComponent();
-            
             this.Resources.Add("WindowTitle", this.Title);
 
             this.homeRadioButton.IsChecked = true;
@@ -37,12 +39,16 @@ namespace BlockifyLauncher
         
         private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
+            // initialization component discord.
+            _discordController = new DiscordController();
+
             this.ProgressBarLoad.Activ = "None";
             try
             {
-                await InitializeVersionsAsync();
                 await InitializeAccountsAsync(); 
-                
+                await InitializeVersionsAsync();
+
+                MinecraftAccountComboBox.SelectionChanged += MinecraftAccountSelectionChanged;
                 setting.launcher.FileChanged += LauncherFileChanged;
             }
             catch (Exception ex)
@@ -55,10 +61,47 @@ namespace BlockifyLauncher
         private async Task InitializeAccountsAsync()
         {
             MinecraftAccountComboBox.Items.Clear();
-            var account = new Account();    
+            account = new Account();
+            int index = 0;
+            bool IsUser = true;
             foreach (var accountItem in account.GetAllUserArray())
+            {
                 MinecraftAccountComboBox.Items.Add(accountItem.Username);
-            MinecraftAccountComboBox.SelectedIndex = 0;
+                if (accountItem.Id == setting.GetLastUser() && IsUser)
+                    IsUser = false;
+                else if (IsUser)
+                    index++;
+            }
+
+            if (MinecraftAccountComboBox.Items.Count > 0)
+                MinecraftAccountComboBox.SelectedIndex = index;
+            else
+                MinecraftAccountComboBox.Text = "None...";
+
+            MinecraftAccountComboBox.Items.Add(new Separator() {
+                Style = (Style)Application.Current.FindResource("MenuSeparatorStyle")
+            });
+
+            var navButton_account = new Button()
+            {
+                Style = (Style)Application.Current.FindResource("ButtonComboBoxAccount"),
+                Content = "Account Setting"
+            };
+            navButton_account.SetBinding(Button.CommandProperty, new Binding("AccountCommand"));
+
+            MinecraftAccountComboBox.Items.Add(navButton_account);
+        }
+
+        // Set information for last user.
+        private void MinecraftAccountSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+               ComboBox senderBox = (ComboBox)sender;
+               SessionStruct sessionUsed = (account.GetAllUserArray())[senderBox.SelectedIndex];
+               setting.SetLastUser(sessionUsed.Id);
+            } 
+            catch { return; }
         }
 
         // Initializa version comboBox
@@ -71,6 +114,7 @@ namespace BlockifyLauncher
             MinecraftVerisonComboBox.SelectedIndex = 0;
         }
 
+        // Error message box.
         private void HandleException(Exception ex) =>
             new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
 
@@ -110,6 +154,8 @@ namespace BlockifyLauncher
             process.Start();
 
             ProgressBarLoad.Activ = "Сlose";
+
+            _discordController.UpdateStartGame(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString());
 
             /*Closing the Launcher after launching minecraft.*/
             if (new Properties.Settings().GetHideLauncher() == 0)

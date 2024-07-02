@@ -8,6 +8,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>False</UseWindowsForms>
     <ApplicationIcon>Image\MainForm.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x86;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,17 +24,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Image\News\" />
     <Folder Include="Properties\" />
+    <Folder Include="SDK\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="1.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Desktop\BlockLauncher\BlockifyLib\BlockifyLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="BlockifyLib">
-      <HintPath>..\BlockLauncher\BlockifyLib\bin\Release\net8.0-windows7.0\BlockifyLib.dll</HintPath>
+      <HintPath>..\..\..\..\Desktop\BlockLauncher\BlockifyLib\bin\Debug\net8.0-windows7.0\BlockifyLib.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -9,14 +9,10 @@
         xmlns:component="clr-namespace:BlockifyLauncher.MVVM.Views.Components"
         mc:Ignorable="d" WindowStyle="None" Loaded="LoadingMainWindow"
         Width="1280" Height="720" Title="Blockify Launcher" AllowsTransparency="True"
-        MinHeight="540" MinWidth="1010">
-
-    <Window.DataContext>
-        <viewModel:CurrentViewModel/>
-    </Window.DataContext>
-
+        MinHeight="540" MinWidth="1010" DataContext="{StaticResource currentViewModel}">
 
     <Grid>
+        <!-- Діленння макету -->
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width="0*"/>
@@ -28,7 +24,6 @@
 
         <Border Style="{StaticResource WindowBorderHeaderStyle}" MouseDown="HeaderMouse">
             <Grid>
-
                 <Label x:Name="TitleCustomForm" Foreground="#5A5A5A" FontSize="12" Margin="0,-5"
                        VerticalAlignment="Center" FontWeight="Regular"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
@@ -51,7 +46,6 @@
                 <Border Style="{StaticResource WindowBorderStyle}" Margin="-22,-20" Grid.RowSpan="10"
                         x:Name="InnerBlurContainer"/>
 
-
                 <Border Grid.Row="1" Style="{StaticResource PanelBorder}" Height="55" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Grid Margin="41,10,11,10">
                         <Grid.ColumnDefinitions>
@@ -63,7 +57,28 @@
                         <StackPanel Orientation="Horizontal" Margin="0,0,100,0" >
                             <Label Content="Name : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
                                    Margin="0,0,10,0"/>
-                            <ComboBox Width="190" Height="Auto" Style="{StaticResource CustomComboBox}" x:Name="MinecraftAccountComboBox"/>
+                            <ComboBox Width="190" Height="Auto" Style="{StaticResource CustomComboBox}" x:Name="MinecraftAccountComboBox">
+                                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+                                <Button Command="{Binding AccountCommand}" Cursor="Hand" Width="150px" Height="25px" Content="Account Setting"
+                                            Background="Transparent" Foreground="White">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Grid>
+                                                            <Border Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" Background="{TemplateBinding Background}">
+                                                                <Label VerticalAlignment="Center" HorizontalAlignment="Center" Content="{TemplateBinding Content}"
+                                                                           Foreground="{TemplateBinding Foreground}"/>
+                                                            </Border>
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </ComboBox>
                             <!--<TextBox Width="190" Height="Auto" Style="{StaticResource CustomTextBox}" x:Name="UserName"
                                      BorderBrush="#3F5A5A5A" BorderThickness="1" Tag="UserName" TextChanged="TextChangedUserName"/> -->
                             <Label Content="Minecraft version : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
@@ -104,8 +119,6 @@
                                     <RowDefinition Height="20*"/>
                                     <RowDefinition Height="40*"/>
                                 </Grid.RowDefinitions>
-
-                                <RadioButton Command="{Binding AccountCommand}" Cursor="Hand" Grid.Row="1"/>
 
                                 <RadioButton Command="{Binding MainCommand}" Cursor="Hand"
                                              x:Name="homeRadioButton">
