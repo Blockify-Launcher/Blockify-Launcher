@@ -9,7 +9,9 @@
         xmlns:component="clr-namespace:BlockifyLauncher.MVVM.Views.Components"
         mc:Ignorable="d" WindowStyle="None" Loaded="LoadingMainWindow"
         Width="1280" Height="720" Title="Blockify Launcher" AllowsTransparency="True"
-        MinHeight="540" MinWidth="1010" DataContext="{StaticResource currentViewModel}">
+        MinHeight="540" MinWidth="1010" DataContext="{StaticResource currentViewModel}"
+        SourceInitialized="Window_OnSourceInitialized" SizeChanged="Window_OnSizeChanged"
+        PreviewMouseMove="Window_OnPreviewMouseMove">
 
     <Grid>
         <!-- Діленння макету -->
@@ -206,13 +208,25 @@
             </Grid>
 
         </Border>
-        <Grid Grid.Row="1" Opacity="0.1">
-            <Thumb Name="BottomLeftThumb" DragDelta="Thumb_DragDelta"  Height="4" Width="4" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW"/>
+        <Grid Grid.Row="1" Opacity="0.02">
+            <Rectangle Height="4" Width="4" x:Name="WindowResizeBottomLeft" PreviewMouseDown="WindowResize_OnPreviewMouseDown"
+                   Stroke="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW"/>
+            <Rectangle Height="4" Width="4" x:Name="WindowResizeBottomRight" PreviewMouseDown="WindowResize_OnPreviewMouseDown"
+                   Stroke="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE"/>
+
+            <Rectangle Width="2" x:Name="WindowResizeLeft" PreviewMouseDown="WindowResize_OnPreviewMouseDown" Fill="#FFF"
+                   Stroke="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE"/>
+            <Rectangle Width="2" x:Name="WindowResizeRight" PreviewMouseDown="WindowResize_OnPreviewMouseDown" Fill="#FFF"
+                   Stroke="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE"/>
+            <Rectangle Height="2" x:Name="WindowResizeBottom" PreviewMouseDown="WindowResize_OnPreviewMouseDown" Fill="#FFF"
+                   Stroke="{x:Null}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS"/>
+            
+            <!--<Thumb Name="BottomLeftThumb" DragDelta="Thumb_DragDelta"  Height="4" Width="4" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW"/>
             <Thumb Name="BottomRightThumb" DragDelta="Thumb_DragDelta" Height="4" Width="4" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE"/>
 
             <Thumb Name="LeftThumb" DragDelta="Thumb_DragDelta" Width="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE"/>
             <Thumb Name="RightThumb" DragDelta="Thumb_DragDelta" Width="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE"/>
-            <Thumb Name="BottomThumb" DragDelta="Thumb_DragDelta" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS"/>
+            <Thumb Name="BottomThumb" DragDelta="Thumb_DragDelta" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS"/>-->
         </Grid>
 
         <component:LoaderComponent Title="Title" Description="Minecraft.jar" Grid.Row="1" VerticalAlignment="Top"

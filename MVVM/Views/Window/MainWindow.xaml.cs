@@ -12,6 +12,12 @@ using System.Windows.Data;
 using BlockifyLauncher.MVVM.Views.Pages.Func.Setting;
 using BlockifyLauncher.Properties;
 using BlockifyLauncher.Core.DiscordActivy;
+using System.Drawing;
+using System.Security.Cryptography.Xml;
+using System.Windows.Interop;
+using System.Runtime.InteropServices;
+using System.Windows.Forms.VisualStyles;
+using BlockifyLauncher.Core.ResizeForm;
 
 namespace BlockifyLauncher
 {
@@ -193,70 +199,97 @@ namespace BlockifyLauncher
         }
         #endregion
 
-        // Resize mainWindow Form
-        private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
-        {
-            Thumb thumb = sender as Thumb;
-            if (thumb != null)
-            {
-                double newWidth = this.Width;
-                double newHeight = this.Height;
+        #region WindowResizing func.
+        private HwndSource _hwndSource;
+        private void Window_OnSourceInitialized(object sender, EventArgs e) 
+            => _hwndSource = (HwndSource)PresentationSource.FromVisual(this);
 
-                try
-                {
-                    switch (thumb.Name)
-                    {
-                        case "LeftThumb":
-                            if (this.Width - e.HorizontalChange > this.MinWidth)
-                            {
-                                newWidth -= e.HorizontalChange;
-                                this.Left += e.HorizontalChange;
-                                this.Width = newWidth;
-                            }
-                            break;
-                        case "RightThumb":
-                            if (this.Width + e.HorizontalChange > this.MinWidth)
-                            {
-                                newWidth += e.HorizontalChange;
-                                this.Width = newWidth;
-                            }
-                            break;
-                        case "BottomThumb":
-                            if (this.Height + e.VerticalChange > this.MinHeight)
-                            {
-                                newHeight += e.VerticalChange;
-                                this.Height = newHeight;
-                            }
-                            break;
-                        case "BottomLeftThumb":
-                            if (this.Width - e.HorizontalChange > this.MinWidth && this.Height + e.VerticalChange > this.MinHeight)
-                            {
-                                newWidth -= e.HorizontalChange;
-                                newHeight += e.VerticalChange;
-                                this.Left += e.HorizontalChange;
-                                this.Width = newWidth;
-                                this.Height = newHeight;
-                            }
-                            break;
-                        case "BottomRightThumb":
-                            if (this.Width + e.HorizontalChange > this.MinWidth && this.Height + e.VerticalChange > this.MinHeight)
-                            {
-                                newWidth += e.HorizontalChange;
-                                newHeight += e.VerticalChange;
-                                this.Width = newWidth;
-                                this.Height = newHeight;
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                    Task.Delay(100).Wait();
-                }
-                catch (Exception)
-                {
-                    return;
-                }
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern IntPtr SendMessage
+            (IntPtr hWmd, UInt32 msg, IntPtr wParam, IntPtr lParam);
+
+        private void ResizeWindow(ResizeDirection direction)
+            => SendMessage(_hwndSource.Handle, 0x112, (IntPtr)(61440 + direction), IntPtr.Zero);
+
+        private enum ResizeDirection
+        {
+            Left = 1,
+            Right = 2,
+            Top = 3,
+            TopLeft = 4,
+            TopRight = 5,
+            Bottom = 6,
+            BottomLeft = 7,
+            BottomRight = 8,
+        }
+
+        private void WindowResize_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var rectangle = (System.Windows.Shapes.Rectangle)sender;
+            if (rectangle == null) return;
+
+            if (WindowStateHelper.IsMaximized) return;
+
+            switch (rectangle.Name)
+            {
+                case "WindowResizeBottom":
+                    Cursor = Cursors.SizeNS;
+                    ResizeWindow(ResizeDirection.Bottom);
+                    break;
+                case "WindowResizeLeft":
+                    Cursor = Cursors.SizeWE;
+                    ResizeWindow(ResizeDirection.Left);
+                    break;
+                case "WindowResizeRight":
+                    Cursor = Cursors.SizeWE;
+                    ResizeWindow(ResizeDirection.Right);
+                    break;
+                case "WindowResizeBottomLeft":
+                    Cursor = Cursors.SizeNESW;
+                    ResizeWindow(ResizeDirection.BottomLeft);
+                    break;
+                case "WindowResizeBottomRight":
+                    Cursor = Cursors.SizeNWSE;
+                    ResizeWindow(ResizeDirection.BottomRight);
+                    break;
             }
         }
+
+        private void Window_OnPreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed)
+                Cursor = Cursors.Arrow;
+        }
+
+        private void Window_OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (WindowState == WindowState.Maximized)
+            {
+                WindowStateHelper.SetWindowMaximized(this);
+                WindowStateHelper.BlockStateChange = true;
+
+                var screen = ScreenFinder.FindAppropriateScreen(this);
+                if (screen != null)
+                {
+                    Top = screen.WorkingArea.Top;
+                    Left = screen.WorkingArea.Left;
+                    Width = screen.WorkingArea.Width;
+                    Height = screen.WorkingArea.Height;
+                }
+
+            }
+            else
+            {
+                if (WindowStateHelper.BlockStateChange)
+                {
+                    WindowStateHelper.BlockStateChange = false;
+                    return;
+                }
+
+                WindowStateHelper.UpdateLastKnownNormalSize(Width, Height);
+                WindowStateHelper.UpdateLastKnownLocation(Top, Left);
+            }
+        }
+        #endregion.
     }
 }
