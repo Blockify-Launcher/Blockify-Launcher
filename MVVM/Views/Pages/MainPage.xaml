@@ -28,12 +28,7 @@
                 BlurRadius="25" Magnification="0.15" Background="Transparent" x:Name="Blur_WindowBlur_Two">
             <Border  Background="#C0121212" CornerRadius="15" SizeChanged="ResizeStackPanelNew"
                  BorderBrush="#3F5A5A5A" BorderThickness="1">
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" x:Name="StackPanelNews">
-                    <Border Width="250" VerticalAlignment="Stretch" Margin="10,20" Style="{StaticResource CustomItemNews}"/>
-                    <Border Width="250" VerticalAlignment="Stretch" Margin="10,20" Style="{StaticResource CustomItemNews}"/>
-                    <Border Width="250" VerticalAlignment="Stretch" Margin="10,20" Style="{StaticResource CustomItemNews}"/>
-                    <Border Width="250" VerticalAlignment="Stretch" Margin="10,20" Style="{StaticResource CustomItemNews}"/>
-                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" x:Name="StackPanelNews"></StackPanel>
             </Border>
         </controls:WindowBlur>
     </Grid>
