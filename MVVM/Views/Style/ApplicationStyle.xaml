@@ -1,12 +1,21 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:converters="clr-namespace:BlockifyLauncher.MVVM.Views.Converters">
+                    xmlns:converters="clr-namespace:BlockifyLauncher.MVVM.Views.Converters"
+                    x:Class="BlockifyLauncher.MVVM.Views.Style.ApplicationStyle">
 
     <SolidColorBrush x:Key="NoTrigerHeaderButton" Color="Transparent"/>
     <SolidColorBrush x:Key="TrigerHeaderButton" Color="#262626"/>
     <SolidColorBrush x:Key="TrigerHeaderButtonExit" Color="Red"/>
     <SolidColorBrush x:Key="HeaderText" Color="#FFF"/>
     <SolidColorBrush x:Key="PanelColor" Color="#121212"/>
+
+    <Style x:Key="ThumbStyle" TargetType="Thumb">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+        <EventSetter Event="DragStarted" Handler="Resize_Init"/>
+        <EventSetter Event="DragCompleted" Handler="Resize_End"/>
+        <EventSetter Event="DragDelta" Handler="Resizeing_Form"/>
+    </Style>
 
     <Style x:Key="CustomButton" TargetType="Button">
         <Setter Property="Cursor" Value="Hand"/>
