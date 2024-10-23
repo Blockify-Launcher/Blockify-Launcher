@@ -201,10 +201,10 @@ namespace BlockifyLauncher
 
         #region WindowResizing func.
         private HwndSource _hwndSource;
-        private void Window_OnSourceInitialized(object sender, EventArgs e) 
+        private void Window_OnSourceInitialized(object sender, EventArgs e) // call for resize effects.
             => _hwndSource = (HwndSource)PresentationSource.FromVisual(this);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]   // using *.dll
         private static extern IntPtr SendMessage
             (IntPtr hWmd, UInt32 msg, IntPtr wParam, IntPtr lParam);
 
@@ -276,7 +276,6 @@ namespace BlockifyLauncher
                     Width = screen.WorkingArea.Width;
                     Height = screen.WorkingArea.Height;
                 }
-
             }
             else
             {

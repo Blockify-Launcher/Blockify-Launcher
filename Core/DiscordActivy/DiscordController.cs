@@ -119,3 +119,10 @@ namespace BlockifyLauncher.Core.DiscordActivy
         }
     }
 }
+
+
+/*
+ 
+Улучшение безопасност 
+ 
+ */
