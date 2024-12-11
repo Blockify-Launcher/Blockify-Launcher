@@ -1,3 +1,30 @@
 {
-  "DISCORDID": 1255825330627805184
+  "DISCORDID": 1255825330627805184,
+  "INFO": [
+    {
+      "key": "play",
+      "value": {
+        "State": "Play minecraft.",
+        "Details": "",
+        "Assets": {
+          "LargeImage": "avatarblockylauncher",
+          "LargeText":  "BlockyLauncher",
+          "SmallText": "minecraft {versionName}",
+          "SmallImage": "minecrafttactivy"
+        }
+      }
+    },{
+      "key": "main",
+      "value": {
+        "State": "Main launcher.",
+        "Details": "This minecraft launcher.",
+        "Assets": {
+          "LargeImage": "avatarblockylauncher",
+          "LargeText": "BlockyLauncher",
+          "SmallText": "BlockyLauncher",
+          "SmallImage": "avatarblockylauncher"
+        }
+      }
+    }
+  ]
 }
