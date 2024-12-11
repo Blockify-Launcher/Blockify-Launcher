@@ -1,121 +1,97 @@
 ﻿using Discord;
+using Microsoft.Identity.Client;
 using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using System.Windows.Forms;
 
 namespace BlockifyLauncher.Core.DiscordActivy
 {
-    public struct DiscordStructurId
-    {
-        [JsonProperty("DISCORDID")]
-        public long Id;
-    }
-
     public class DiscordController
     {
-        private bool _valid = true;
+        private bool _valid = false;
 
-        internal string filePath { get; set; } = "Core";
-        internal string fileName { get; set; } = "discord_config.json";
+        internal string _filePath { get; } = @"Core\DiscordActivy";
+        internal string _fileName { get; } = "discord_config.json";
 
-        private DiscordStructurId _discordInformation;
+        private DiscordStructurInitaliz _discordStr;
+        private Discord.Discord? _discord;
+        private Discord.Activity _activity;
 
-        private Discord.Discord? discord;
-        private Discord.Activity activity;
-
+        // param
         private int _delayUpdate = 0;
+        private Task backgroundTask; 
 
-        public DiscordController()
-        {
-            //DiscordInititalization();
-            _delayUpdate = 1000 / 60;
+        private static bool IsDiscordRunning() =>
+            (Process.GetProcessesByName("Discord")).Length > 0;
 
-            if (_valid && IsDiscordRunning())
+        private Discord.Activity _UpdateDiscordActivity(DiscordStructur _infoDis) =>
+            new Discord.Activity
             {
-                discord = new Discord.Discord(1255825330627805184, (ulong)CreateFlags.Default);
-                var lobbyManager = discord.GetLobbyManager();
-                
-                Intitalization();   // create format information.
-
-                Start(lobbyManager);
-                UpdateActivity();
-            }
-        }
-
-        public static bool IsDiscordRunning()
-        {
-            Process[] processes = Process.GetProcessesByName("Discord");
-            return processes.Length > 0;
-        }
-
-        /* Information block launcher for discord. */
-        private void Intitalization()
-        {
-            activity = new Discord.Activity
-            {
-                State = "Main launcher",
-                Details = "This minecraft launcher.",
-                Timestamps =
+                State       = _infoDis.State,
+                Details     = _infoDis.Details,
+                Timestamps  =
                 {
                     Start = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
                 },
-                Assets =
+                Assets      =
                 {
-                    LargeImage = "avatarblockylauncher",
-                    LargeText = "BlockyLauncher",
+                    LargeImage  = _infoDis.Assets.LargeImage, 
+                    LargeText   = _infoDis.Assets.LargeText,
+                    SmallImage  = _infoDis.Assets.SmallImage,
+                    SmallText   = _infoDis.Assets.SmallText,
                 },
-                Instance = true
+                Instance = _infoDis.Instance,
             };
-        }
 
-        /* Information block launcher for start game. */
-        public void UpdateStartGame(string versionName)
+        private void InitializationJSON() => 
+         _discordStr = JsonConvert
+                .DeserializeObject<DiscordStructurInitaliz>(
+                    Path.Combine(Directory.GetCurrentDirectory(), _filePath, _fileName));
+
+        /*public void UpdateDiscordActivity(string key)
         {
-            // econom resource pc.
-            _delayUpdate = 1000;
 
-            activity.State = "Play minecraft.";
-            activity.Assets.SmallText = $"minecraft {versionName}";
-            activity.Assets.SmallImage = "minecraftactivy";
-            UpdateActivity();
-        }
+        }*/
 
-        public void UpdateActivity()
-        {
-            var activityManager = discord?.GetActivityManager();
-            activityManager.UpdateActivity(activity, (result) =>
+        public DiscordController()
+               : base() {
+            _delayUpdate = 1000 / 60;
+
+            if (_valid || IsDiscordRunning())
             {
-                // func result
-            });
-        }
-
-        public void stop()
-        {
-            _valid = false;
-            discord.Dispose();
-        }
-
-        public async Task StartAsync(LobbyManager lobbyManager)
-        {
-            UpdateActivity();
-
-            while (_valid)
-            {
-                discord?.RunCallbacks();
-                lobbyManager.FlushNetwork();
-
-                await Task.Delay(_delayUpdate); // Delay 1.63 milisecond
+                string local = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _filePath, _fileName); // fix path
+                Debug.WriteLine(local);
+                InitializationJSON();
+                _discord = new Discord.Discord(
+                    _discordStr.DISCORDID, 
+                    (ulong)CreateFlags.Default);
             }
         }
 
-        private Task backgroundTask;
-
-        public async void Start(LobbyManager lobbyManager)
+        /*private void UpdateActivity()
         {
+            var activity = _discord?.GetActivityManager();
+            //activity.UpdateActivity(_activity, (result) => { });
+        }*/
+
+        private async Task StartAsync(LobbyManager lobbyManager)
+        {
+            while (_valid || IsDiscordRunning())
+            {
+                _discord?.RunCallbacks();
+                lobbyManager.FlushNetwork();
+                await Task.Delay(_delayUpdate);
+            }
+        }
+
+        public async void Start(LobbyManager lobbyManager) =>
             await StartAsync(lobbyManager);
+
+        public void Stop()
+        {
+            _valid = false;
+            _discord?.Dispose();
         }
     }
 }

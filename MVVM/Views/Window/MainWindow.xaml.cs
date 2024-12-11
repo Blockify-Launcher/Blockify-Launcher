@@ -161,7 +161,7 @@ namespace BlockifyLauncher
 
             ProgressBarLoad.Activ = "Сlose";
 
-            _discordController.UpdateStartGame(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString());
+            //_discordController.UpdateStartGame(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString());
 
             /*Closing the Launcher after launching minecraft.*/
             if (new Properties.Settings().GetHideLauncher() == 0)

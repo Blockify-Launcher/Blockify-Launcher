@@ -3,13 +3,17 @@
 namespace BlockifyLauncher.Core.DiscordActivy
 {
     /* Struct connection */
-    public struct DiscordStructurInitaliz 
+    public struct DiscordStructurInitaliz
     {
         [JsonProperty("DISCORDID")]
         public long DISCORDID;
+
+        [JsonProperty("INFO")]
+        public IDictionary<string, DiscordStructur>
+            DiscordStruct;
     }
 
-    /* Struct information */ 
+    /* Struct information */
     public struct DiscordStructur
     {
         [JsonProperty("State")]
@@ -68,4 +72,5 @@ namespace BlockifyLauncher.Core.DiscordActivy
         [JsonProperty("Instance")]
         public bool Instance;
     }
+
 }
