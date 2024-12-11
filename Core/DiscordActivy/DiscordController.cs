@@ -4,15 +4,22 @@ using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+using System.Windows.Navigation;
 
 namespace BlockifyLauncher.Core.DiscordActivy
 {
     public class DiscordController
     {
-        private bool _valid = false;
+        private bool _valid = true;
 
-        internal string _filePath { get; } = @"Core\DiscordActivy";
+        internal string _filePath { get; } = @"C:\Users\Palma\source\repos\BlockifyLauncher\Blockify-Launcher\Core\DiscordActivy\discord_config.json";
         internal string _fileName { get; } = "discord_config.json";
+        internal string _SDKPath  {
+            get => Environment.Is64BitProcess ?
+                @"SDK\Discord\x86_64\" : @"SDK\Discord\x86\";
+        }
 
         private DiscordStructurInitaliz _discordStr;
         private Discord.Discord? _discord;
@@ -20,7 +27,6 @@ namespace BlockifyLauncher.Core.DiscordActivy
 
         // param
         private int _delayUpdate = 0;
-        private Task backgroundTask; 
 
         private static bool IsDiscordRunning() =>
             (Process.GetProcessesByName("Discord")).Length > 0;
@@ -47,33 +53,55 @@ namespace BlockifyLauncher.Core.DiscordActivy
         private void InitializationJSON() => 
          _discordStr = JsonConvert
                 .DeserializeObject<DiscordStructurInitaliz>(
-                    Path.Combine(Directory.GetCurrentDirectory(), _filePath, _fileName));
+                    File.ReadAllText(_filePath));
 
         /*public void UpdateDiscordActivity(string key)
         {
 
         }*/
 
-        public DiscordController()
-               : base() {
+        public DiscordController() : base() {
             _delayUpdate = 1000 / 60;
 
             if (_valid || IsDiscordRunning())
             {
-                string local = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _filePath, _fileName); // fix path
-                Debug.WriteLine(local);
+                //string local = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _filePath, _fileName); // fix path
+                //Debug.WriteLine(local);
+                
+                SetDllDirectory(
+                    Path.Combine(
+                        AppDomain.CurrentDomain.BaseDirectory,
+                        _SDKPath));
+
+                try
+                {
+                    IntPtr handle = LoadLibrary("discord_game_sdk.dll");
+                    if (handle == IntPtr.Zero)
+                        throw new DllNotFoundException("Не удалось загрузить библиотеку discord_game_sdk.dll");
+                }
+                catch (DllNotFoundException ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+
                 InitializationJSON();
-                _discord = new Discord.Discord(
+
+                _activity   = _UpdateDiscordActivity(_discordStr.DiscordStruct["main"]);
+                _discord    = new Discord.Discord(
                     _discordStr.DISCORDID, 
-                    (ulong)CreateFlags.Default);
+                    (UInt64)CreateFlags.Default);
+
+                var lobbyManager = _discord.GetLobbyManager();
+                Start(lobbyManager);
+                UpdateActivity();
             }
         }
 
-        /*private void UpdateActivity()
+        private void UpdateActivity()
         {
             var activity = _discord?.GetActivityManager();
-            //activity.UpdateActivity(_activity, (result) => { });
-        }*/
+            activity.UpdateActivity(_activity, (result) => {});
+        }
 
         private async Task StartAsync(LobbyManager lobbyManager)
         {
@@ -85,14 +113,26 @@ namespace BlockifyLauncher.Core.DiscordActivy
             }
         }
 
-        public async void Start(LobbyManager lobbyManager) =>
-            await StartAsync(lobbyManager);
+        private Task _backgroundTask;
+
+        public async void Start(LobbyManager lobbyManager)
+        {
+            //_backgroundTask = 
+                StartAsync(lobbyManager);
+            //_backgroundTask.Start();
+        }
 
         public void Stop()
         {
             _valid = false;
             _discord?.Dispose();
         }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        private static extern IntPtr SetDllDirectory(string lpPathName);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        private static extern IntPtr LoadLibrary(string lpFileName);
     }
 }
 

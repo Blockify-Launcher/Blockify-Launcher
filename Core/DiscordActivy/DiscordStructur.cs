@@ -9,6 +9,7 @@ namespace BlockifyLauncher.Core.DiscordActivy
         public long DISCORDID;
 
         [JsonProperty("INFO")]
+        [JsonConverter(typeof(InfConvertDiscord))]
         public IDictionary<string, DiscordStructur>
             DiscordStruct;
     }
@@ -72,5 +73,4 @@ namespace BlockifyLauncher.Core.DiscordActivy
         [JsonProperty("Instance")]
         public bool Instance;
     }
-
 }

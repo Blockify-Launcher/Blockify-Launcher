@@ -8,10 +8,11 @@
         "Details": "",
         "Assets": {
           "LargeImage": "avatarblockylauncher",
-          "LargeText":  "BlockyLauncher",
+          "LargeText": "BlockyLauncher",
           "SmallText": "minecraft {versionName}",
           "SmallImage": "minecrafttactivy"
-        }
+        },
+        "Instance":  true
       }
     },{
       "key": "main",
@@ -23,7 +24,8 @@
           "LargeText": "BlockyLauncher",
           "SmallText": "BlockyLauncher",
           "SmallImage": "avatarblockylauncher"
-        }
+        },
+        "Instance": true
       }
     }
   ]
