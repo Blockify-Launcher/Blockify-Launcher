@@ -1,12 +1,8 @@
 ﻿using Discord;
-using Microsoft.Identity.Client;
-using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Windows.Navigation;
 
 namespace BlockifyLauncher.Core.DiscordActivy
 {
@@ -16,7 +12,8 @@ namespace BlockifyLauncher.Core.DiscordActivy
 
         internal string _filePath { get; } = @"C:\Users\Palma\source\repos\BlockifyLauncher\Blockify-Launcher\Core\DiscordActivy\discord_config.json";
         internal string _fileName { get; } = "discord_config.json";
-        internal string _SDKPath  {
+        internal string _SDKPath
+        {
             get => Environment.Is64BitProcess ?
                 @"SDK\Discord\x86_64\" : @"SDK\Discord\x86\";
         }
@@ -34,15 +31,15 @@ namespace BlockifyLauncher.Core.DiscordActivy
         private Discord.Activity _UpdateDiscordActivity(DiscordStructur _infoDis) =>
             new Discord.Activity
             {
-                State       = _infoDis.State,
-                Details     = _infoDis.Details,
-                Timestamps  =
+                State = _infoDis.State,
+                Details = _infoDis.Details,
+                Timestamps =
                 {
                     Start = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
                 },
-                Assets      =
+                Assets =
                 {
-                    LargeImage  = _infoDis.Assets.LargeImage, 
+                    LargeImage  = _infoDis.Assets.LargeImage,
                     LargeText   = _infoDis.Assets.LargeText,
                     SmallImage  = _infoDis.Assets.SmallImage,
                     SmallText   = _infoDis.Assets.SmallText,
@@ -50,24 +47,33 @@ namespace BlockifyLauncher.Core.DiscordActivy
                 Instance = _infoDis.Instance,
             };
 
-        private void InitializationJSON() => 
+        private void InitializationJSON() =>
          _discordStr = JsonConvert
                 .DeserializeObject<DiscordStructurInitaliz>(
                     File.ReadAllText(_filePath));
 
-        /*public void UpdateDiscordActivity(string key)
+        public void UpdateDiscordActivity(string key, string val = null)
         {
+            if (key == "game")
+            {
+                // econom resourse pc.
+                _delayUpdate = 1000;
 
-        }*/
+                _UpdateDiscordActivity(_discordStr.DiscordStruct[key]);
+                UpdateActivity();
+            }
+        }
 
-        public DiscordController() : base() {
+        public DiscordController() : base()
+        {
             _delayUpdate = 1000 / 60;
 
-            if (_valid || IsDiscordRunning())
+            if (_valid && IsDiscordRunning())
             {
+                // TODO : fix path
                 //string local = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _filePath, _fileName); // fix path
                 //Debug.WriteLine(local);
-                
+
                 SetDllDirectory(
                     Path.Combine(
                         AppDomain.CurrentDomain.BaseDirectory,
@@ -86,9 +92,9 @@ namespace BlockifyLauncher.Core.DiscordActivy
 
                 InitializationJSON();
 
-                _activity   = _UpdateDiscordActivity(_discordStr.DiscordStruct["main"]);
-                _discord    = new Discord.Discord(
-                    _discordStr.DISCORDID, 
+                _activity = _UpdateDiscordActivity(_discordStr.DiscordStruct["main"]);
+                _discord = new Discord.Discord(
+                    _discordStr.DISCORDID,
                     (UInt64)CreateFlags.Default);
 
                 var lobbyManager = _discord.GetLobbyManager();
@@ -100,16 +106,32 @@ namespace BlockifyLauncher.Core.DiscordActivy
         private void UpdateActivity()
         {
             var activity = _discord?.GetActivityManager();
-            activity.UpdateActivity(_activity, (result) => {});
+            activity.UpdateActivity(_activity, (result) => {
+                //Debug.WriteLine($"debug discord update activity. Code : {result}");
+            });
         }
 
         private async Task StartAsync(LobbyManager lobbyManager)
         {
-            while (_valid || IsDiscordRunning())
+            try
             {
-                _discord?.RunCallbacks();
-                lobbyManager.FlushNetwork();
-                await Task.Delay(_delayUpdate);
+                while (_valid)
+                {
+                    if (!IsDiscordRunning())
+                    {
+                        Debug.WriteLine("Discord не работает. Завершаю цикл.");
+                        break;
+                    }
+
+                    lobbyManager.FlushNetwork();
+
+                    _discord?.RunCallbacks();
+                    await Task.Delay(_delayUpdate);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("error StartAsync: " + ex.Message);
             }
         }
 
@@ -117,15 +139,15 @@ namespace BlockifyLauncher.Core.DiscordActivy
 
         public async void Start(LobbyManager lobbyManager)
         {
-            //_backgroundTask = 
-                StartAsync(lobbyManager);
-            //_backgroundTask.Start();
+            _backgroundTask = Task.Run(() => StartAsync(lobbyManager));
+            await _backgroundTask;
         }
 
         public void Stop()
         {
             _valid = false;
             _discord?.Dispose();
+            _backgroundTask?.Wait();
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
