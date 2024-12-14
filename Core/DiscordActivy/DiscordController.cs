@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO;
+using System.Management;
 using System.Runtime.InteropServices;
 
 namespace BlockifyLauncher.Core.DiscordActivy
@@ -9,6 +10,7 @@ namespace BlockifyLauncher.Core.DiscordActivy
     public class DiscordController
     {
         private bool _valid = true;
+        private bool _play = false;
 
         internal string _filePath { get; } = @"C:\Users\Palma\source\repos\BlockifyLauncher\Blockify-Launcher\Core\DiscordActivy\discord_config.json";
         internal string _fileName { get; } = "discord_config.json";
@@ -22,21 +24,60 @@ namespace BlockifyLauncher.Core.DiscordActivy
         private Discord.Discord? _discord;
         private Discord.Activity _activity;
 
-        // param
         private int _delayUpdate = 0;
 
         private static bool IsDiscordRunning() =>
             (Process.GetProcessesByName("Discord")).Length > 0;
+
+        private static bool IsProcessRunning(string processName) =>
+            Process.GetProcessesByName(processName).Length > 0;
+
+        private static bool IsBlockifyLauncherRunning()
+        {
+            var processes = Process.GetProcessesByName("javaw");
+
+            foreach (var process in processes)
+            {
+                try
+                {
+                    var commandLine = GetCommandLine(process);
+
+                    if (commandLine != null && commandLine.Contains("BlockifyLauncher"))
+                        return true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+
+            return false;
+        }
+
+        private static string GetCommandLine(Process process)
+        {
+            try
+            {
+                var query = $"SELECT CommandLine FROM Win32_Process WHERE ProcessId = {process.Id}";
+                var searcher = new ManagementObjectSearcher(query);
+                var queryCollection = searcher.Get();
+
+                foreach (var queryObj in queryCollection)
+                    return queryObj["CommandLine"]?.ToString();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+
+            return null;
+        }
 
         private Discord.Activity _UpdateDiscordActivity(DiscordStructur _infoDis) =>
             new Discord.Activity
             {
                 State = _infoDis.State,
                 Details = _infoDis.Details,
-                Timestamps =
-                {
-                    Start = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-                },
                 Assets =
                 {
                     LargeImage  = _infoDis.Assets.LargeImage,
@@ -54,13 +95,15 @@ namespace BlockifyLauncher.Core.DiscordActivy
 
         public void UpdateDiscordActivity(string key, string val = null)
         {
-            if (key == "game")
+            if (key == "play")
             {
                 // econom resourse pc.
                 _delayUpdate = 1000;
 
-                _UpdateDiscordActivity(_discordStr.DiscordStruct[key]);
+                _activity = _UpdateDiscordActivity(_discordStr.DiscordStruct[key]);
                 UpdateActivity();
+
+                _play = true; 
             }
         }
 
@@ -83,7 +126,7 @@ namespace BlockifyLauncher.Core.DiscordActivy
                 {
                     IntPtr handle = LoadLibrary("discord_game_sdk.dll");
                     if (handle == IntPtr.Zero)
-                        throw new DllNotFoundException("Не удалось загрузить библиотеку discord_game_sdk.dll");
+                        throw new DllNotFoundException("Failed to load the library discord_game_sdk.dll");
                 }
                 catch (DllNotFoundException ex)
                 {
@@ -93,12 +136,12 @@ namespace BlockifyLauncher.Core.DiscordActivy
                 InitializationJSON();
 
                 _activity = _UpdateDiscordActivity(_discordStr.DiscordStruct["main"]);
+                _activity.Timestamps.Start = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 _discord = new Discord.Discord(
                     _discordStr.DISCORDID,
                     (UInt64)CreateFlags.Default);
 
-                var lobbyManager = _discord.GetLobbyManager();
-                Start(lobbyManager);
+                Start();
                 UpdateActivity();
             }
         }
@@ -111,7 +154,7 @@ namespace BlockifyLauncher.Core.DiscordActivy
             });
         }
 
-        private async Task StartAsync(LobbyManager lobbyManager)
+        private async Task StartAsync(string processName)
         {
             try
             {
@@ -119,11 +162,24 @@ namespace BlockifyLauncher.Core.DiscordActivy
                 {
                     if (!IsDiscordRunning())
                     {
-                        Debug.WriteLine("Discord не работает. Завершаю цикл.");
-                        break;
+                        Stop();
+                        throw new Exception("Discord closing...");
                     }
 
-                    lobbyManager.FlushNetwork();
+                    if (!IsProcessRunning(processName))
+                    {
+                        Stop();
+                        throw new Exception("Not work process...");
+                    }
+
+                    if (_play)
+                        if (!IsBlockifyLauncherRunning())
+                        {
+                            Stop();
+                            throw new Exception("The javaw.exe process is closed...");
+                        }
+                    
+                    Debug.WriteLine(IsProcessRunning(processName));
 
                     _discord?.RunCallbacks();
                     await Task.Delay(_delayUpdate);
@@ -132,14 +188,15 @@ namespace BlockifyLauncher.Core.DiscordActivy
             catch (Exception ex)
             {
                 Debug.WriteLine("error StartAsync: " + ex.Message);
+                Stop();
             }
         }
 
         private Task _backgroundTask;
 
-        public async void Start(LobbyManager lobbyManager)
+        public async void Start()
         {
-            _backgroundTask = Task.Run(() => StartAsync(lobbyManager));
+            _backgroundTask = Task.Run(() => StartAsync("BlockifyLauncher"));
             await _backgroundTask;
         }
 
@@ -147,7 +204,10 @@ namespace BlockifyLauncher.Core.DiscordActivy
         {
             _valid = false;
             _discord?.Dispose();
-            _backgroundTask?.Wait();
+            if (_backgroundTask != null && !_backgroundTask.IsCompleted)
+            {
+                _backgroundTask.Wait();
+            }
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]

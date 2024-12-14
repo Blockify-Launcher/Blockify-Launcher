@@ -23,7 +23,7 @@ namespace BlockifyLauncher
 {
     public partial class MainWindow : Window
     {
-        private DiscordController _discordController;
+        //private DiscordController _discordController;
 
         public Border MainBorder { get; set; }
 
@@ -46,7 +46,7 @@ namespace BlockifyLauncher
         private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
             // initialization component discord.
-            _discordController = new DiscordController();
+            //_discordController = new DiscordController();
 
             this.ProgressBarLoad.Activ = "None";
             try
@@ -161,6 +161,7 @@ namespace BlockifyLauncher
 
             ProgressBarLoad.Activ = "Сlose";
 
+            var _discordController = App._discordController;
             _discordController.UpdateDiscordActivity("play");//MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString());
 
             /*Closing the Launcher after launching minecraft.*/
