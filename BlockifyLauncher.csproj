@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>False</UseWindowsForms>
-    <ApplicationIcon>Image\MainForm.ico</ApplicationIcon>
+    <ApplicationIcon>Image\Logo.ico</ApplicationIcon>
     <Platforms>AnyCPU;x86;x64</Platforms>
     <StartupObject></StartupObject>
     <AssemblyVersion>0.0.1.0</AssemblyVersion>
@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Image\MainForm.ico" />
+    <Content Include="Image\Logo.ico" />
   </ItemGroup>
 
   <ItemGroup>

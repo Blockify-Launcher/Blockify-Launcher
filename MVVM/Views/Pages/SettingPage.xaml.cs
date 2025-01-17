@@ -7,6 +7,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 using Microsoft.Win32;
+using System.Collections.ObjectModel;
+using BlockifyLib.Launcher.Version;
+using System.Windows.Media;
 
 namespace BlockifyLauncher.MVVM.Views.Pages
 {
@@ -19,10 +22,17 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         private MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
         private Properties.Settings setting = new Properties.Settings();
 
+        // element
+        public ObservableCollection<CheckBox> _version_list { get; set; }
+            = new ObservableCollection<CheckBox>();
+
         public SettingPage()
         {
             InitializeComponent();
             Blur_WindowBlur.BlurContainer = mainWindow.MainBorder;
+            DataContext = this;
+
+            new OutVersionList(); 
         }
 
         private void LoadingPages(object sender, RoutedEventArgs e)
@@ -46,6 +56,9 @@ namespace BlockifyLauncher.MVVM.Views.Pages
 
             this.ComboBoxDisplayForm.SelectedIndex = setting.GetHideLauncher();
             this.ComboBoxLauncherLanguage.SelectedIndex = setting.GetLanguage();
+
+            // Generate element
+            GenarateElement_CheckBox();
         }
 
         private static readonly Regex onlyNumbers = new Regex("[^0-9.-]+");
@@ -83,6 +96,21 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             }
             setting.SetSettingDisplayGame(display);
             SaveProperties("Save", "Changing screen settings.");
+        }
+
+        private void GenarateElement_CheckBox()
+        {
+            int i = 0;
+            foreach(var item in OutVersionList.GetVersionList())
+            {
+                _version_list.Add(new CheckBox() {
+                    Name = $"_version_checkBox_{i++}",
+                    Content = $"Display {OutVersionList.ToString(item)} (\"{ProfileConverter.ToString(item)}\")",
+                    Style = (System.Windows.Style)FindResource("CustomCheckBox"),
+                    Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255)),
+                    FontSize = 20
+                });
+            }
         }
 
         private void SliderRAMValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

@@ -84,8 +84,9 @@
                             <Rectangle Fill="#4C5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
                             <StackPanel>
                                 <Label Margin="20,0" Content="Version list : " Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                                <StackPanel Margin="50,5">
-                                    <CheckBox Content="Display Snapshots (&quot;Snapshots&quot;)" Style="{StaticResource CustomCheckBox}" Foreground="#FFF" FontSize="20"/>
+                                <StackPanel Margin="50,5" x:Name="versionlist">
+                                    <ItemsControl ItemsSource="{Binding _version_list}"/>
+                                    <!--<CheckBox Content="Display Snapshots (&quot;Snapshots&quot;)" Style="{StaticResource CustomCheckBox}" Foreground="#FFF" FontSize="20"/>-->
                                 </StackPanel>
                             </StackPanel>
                             <Rectangle Fill="#3F5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
