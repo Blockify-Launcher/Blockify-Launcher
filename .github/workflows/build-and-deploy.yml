@@ -32,12 +32,14 @@ jobs:
       - name: Publish project
         run: dotnet publish -c Release -o ./publish
 
-      - name: Store Discord Bot Token
-        run: echo "DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}" > .env
-        shell: bash
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: wpf-app
+          name: Bloctify-archiv
           path: ./publish
+
+      - name: Store Discord Bot Token
+        run: |
+          scp -r ./publish user@yourserver:/path/to/deploy
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
