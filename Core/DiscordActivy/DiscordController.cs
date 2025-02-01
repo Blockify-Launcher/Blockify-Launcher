@@ -133,6 +133,8 @@ namespace BlockifyLauncher.Core.DiscordActivy
                     Debug.WriteLine(ex.Message);
                 }
 
+                string discordToken = Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN");
+                Debug.WriteLine(discordToken);
                 _discordStr.DISCORDID =
                     long.Parse(Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
 
