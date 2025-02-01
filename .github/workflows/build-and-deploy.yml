@@ -39,5 +39,7 @@ jobs:
           path: ./publish
 
       - name: Store Discord Bot Token
+        run: |
+          echo ""
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
