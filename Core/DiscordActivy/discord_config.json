@@ -1,3 +1,30 @@
 {
-
+  "INFO": [ 
+    {
+      "key": "play",
+      "value": {
+        "State": "Play minecraft.",
+        "Details": "",
+        "Assets": {
+          "LargeImage": "avatarblockylauncher",
+          "LargeText": "BlockyLauncher",
+          "SmallText": "minecraft {versionName}",
+          "SmallImage": "minecrafttactivy"
+        },
+        "Instance": true
+      }
+    },
+    {
+      "key": "main",
+      "value": {
+        "State": "Main launcher.",
+        "Details": "This minecraft launcher.",
+        "Assets": {
+          "LargeImage": "avatarblockylauncher",
+          "LargeText": "BlockyLauncher"
+        },
+        "Instance": true
+      }
+    }
+  ]
 }
