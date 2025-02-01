@@ -33,7 +33,7 @@ jobs:
         run: dotnet publish -c Release -o ./publish
 
       - name: Store Discord Bot Token
-        run: echo "DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}" > .env
+        run: echo "DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}" >> $GITHUB_ENV
         shell: bash
 
       - name: Upload artifacts
