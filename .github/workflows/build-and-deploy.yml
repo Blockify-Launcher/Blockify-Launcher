@@ -1,0 +1,41 @@
+name: Build and Deploy WPF Application
+
+on:
+  push:
+    branches:
+      - master  # Запускать пайплайн при пуше в ветку master
+  pull_request:
+    branches:
+      - master  # Запускать пайплайн при создании PR в ветку master
+
+jobs:
+  build:
+    runs-on: windows-latest  # Используем Windows для сборки WPF
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build project
+        run: dotnet build --configuration Release
+
+      - name: Publish project
+        run: dotnet publish -c Release -o ./publish
+
+      - name: Store Discord Bot Token
+        run: echo "DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}" > .env
+        shell: bash
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: wpf-app
+          path: ./publish
