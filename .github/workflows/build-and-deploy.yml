@@ -3,20 +3,20 @@ name: Build and Deploy WPF Application
 on:
   push:
     branches:
-      - master  # Запускать пайплайн при пуше в ветку master
+      - master  
   pull_request:
     branches:
-      - master  # Запускать пайплайн при создании PR в ветку master
+      - master  
 
 jobs:
   build:
-    runs-on: windows-latest  # Используем Windows для сборки WPF
+    runs-on: windows-latest  
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          submodules: true  # Инициализировать и обновить подмодули
+          submodules: true  
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -24,13 +24,13 @@ jobs:
           dotnet-version: '9.0.101'
 
       - name: Restore dependencies
-        run: dotnet restore path/to/your.sln
+        run: dotnet restore Blockify-Launcher/Blockify-Launcher.sln 
 
       - name: Build project
-        run: dotnet build path/to/your.sln --configuration Release
+        run: dotnet build Blockify-Launcher/Blockify-Launcher.sln --configuration Release  
 
       - name: Publish project
-        run: dotnet publish path/to/your.sln -c Release -o ./publish
+        run: dotnet publish Blockify-Launcher/Blockify-Launcher.sln -c Release -o ./publish  
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
