@@ -67,6 +67,7 @@
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="1.1.2" />
     <PackageReference Include="ConfigureAwait.Fody" Version="3.3.2" />
+    <PackageReference Include="dotenv.net" Version="3.2.1" />
     <PackageReference Include="LZMA-SDK" Version="22.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.67.2" />

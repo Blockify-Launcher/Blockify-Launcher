@@ -1,4 +1,5 @@
 ﻿using Discord;
+using dotenv.net;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO;
@@ -133,10 +134,13 @@ namespace BlockifyLauncher.Core.DiscordActivy
                     Debug.WriteLine(ex.Message);
                 }
 
+                // using sicret key
+                DotEnv.Load();
                 string discordToken = Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN");
-                Debug.WriteLine(discordToken);
-                _discordStr.DISCORDID =
-                    long.Parse(Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
+                if (!string.IsNullOrEmpty(discordToken))
+                {
+                    _discordStr.DISCORDID = long.Parse(discordToken);
+                } else return; 
 
                 InitializationJSON();
 

@@ -2,6 +2,7 @@
 **/obj
 **/bin
 **/.vs
+**/.env
 
 #File
 *.diff
