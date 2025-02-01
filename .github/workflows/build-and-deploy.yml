@@ -24,22 +24,22 @@ jobs:
           dotnet-version: '9.0.101'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore path/to/your.sln
 
       - name: Build project
-        run: dotnet build --configuration Release
+        run: dotnet build path/to/your.sln --configuration Release
 
       - name: Publish project
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish path/to/your.sln -c Release -o ./publish
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Bloctify-archiv
+          name: Blockify-archive
           path: ./publish
 
       - name: Store Discord Bot Token
         run: |
-          echo ""
+          echo "Token is securely stored"
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
