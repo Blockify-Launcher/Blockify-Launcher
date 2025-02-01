@@ -35,11 +35,6 @@ jobs:
       - name: Store Discord Bot Token
         run: echo "DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}" >> $GITHUB_ENV
 
-      - name: Debug environment variables
-        run: |
-          echo "DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}"
-          echo "DISCORD_BOT_TOKEN=$DISCORD_BOT_TOKEN"
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
