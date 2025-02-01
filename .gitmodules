@@ -1,0 +1,3 @@
+[submodule "libs/BlockifyLib"]
+	path = libs/BlockifyLib
+	url = https://github.com/Blockify-Launcher/BlockifyLib

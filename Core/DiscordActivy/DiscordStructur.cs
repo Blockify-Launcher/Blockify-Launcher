@@ -5,7 +5,6 @@ namespace BlockifyLauncher.Core.DiscordActivy
     /* Struct connection */
     public struct DiscordStructurInitaliz
     {
-        [JsonProperty("DISCORDID")]
         public long DISCORDID;
 
         [JsonProperty("INFO")]
