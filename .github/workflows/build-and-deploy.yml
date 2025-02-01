@@ -24,13 +24,13 @@ jobs:
           dotnet-version: '9.0.101'
 
       - name: Restore dependencies
-        run: dotnet restore Blockify-Launcher/Blockify-Launcher.sln 
+        run: dotnet restore
 
       - name: Build project
-        run: dotnet build Blockify-Launcher/Blockify-Launcher.sln --configuration Release  
+        run: dotnet build  --configuration Release  
 
       - name: Publish project
-        run: dotnet publish Blockify-Launcher/Blockify-Launcher.sln -c Release -o ./publish  
+        run: dotnet publish -c Release -o ./publish  
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
