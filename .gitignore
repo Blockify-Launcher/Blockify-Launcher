@@ -2,6 +2,8 @@
 **/obj
 **/bin
 **/.vs
+**/.env
+**/publish
 
 #File
 *.diff
