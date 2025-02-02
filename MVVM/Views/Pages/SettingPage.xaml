@@ -78,14 +78,19 @@
                                 <Label Content="Launcher language " Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <ComboBox Style="{StaticResource CustomComboBox}" Width="200" Tag="SettingComboBox" Margin="10,0,0,0" BorderThickness="1" 
                                           SelectionChanged="ComboBoxLauncherLanguageSelect" x:Name="ComboBoxLauncherLanguage">
-                                    <ComboBoxItem Content="English"/>
                                 </ComboBox>
                             </StackPanel>
                             <Rectangle Fill="#4C5A5A5A" Height="1" HorizontalAlignment="Stretch"/>
                             <StackPanel>
                                 <Label Margin="20,0" Content="Version list : " Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                                 <StackPanel Margin="50,5">
-                                    <CheckBox Content="Display Snapshots (&quot;Snapshots&quot;)" Style="{StaticResource CustomCheckBox}" Foreground="#FFF" FontSize="20"/>
+                                    <ItemsControl ItemsSource="{Binding _version_list}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <CheckBox Content="{Binding}" Style="{StaticResource CustomCheckBox}" Foreground="#FFF" FontSize="20"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
                             </StackPanel>
                             <Rectangle Fill="#3F5A5A5A" Height="1" HorizontalAlignment="Stretch"/>

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using BlockifyLauncher.MVVM.ViewModel.Pages.VisualFucn;
 
 namespace BlockifyLauncher.MVVM.Views.Components
 {
@@ -72,16 +73,30 @@ namespace BlockifyLauncher.MVVM.Views.Components
             }
         }
 
-        public async Task GetNotification(string title, string description)
+        public async Task GetNotification(string title, string description, int delay = 1000)
         {
             Title = title;
             Description = description;
 
             await OpacityNotific(0.1, true);
-            await Task.Delay(1000);
+            await Task.Delay(delay);
             await OpacityNotific(0.1, false);
             await Task.Delay(10);
             this.Opacity = 0;
+        }
+
+        public async Task GetNotification(string title, string description, string image, int delay = 1000)
+        {
+            Title = title; 
+            Description = description;
+
+            await OpacityNotific(0.1, true);
+            await Task.Delay(delay);
+            await OpacityNotific(0.1, false);
+            await Task.Delay(10);
+            this.Opacity = 0;
+
+            // TODO Добавить смену изображения 
         }
     }
 }

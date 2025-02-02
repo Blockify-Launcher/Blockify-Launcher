@@ -1,10 +1,11 @@
-﻿using BlockifyLib.Launcher.Microsoft;
+﻿using BlockifyLauncher.MVVM.ViewModel.Pages.VisualFucn;
+using BlockifyLib.Launcher.Microsoft;
 using BlockifyLib.Launcher.Minecraft.Auth;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace BlockifyLauncher.MVVM.Views.Pages
 {
@@ -104,11 +105,19 @@ namespace BlockifyLauncher.MVVM.Views.Pages
 
         private void SaveUserAccount(object sender, RoutedEventArgs e)
         {
-            new Properties.Settings().accountSession.EditUser(editElement.Id, UserNameTextBox.Text);
-            GetAccount();
+            try
+            {
+                new Properties.Settings().accountSession.EditUser(editElement.Id, UserNameTextBox.Text);
+                GetAccount();
 
-            Notification("Edit account", $"a new username has been set up \"{UserNameTextBox.Text}\"");
-            UpdateElement();
+                Notification.Show("Edit account", $"a new username has been set up \"{UserNameTextBox.Text}\"");
+                UpdateElement();
+            } 
+                catch (Exception ex)
+            {
+                Notification.Show("Error", ex.Message);
+                return;
+            }
         }
 
         // Edit element contextMenu.
@@ -134,12 +143,12 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             new Properties.Settings().accountSession.CreateUser(UserName);
             GetAccount();
 
-            Notification("Create new account", $"a new account has been created with the name \"{UserName}\"");
+            Notification.Show("Create new account", $"a new account has been created with the name \"{UserName}\"");
             UpdateElement();
         }
 
-        private void Notification(string Title, string Description = "None") =>
-             _ = mainWindow.NotificationElement.GetNotification(Title, Description);
+        //private void Notification(string Title, string Description = "None") =>
+         //    _ = mainWindow.NotificationElement.GetNotification(Title, Description);
 
     }
 }

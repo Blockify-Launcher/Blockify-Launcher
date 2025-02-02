@@ -1,8 +1,7 @@
 ﻿using BlockifyLauncher.Core.DiscordActivy;
+using BlockifyLauncher.Resources;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Input;
 
 namespace BlockifyLauncher
 {
@@ -12,7 +11,7 @@ namespace BlockifyLauncher
     public partial class App : Application
     {
         public static DiscordController _discordController { get; private set; }
-        
+
         public App()
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
@@ -21,9 +20,15 @@ namespace BlockifyLauncher
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            Debug.WriteLine(new Properties.Settings().GetLanguage());
+
+            ResxLocalizationProvider.Instance.ChangeLanguage(
+                new Properties.Settings().GetLanguage()
+                );
+
             try
             {
-                _discordController = new DiscordController(); 
+                _discordController = new DiscordController();
             }
             catch (Exception ex)
             {
@@ -36,6 +41,7 @@ namespace BlockifyLauncher
             base.OnExit(e);
             _discordController?.Stop();
         }
+
 
         /*
         //Intialization Aplication.

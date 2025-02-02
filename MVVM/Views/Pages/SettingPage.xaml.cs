@@ -10,6 +10,8 @@ using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using BlockifyLib.Launcher.Version;
 using System.Windows.Media;
+using BlockifyLauncher.Resources;
+using System.Globalization;
 
 namespace BlockifyLauncher.MVVM.Views.Pages
 {
@@ -55,10 +57,10 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             this.JavaVersion.SelectedIndex = 0;
 
             this.ComboBoxDisplayForm.SelectedIndex = setting.GetHideLauncher();
-            this.ComboBoxLauncherLanguage.SelectedIndex = setting.GetLanguage();
 
             // Generate element
             GenarateElement_CheckBox();
+            FillLanguageComboBox();
         }
 
         private static readonly Regex onlyNumbers = new Regex("[^0-9.-]+");
@@ -101,16 +103,18 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         private void GenarateElement_CheckBox()
         {
             int i = 0;
-            /*foreach(var item in OutVersionList.GetVersionList())
+
+            foreach(var item in ProfileConverter.GetListVersion())
             {
-                _version_list.Add(new CheckBox() {
+                _version_list.Add(new CheckBox()
+                {
                     Name = $"_version_checkBox_{i++}",
-                    Content = $"Display {OutVersionList.ToString(item)} (\"{ProfileConverter.ToString(item)}\")",
+                    Content = $"Display {ProfileConverter.ToString(item)} (\"{ProfileConverter.ToString(item)}\")",
                     Style = (System.Windows.Style)FindResource("CustomCheckBox"),
                     Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255)),
                     FontSize = 20
                 });
-            }*/
+            }
         }
 
         private void SliderRAMValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -154,10 +158,47 @@ namespace BlockifyLauncher.MVVM.Views.Pages
                 );
         }
 
+        private void FillLanguageComboBox()
+        {
+            // TODO Нужно будет переделать реализацию
+            var availableCultures = new List<CultureInfo>
+            {
+                new CultureInfo("en-US"),
+                new CultureInfo("ru-RU"),
+                new CultureInfo("uk-UA")
+            };
+
+            ComboBoxLauncherLanguage.Items.Clear();
+
+
+            foreach (var culture in availableCultures)
+            {
+                var comboBoxItem = new ComboBoxItem
+                {
+                    Content = culture.NativeName, 
+                    Tag = culture.Name 
+                };
+
+                ComboBoxLauncherLanguage.Items.Add(comboBoxItem);
+            }
+
+            foreach (ComboBoxItem item in ComboBoxLauncherLanguage.Items)
+                if (item.Tag.ToString() == new Properties.Settings().GetLanguage())
+                {
+                    ComboBoxLauncherLanguage.SelectedItem = item;
+                    break;
+                }
+        }
+
         private void ComboBoxLauncherLanguageSelect(object sender, SelectionChangedEventArgs e)
         {
+            var selectedItem = (ComboBoxItem)((ComboBox)sender).SelectedItem;
+            ResxLocalizationProvider.Instance.ChangeLanguage(
+                selectedItem.Tag.ToString()
+                );
+
             new Properties.Settings().SetLauguage(
-                ((ComboBox)sender).SelectedIndex
+                selectedItem.Tag.ToString()
                 );
         }
 

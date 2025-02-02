@@ -6,6 +6,7 @@
         xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel"
         xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
         xmlns:local="clr-namespace:BlockifyLauncher"
+        xmlns:lang="clr-namespace:BlockifyLauncher.Resources"
         xmlns:component="clr-namespace:BlockifyLauncher.MVVM.Views.Components"
         mc:Ignorable="d" WindowStyle="None" Loaded="LoadingMainWindow"
         Width="1280" Height="720" Title="Blockify Launcher" AllowsTransparency="True"
@@ -83,11 +84,11 @@
                             </ComboBox>
                             <!--<TextBox Width="190" Height="Auto" Style="{StaticResource CustomTextBox}" x:Name="UserName"
                                      BorderBrush="#3F5A5A5A" BorderThickness="1" Tag="UserName" TextChanged="TextChangedUserName"/> -->
-                            <Label Content="Minecraft version : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
+                            <Label Content="{Binding [version], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
                                    Margin="16,0,10,0"/>
                             <ComboBox Width="190" Height="Auto" Style="{StaticResource CustomComboBox}" x:Name="MinecraftVerisonComboBox"/>
                         </StackPanel>
-                        <Button HorizontalAlignment="Right" Content="Start" Grid.Column="2" Name="Start"
+                        <Button HorizontalAlignment="Right" Content="{Binding [start_game], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Grid.Column="2" Name="Start"
                                 Width="190" Height="Auto" Style="{StaticResource CustomButton}" Click="ButtonClickStartGame"/>
                     </Grid>
                 </Border>

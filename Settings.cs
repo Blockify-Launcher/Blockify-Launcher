@@ -54,8 +54,8 @@ namespace BlockifyLauncher.Properties {
         public int GetHideLauncher() => this.HideLauncher;
 
         /* Мова лаунчеру */
-        public void SetLauguage(int num) => this.Language = num;
-        public int GetLanguage() => this.Language;
+        public void SetLauguage(string num) => this.Language = num;
+        public string GetLanguage() => this.Language;
 
         /* Хуй знает что за хуета */
         public void SetVersionDisplay(int num) => this.VersionDisplay = num;
