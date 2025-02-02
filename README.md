@@ -8,7 +8,7 @@
 ![Baner](https://github.com/Blockify-Launcher/.github/assets/84909252/47206b7a-edc5-4b4c-b368-9e8e6634ecce)
 <div align="center">
 
-  [![.github/workflows/build-and-deploy.yml](https://github.com/Blockify-Launcher/Blockify-Launcher/actions/workflows/build-and-deploy.yml/badge.svg?branch=master)](https://github.com/Blockify-Launcher/Blockify-Launcher/actions/workflows/build-and-deploy.yml)
+  [![Build and Deploy WPF Application](https://github.com/Blockify-Launcher/Blockify-Launcher/actions/workflows/build-and-deploy.yml/badge.svg)](https://github.com/Blockify-Launcher/Blockify-Launcher/actions/workflows/build-and-deploy.yml)
 
 </div>
 
