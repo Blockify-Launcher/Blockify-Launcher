@@ -24,13 +24,13 @@ jobs:
           dotnet-version: '9.0.101'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore BlockifyLauncher.csproj
 
       - name: Build project
-        run: dotnet build  --configuration Release  
+        run: dotnet build BlockifyLauncher.csproj -c Release  
 
       - name: Publish project
-        run: dotnet publish -c Release -o ./publish  
+        run: dotnet publish BlockifyLauncher.csproj -c Release -o ./publish  
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -43,3 +43,5 @@ jobs:
           echo "Token is securely stored"
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        shell:
+          bash
