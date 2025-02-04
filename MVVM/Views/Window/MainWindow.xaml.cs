@@ -1,23 +1,16 @@
-﻿using BlockifyLib.Launcher.Downloader;
-using BlockifyLib.Launcher.Minecraft.Auth;
-using BlockifyLib.Launcher.src;
-
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
-using System.Windows.Data;
-
+﻿using BlockifyLauncher.Core.ResizeForm;
 using BlockifyLauncher.MVVM.Views.Pages.Func.Setting;
 using BlockifyLauncher.Properties;
-using BlockifyLauncher.Core.DiscordActivy;
-using System.Drawing;
-using System.Security.Cryptography.Xml;
-using System.Windows.Interop;
+using BlockifyLib.Launcher.Downloader;
+using BlockifyLib.Launcher.Minecraft.Auth;
+using BlockifyLib.Launcher.src;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Windows.Forms.VisualStyles;
-using BlockifyLauncher.Core.ResizeForm;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace BlockifyLauncher
 {
@@ -39,10 +32,10 @@ namespace BlockifyLauncher
 
             this.MainBorder = InnerBlurContainer;
 
-            this.Width  = Settings.Default.WidthProgram;
+            this.Width = Settings.Default.WidthProgram;
             this.Height = Settings.Default.HeightProgram;
         }
-        
+
         private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
             // initialization component discord.
@@ -51,7 +44,7 @@ namespace BlockifyLauncher
             this.ProgressBarLoad.Activ = "None";
             try
             {
-                await InitializeAccountsAsync(); 
+                await InitializeAccountsAsync();
                 await InitializeVersionsAsync();
 
                 MinecraftAccountComboBox.SelectionChanged += MinecraftAccountSelectionChanged;
@@ -84,7 +77,8 @@ namespace BlockifyLauncher
             else
                 MinecraftAccountComboBox.Text = "None...";
 
-            MinecraftAccountComboBox.Items.Add(new Separator() {
+            MinecraftAccountComboBox.Items.Add(new Separator()
+            {
                 Style = (Style)Application.Current.FindResource("MenuSeparatorStyle")
             });
 
@@ -103,10 +97,10 @@ namespace BlockifyLauncher
         {
             try
             {
-               ComboBox senderBox = (ComboBox)sender;
-               SessionStruct sessionUsed = (account.GetAllUserArray())[senderBox.SelectedIndex];
-               setting.SetLastUser(sessionUsed.Id);
-            } 
+                ComboBox senderBox = (ComboBox)sender;
+                SessionStruct sessionUsed = (account.GetAllUserArray())[senderBox.SelectedIndex];
+                setting.SetLastUser(sessionUsed.Id);
+            }
             catch { return; }
         }
 
@@ -140,8 +134,8 @@ namespace BlockifyLauncher
                     GameLauncherName = this.GameLauncherName,
                     GameLauncherVersion = this.GameLauncherVersion,
 
-                    ScreenWidth     =   display.w,
-                    ScreenHeight    =   display.h,
+                    ScreenWidth = display.w,
+                    ScreenHeight = display.h,
                     FullScreen = setting.GetFullScrean(),
                 });
             return process ?? new Process();
@@ -173,7 +167,7 @@ namespace BlockifyLauncher
         {
             Dispatcher.Invoke(() =>
             {
-                ProgressBarLoad.Description = e.FileName; 
+                ProgressBarLoad.Description = e.FileName;
                 ProgressBarLoad.Title = e.FileKind.ToString();
                 ProgressBarLoad.Maximum = e.TotalFileCount;
                 ProgressBarLoad.Value = e.ProgressedFileCount;
