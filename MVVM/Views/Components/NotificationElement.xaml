@@ -1,32 +1,60 @@
-﻿<UserControl x:Class="BlockifyLauncher.MVVM.Views.Components.NotificationElement"
+<UserControl x:Class="BlockifyLauncher.MVVM.Views.Components.NotificationElement"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Components"
-             mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="250">
-    <Grid>
-        <Border Style="{StaticResource PanelBorder}" BorderBrush="#725B5B5B" BorderThickness="1"
-    Height="50" Width="250" Panel.ZIndex="111" Grid.Row="1" CornerRadius="25" Name="Loading" Visibility="Visible">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+             mc:Ignorable="d"
+             d:DesignHeight="56" d:DesignWidth="280">
+    <!-- toast notification: glass panel, emerald cube, green accent stripe -->
+    <Border Background="#F0121519" BorderBrush="#2BFFFFFF" BorderThickness="1"
+            MinWidth="250" MaxWidth="360" Panel.ZIndex="111" CornerRadius="12" Name="Loading">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" ShadowDepth="4" Color="#000000" Opacity="0.5"/>
+        </Border.Effect>
+        <Grid Margin="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">
-                    <Label Content="{Binding Title}" Foreground="White" FontWeight="Bold" FontSize="14"/>
-                    <Label Foreground="#FF828282" Margin="0,-12,0,0" FontSize="10" FontWeight="Medium" MaxWidth="190">
-                        <Label.Content>
-                            <TextBlock TextWrapping="Wrap" Text="{Binding Description}"></TextBlock>
-                        </Label.Content>
-                    </Label>
+            <!-- accent stripe -->
+            <Border Width="4" CornerRadius="11,0,0,11" VerticalAlignment="Stretch">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#00B558" Offset="0"/>
+                        <GradientStop Color="#009046" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
 
-                </StackPanel>
+            <!-- emerald cube icon -->
+            <Border Grid.Column="1" Width="26" Height="26" CornerRadius="6" VerticalAlignment="Center" Margin="12,0,0,0">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#3ED160" Offset="0.5"/>
+                        <GradientStop Color="#1F8F3A" Offset="0.5"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="0" Color="#00B558" Opacity="0.5"/>
+                </Border.Effect>
+                <Border BorderThickness="1,1,0,0" BorderBrush="#59FFFFFF" CornerRadius="6">
+                    <Border BorderThickness="0,0,1,1" BorderBrush="#40000000" CornerRadius="6"/>
+                </Border>
+            </Border>
 
-                <Image Height="25" Width="25" Source="{StaticResource FileDrawindImage}" Margin="10,0,0,0"/>
-            </Grid>
-        </Border>
-    </Grid>
+            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="11,9,14,10">
+                <TextBlock Text="{Binding Title}" Foreground="#FFF" FontWeight="Bold" FontSize="12.5"
+                           TextTrimming="CharacterEllipsis">
+                    <TextBlock.Effect>
+                        <DropShadowEffect BlurRadius="0" ShadowDepth="2" Direction="315" Color="#000000" Opacity="0.5"/>
+                    </TextBlock.Effect>
+                </TextBlock>
+                <TextBlock Text="{Binding Description}" Foreground="#9FB2C0" FontSize="10.5"
+                           TextWrapping="Wrap" MaxHeight="30" Margin="0,2,0,0"/>
+            </StackPanel>
+        </Grid>
+    </Border>
 </UserControl>
