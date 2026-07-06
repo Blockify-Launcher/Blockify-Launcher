@@ -284,20 +284,24 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Window controls: quiet rounded, close turns red -->
+    <!-- Window controls: inventory slots, close turns into a red block -->
     <Style x:Key="WinControl" TargetType="Button">
         <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="Foreground" Value="#8CFFFFFF"/>
+        <Setter Property="Foreground" Value="#CFD9DF"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bg" Background="Transparent" CornerRadius="8" Margin="2,0">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                    <Border x:Name="Bg" Background="#FF191C1F" CornerRadius="7" Margin="2,0">
+                        <Grid>
+                            <Border x:Name="BevelDark" BorderThickness="2,2,0,0" BorderBrush="#73000000" CornerRadius="7"/>
+                            <Border x:Name="BevelLight" BorderThickness="0,0,2,2" BorderBrush="#12FFFFFF" CornerRadius="7"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="#22FFFFFF"/>
+                            <Setter TargetName="Bg" Property="Background" Value="#FF24282C"/>
                             <Setter Property="Foreground" Value="#FFF"/>
                         </Trigger>
                         <MultiTrigger>
@@ -305,7 +309,16 @@
                                 <Condition Property="IsMouseOver" Value="True"/>
                                 <Condition Property="Tag" Value="close"/>
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="Bg" Property="Background" Value="#E6C0392B"/>
+                            <Setter TargetName="Bg" Property="Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#E05545" Offset="0"/>
+                                        <GradientStop Color="#B03225" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="BevelDark" Property="BorderBrush" Value="#40FFFFFF"/>
+                            <Setter TargetName="BevelLight" Property="BorderBrush" Value="#4D000000"/>
                             <Setter Property="Foreground" Value="#FFF"/>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
@@ -346,23 +359,33 @@
         </Setter>
     </Style>
 
-    <!-- Ghost button: quiet translucent, for secondary actions -->
+    <!-- Secondary block button: dark stone block with a plinth, presses down -->
     <Style x:Key="GhostButton" TargetType="Button">
         <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="Foreground" Value="{StaticResource MutedText}"/>
+        <Setter Property="Foreground" Value="#CFD9DF"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bg" Background="#12FFFFFF" CornerRadius="11"
-                            BorderBrush="{StaticResource GlassLine}" BorderThickness="1">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextBlock.Foreground="{TemplateBinding Foreground}"/>
-                    </Border>
+                    <Grid>
+                        <Border Background="#FF0A0C0E" CornerRadius="8" Margin="0,4,0,0"/>
+                        <Border x:Name="Face" Background="#FF1A1E22" CornerRadius="8" Margin="0,0,0,3"
+                                BorderBrush="{StaticResource GlassLine}" BorderThickness="1">
+                            <Grid>
+                                <Border VerticalAlignment="Top" Height="2" Background="#14FFFFFF" CornerRadius="8,8,0,0" Margin="1,1,1,0"/>
+                                <Border VerticalAlignment="Bottom" Height="3" Background="#59000000" CornerRadius="0,0,8,8" Margin="1,0,1,1"/>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,1"
+                                                  TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="#22FFFFFF"/>
+                            <Setter TargetName="Face" Property="Background" Value="#FF22272C"/>
                             <Setter Property="Foreground" Value="#FFF"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Face" Property="Margin" Value="0,3,0,0"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.45"/>

@@ -10,7 +10,7 @@
       Title="PacksPage" Loaded="LoadingPage">
 
     <Page.Resources>
-        <!-- pill filter chip -->
+        <!-- emerald-block filter chip: slot with a hotbar selector ring when active -->
         <Style x:Key="FilterChip" TargetType="RadioButton">
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Foreground" Value="#9FB2C0"/>
@@ -19,17 +19,27 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="Pill" CornerRadius="999" Padding="14,6" Background="#B80D0F12"
-                                BorderBrush="#17FFFFFF" BorderThickness="1">
-                            <ContentPresenter TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                        <Border x:Name="Ring" CornerRadius="10" BorderThickness="2" BorderBrush="Transparent" Padding="0">
+                            <Border x:Name="Pill" CornerRadius="8" Padding="13,6" Background="#FF191C1F"
+                                    BorderBrush="#17FFFFFF" BorderThickness="1">
+                                <Grid>
+                                    <Border x:Name="BevelDark" BorderThickness="1,1,0,0" BorderBrush="#59000000" CornerRadius="8" Margin="-13,-6"/>
+                                    <Border x:Name="BevelLight" BorderThickness="0,0,1,1" BorderBrush="#0FFFFFFF" CornerRadius="8" Margin="-13,-6"/>
+                                    <ContentPresenter TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                                </Grid>
+                            </Border>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground" Value="#FFF"/>
+                                <Setter TargetName="Pill" Property="Background" Value="#FF22262A"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Pill" Property="Background" Value="{StaticResource GreenAccent}"/>
                                 <Setter TargetName="Pill" Property="BorderBrush" Value="Transparent"/>
+                                <Setter TargetName="Ring" Property="BorderBrush" Value="#E8E8E8"/>
+                                <Setter TargetName="BevelDark" Property="BorderBrush" Value="#40FFFFFF"/>
+                                <Setter TargetName="BevelLight" Property="BorderBrush" Value="#4D000000"/>
                                 <Setter Property="Foreground" Value="#FFF"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                             </Trigger>
@@ -61,8 +71,8 @@
         <!-- filters + search -->
         <StackPanel Margin="4,0,4,10">
             <DockPanel>
-                <!-- search pill -->
-                <Border DockPanel.Dock="Right" Width="240" Height="34" CornerRadius="999" Background="#B80D0F12" BorderThickness="1">
+                <!-- search slot -->
+                <Border DockPanel.Dock="Right" Width="240" Height="34" CornerRadius="8" Background="#FF15181B" BorderThickness="1">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Setter Property="BorderBrush" Value="#17FFFFFF"/>
@@ -209,8 +219,9 @@
                                             <TextBlock Text="{Binding DownloadsText}" Foreground="#5F7280" FontSize="11"
                                                        VerticalAlignment="Center" Margin="3,0,0,0"/>
                                         </StackPanel>
-                                        <TextBlock Text="→" Foreground="#00B558" FontWeight="Bold" FontSize="13"
-                                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        <Button Content="{Binding [packs_open], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                                Style="{StaticResource GhostButton}" FontSize="11" Height="30" Padding="13,0"
+                                                HorizontalAlignment="Right" Click="OpenPackPage"/>
                                     </Grid>
                                 </StackPanel>
                             </Grid>

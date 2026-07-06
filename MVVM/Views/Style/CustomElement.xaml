@@ -16,12 +16,14 @@
                                           BorderThickness="{TemplateBinding BorderThickness}">
                                 <ToggleButton.Template>
                                     <ControlTemplate TargetType="ToggleButton">
-                                        <Border Background="{TemplateBinding Background}" CornerRadius="10" BorderBrush="{TemplateBinding BorderBrush}"
+                                        <Border x:Name="SelBorder" Background="#FF191C1F" CornerRadius="8" BorderBrush="{TemplateBinding BorderBrush}"
                                                 BorderThickness="{TemplateBinding BorderThickness}" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}">
                                             <Grid VerticalAlignment="Center">
+                                                <Border BorderThickness="1,1,0,0" BorderBrush="#59000000" CornerRadius="8"/>
+                                                <Border BorderThickness="0,0,1,1" BorderBrush="#0FFFFFFF" CornerRadius="8"/>
                                                 <Label HorizontalAlignment="Left" Content="{TemplateBinding Content}" Width="Auto"
                                                        Margin="8,0,30,2" FontSize="14" Foreground="{TemplateBinding Foreground}"/>
-                                                <Image Height="11" Width="11" Cursor="Hand" HorizontalAlignment="Right" Margin="12,0" Opacity="0.6">
+                                                <Image x:Name="Chev" Height="11" Width="11" Cursor="Hand" HorizontalAlignment="Right" Margin="12,0" Opacity="0.55">
                                                     <Image.Source>
                                                         <DrawingImage>
                                                             <DrawingImage.Drawing>
@@ -36,17 +38,20 @@
                                                 </Image>
                                             </Grid>
                                         </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="SelBorder" Property="Background" Value="#FF24282C"/>
+                                                <Setter TargetName="SelBorder" Property="BorderBrush" Value="#7300B558"/>
+                                                <Setter TargetName="Chev" Property="Opacity" Value="1"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="SelBorder" Property="Background" Value="#FF24282C"/>
+                                                <Setter TargetName="SelBorder" Property="BorderBrush" Value="#B300B558"/>
+                                                <Setter TargetName="Chev" Property="Opacity" Value="1"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                 </ToggleButton.Template>
-                                <ToggleButton.Style>
-                                    <Style TargetType="ToggleButton">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Foreground" Value="#70FFFFFF"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
                             <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}"  AllowsTransparency="True" 
                                    Focusable="False" PopupAnimation="Slide">
@@ -108,11 +113,20 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="20"
+                        <Border x:Name="SlotBorder" Background="#FF15181B" CornerRadius="8"
                                 Height="{TemplateBinding Height}" Width="{TemplateBinding Width}"
                                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <ScrollViewer x:Name="PART_ContentHost" Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="8,0,4,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SlotBorder" Property="BorderBrush" Value="#7300B558"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="SlotBorder" Property="BorderBrush" Value="#B300B558"/>
+                                <Setter TargetName="SlotBorder" Property="Background" Value="#FF1A1E22"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
 
                         <!-- TODO : Tag implementation for TextBox -->
                         <!--
