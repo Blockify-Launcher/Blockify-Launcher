@@ -150,6 +150,100 @@ namespace BlockifyLauncher
             ButtonClickStartGame(Start, new RoutedEventArgs());
         }
 
+        // Diorama on the dock: baked pixel art + four kinds of living particles.
+        private void DockSizeChanged(object sender, SizeChangedEventArgs e) => RebuildDockDiorama();
+
+        private void RebuildDockDiorama()
+        {
+            int w = (int)DockBorder.ActualWidth;
+            if (w < 200) return;
+
+            var art = Core.Vibe.DockDiorama.Render(w);
+            DockDecorImage.Source = art.Bitmap;
+            System.Windows.Media.RenderOptions.SetBitmapScalingMode(
+                DockDecorImage, System.Windows.Media.BitmapScalingMode.NearestNeighbor);
+
+            var fx = DockFxCanvas;
+            fx.Children.Clear();
+            var rnd = new Random(42);
+
+            System.Windows.Shapes.Ellipse Dot(double size, System.Windows.Media.Color color, double glow)
+            {
+                var el = new System.Windows.Shapes.Ellipse
+                {
+                    Width = size, Height = size,
+                    Fill = new System.Windows.Media.SolidColorBrush(color),
+                    Effect = new System.Windows.Media.Effects.DropShadowEffect
+                    { BlurRadius = glow, ShadowDepth = 0, Color = color, Opacity = 0.85 }
+                };
+                return el;
+            }
+
+            void Twinkle(System.Windows.Shapes.Ellipse el, double x, double y, double durSec)
+            {
+                Canvas.SetLeft(el, x); Canvas.SetTop(el, y);
+                fx.Children.Add(el);
+                el.BeginAnimation(OpacityProperty,
+                    new System.Windows.Media.Animation.DoubleAnimation(0.06, 0.95, TimeSpan.FromSeconds(durSec))
+                    {
+                        RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever,
+                        AutoReverse = true,
+                        BeginTime = TimeSpan.FromSeconds(-rnd.NextDouble() * 4)
+                    });
+            }
+
+            // sculk souls (left zone)
+            for (int i = 0; i < 5; i++)
+                Twinkle(Dot(3, System.Windows.Media.Color.FromRgb(0x3D, 0xE8, 0xFF), 6),
+                    w * (0.01 + rnd.NextDouble() * 0.24), 38 + rnd.NextDouble() * 52, 2.4 + rnd.NextDouble() * 2);
+
+            // amethyst glints
+            for (int i = 0; i < 3; i++)
+                Twinkle(Dot(3, System.Windows.Media.Color.FromRgb(0xE3, 0xD0, 0xFF), 7),
+                    w * (0.315 + rnd.NextDouble() * 0.09), 32 + rnd.NextDouble() * 58, 3.5 + rnd.NextDouble() * 3);
+
+            // glow berry pulse at vine tips
+            foreach (var tip in art.BerryTips)
+                Twinkle(Dot(4, System.Windows.Media.Color.FromRgb(0xFF, 0xB0, 0x2E), 8),
+                    tip.X - 1, tip.Y, 2 + rnd.NextDouble() * 2);
+
+            // spore blossom particles drifting down
+            for (int i = 0; i < 8; i++)
+            {
+                var spore = Dot(3, rnd.NextDouble() < 0.7
+                    ? System.Windows.Media.Color.FromRgb(0xF2, 0xA1, 0xC0)
+                    : System.Windows.Media.Color.FromRgb(0xCD, 0xEA, 0x7A), 3);
+                double sx = art.SporeOrigin.X - 10 + rnd.NextDouble() * 26;
+                Canvas.SetLeft(spore, sx); Canvas.SetTop(spore, art.SporeOrigin.Y);
+                fx.Children.Add(spore);
+
+                var move = new System.Windows.Media.TranslateTransform();
+                spore.RenderTransform = move;
+                double dur = 5 + rnd.NextDouble() * 4;
+                var begin = TimeSpan.FromSeconds(-rnd.NextDouble() * 8);
+                var forever = System.Windows.Media.Animation.RepeatBehavior.Forever;
+
+                move.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty,
+                    new System.Windows.Media.Animation.DoubleAnimation(0, 72, TimeSpan.FromSeconds(dur))
+                    { RepeatBehavior = forever, BeginTime = begin });
+                move.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty,
+                    new System.Windows.Media.Animation.DoubleAnimation(0, 14, TimeSpan.FromSeconds(dur))
+                    { RepeatBehavior = forever, BeginTime = begin });
+
+                var fade = new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames
+                { Duration = TimeSpan.FromSeconds(dur), RepeatBehavior = forever, BeginTime = begin };
+                fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(0,
+                    System.Windows.Media.Animation.KeyTime.FromPercent(0)));
+                fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(0.9,
+                    System.Windows.Media.Animation.KeyTime.FromPercent(0.1)));
+                fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(0.7,
+                    System.Windows.Media.Animation.KeyTime.FromPercent(0.85)));
+                fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(0,
+                    System.Windows.Media.Animation.KeyTime.FromPercent(1)));
+                spore.BeginAnimation(OpacityProperty, fade);
+            }
+        }
+
         // Dock "assembly" entrance: the panel rises, then account → version →
         // Start drop onto it one by one, like items into a crafting grid.
         private void PlayDockAssembly()
