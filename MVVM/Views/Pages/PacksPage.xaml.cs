@@ -2,17 +2,18 @@ using BlockifyLauncher.Core.Modrinth;
 using BlockifyLauncher.Resources;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace BlockifyLauncher.MVVM.Views.Pages
 {
     /// <summary>
-    /// Modpack catalog (Modrinth). Browsing and opening pack pages for now;
-    /// one-click .mrpack install is the next phase.
+    /// Modpack catalog (Modrinth): banner cards, loader filters and search.
+    /// A click opens the pack page; one-click .mrpack install is the next phase.
     /// </summary>
     public partial class PacksPage : Page
     {
-        private MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
         private string _currentLoader = "";
+        private string _query = "";
         private bool _loaded;
 
         public PacksPage()
@@ -34,13 +35,22 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             await LoadPacksAsync();
         }
 
+        private async void SearchKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+            _query = SearchBox.Text.Trim();
+            await LoadPacksAsync();
+        }
+
         private async Task LoadPacksAsync()
         {
             StatusText.Text = "…";
             try
             {
                 var packs = await ModrinthService.SearchAsync(
-                    string.IsNullOrEmpty(_currentLoader) ? null : _currentLoader);
+                    string.IsNullOrEmpty(_currentLoader) ? null : _currentLoader,
+                    string.IsNullOrEmpty(_query) ? null : _query,
+                    limit: 21);
                 PacksList.ItemsSource = packs;
                 StatusText.Text = "";
             }

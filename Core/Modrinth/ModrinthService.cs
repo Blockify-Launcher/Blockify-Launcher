@@ -9,9 +9,13 @@ namespace BlockifyLauncher.Core.Modrinth
         public string Description { get; set; } = "";
         public string Slug { get; set; } = "";
         public string? IconUrl { get; set; }
+        public string? FeaturedImageUrl { get; set; }
         public long Downloads { get; set; }
         public string Loader { get; set; } = "";
         public string GameVersion { get; set; } = "";
+
+        /// <summary>Banner for the card: featured gallery shot, icon as fallback.</summary>
+        public string? BannerUrl => FeaturedImageUrl ?? IconUrl;
 
         public string PageUrl => "https://modrinth.com/modpack/" + Slug;
 
@@ -66,12 +70,16 @@ namespace BlockifyLauncher.Core.Modrinth
                 // newest supported game version (the "versions" array is ordered oldest→newest)
                 string gameVersion = ((JArray?)hit["versions"])?.LastOrDefault()?.Value<string>() ?? "";
 
+                string? featured = hit.Value<string>("featured_gallery")
+                    ?? ((JArray?)hit["gallery"])?.FirstOrDefault()?.Value<string>();
+
                 result.Add(new ModpackInfo
                 {
                     Title = hit.Value<string>("title") ?? "",
                     Description = hit.Value<string>("description") ?? "",
                     Slug = hit.Value<string>("slug") ?? "",
                     IconUrl = hit.Value<string>("icon_url"),
+                    FeaturedImageUrl = featured,
                     Downloads = hit.Value<long?>("downloads") ?? 0,
                     Loader = loaderName.Length > 0
                         ? char.ToUpper(loaderName[0]) + loaderName[1..]

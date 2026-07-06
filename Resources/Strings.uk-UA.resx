@@ -333,4 +333,7 @@
   <data name="saved" xml:space="preserve">
     <value>Збережено</value>
   </data>
+  <data name="packs_search" xml:space="preserve">
+    <value>Пошук збірок… (Enter)</value>
+  </data>
 </root>
