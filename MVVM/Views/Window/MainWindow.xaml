@@ -147,10 +147,10 @@
                     </TextBlock>
                     <Label x:Name="TitleCustomForm" Visibility="Collapsed"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,6,0">
-                    <Button Height="32" Width="42" Style="{StaticResource HeaderButton}" Content="─" FontSize="18"
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0">
+                    <Button Height="30" Width="40" Style="{StaticResource WinControl}" Content="─" FontSize="15"
                             Click="MainWindowsMinimals"/>
-                    <Button Height="32" Width="42" Style="{StaticResource HeaderButton}" Content="⨉" FontSize="15" Name="Exit"
+                    <Button Height="30" Width="40" Style="{StaticResource WinControl}" Content="✕" FontSize="13" Tag="close"
                             Click="MainWindowsClose"/>
                 </StackPanel>
             </Grid>

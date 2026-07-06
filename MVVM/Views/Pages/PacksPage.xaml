@@ -59,35 +59,79 @@
         </Grid.RowDefinitions>
 
         <!-- filters + search -->
-        <DockPanel Margin="4,0,4,12">
-            <Grid DockPanel.Dock="Right" Width="230" Height="33">
-                <TextBox x:Name="SearchBox" Style="{StaticResource CustomTextBox}" FontSize="13"
-                         BorderBrush="#3F5A5A5A" BorderThickness="1" KeyDown="SearchKeyDown"/>
-                <TextBlock IsHitTestVisible="False" Foreground="#5F7280" FontSize="12" Margin="10,0,0,0" VerticalAlignment="Center"
-                           Text="{Binding [packs_search], Source={x:Static lang:ResxLocalizationProvider.Instance}}">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed"/>
+        <StackPanel Margin="4,0,4,10">
+            <DockPanel>
+                <!-- search pill -->
+                <Border DockPanel.Dock="Right" Width="240" Height="34" CornerRadius="999" Background="#B80D0F12" BorderThickness="1">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="BorderBrush" Value="#17FFFFFF"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                <DataTrigger Binding="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource Self}}" Value="True">
+                                    <Setter Property="BorderBrush" Value="#8C00B558"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-            </Grid>
+                    </Border.Style>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="32"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Width="13" Height="13" HorizontalAlignment="Right" Margin="0,0,2,0">
+                            <Ellipse Width="9" Height="9" Stroke="#5F7280" StrokeThickness="1.6" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Line X1="8" Y1="8" X2="13" Y2="13" Stroke="#5F7280" StrokeThickness="1.6"/>
+                        </Grid>
+                        <TextBox Grid.Column="1" x:Name="SearchBox" Background="Transparent" BorderThickness="0"
+                                 Foreground="#FFF" FontSize="12.5" CaretBrush="#00B558" VerticalContentAlignment="Center"
+                                 Margin="0,0,12,0" KeyDown="SearchKeyDown"/>
+                        <TextBlock Grid.Column="1" IsHitTestVisible="False" Foreground="#5F7280" FontSize="12" Margin="3,0,0,0" VerticalAlignment="Center"
+                                   Text="{Binding [packs_search], Source={x:Static lang:ResxLocalizationProvider.Instance}}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </Border>
 
-            <StackPanel Orientation="Horizontal">
-                <RadioButton Style="{StaticResource FilterChip}" Content="{Binding [packs_all], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
-                             IsChecked="True" Checked="FilterChecked" Tag=""/>
-                <RadioButton Style="{StaticResource FilterChip}" Content="Fabric" Checked="FilterChecked" Tag="fabric"/>
-                <RadioButton Style="{StaticResource FilterChip}" Content="Forge" Checked="FilterChecked" Tag="forge"/>
-                <RadioButton Style="{StaticResource FilterChip}" Content="NeoForge" Checked="FilterChecked" Tag="neoforge"/>
-                <RadioButton Style="{StaticResource FilterChip}" Content="Quilt" Checked="FilterChecked" Tag="quilt"/>
-                <TextBlock x:Name="StatusText" Foreground="#9FB2C0" FontSize="12" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            </StackPanel>
-        </DockPanel>
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="loader" Content="{Binding [packs_all], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                 IsChecked="True" Checked="FilterChecked" Tag=""/>
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="loader" Content="Fabric" Checked="FilterChecked" Tag="fabric"/>
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="loader" Content="Forge" Checked="FilterChecked" Tag="forge"/>
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="loader" Content="NeoForge" Checked="FilterChecked" Tag="neoforge"/>
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="loader" Content="Quilt" Checked="FilterChecked" Tag="quilt"/>
+                    <TextBlock x:Name="StatusText" Foreground="#9FB2C0" FontSize="12" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- category chips + version + sort -->
+            <DockPanel Margin="0,9,0,0">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <ComboBox x:Name="VersionFilter" Style="{StaticResource CustomComboBox}" Width="130" Height="32"
+                              Tag="SettingComboBox" BorderThickness="1" Margin="0,0,8,0" SelectionChanged="RefineChanged"/>
+                    <ComboBox x:Name="SortFilter" Style="{StaticResource CustomComboBox}" Width="150" Height="32"
+                              Tag="SettingComboBox" BorderThickness="1" SelectionChanged="RefineChanged"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="cat" Content="{Binding [cat_all], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                 IsChecked="True" Checked="CategoryChecked" Tag=""/>
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="cat" Content="{Binding [cat_optimization], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Checked="CategoryChecked" Tag="optimization"/>
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="cat" Content="{Binding [cat_adventure], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Checked="CategoryChecked" Tag="adventure"/>
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="cat" Content="{Binding [cat_magic], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Checked="CategoryChecked" Tag="magic"/>
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="cat" Content="{Binding [cat_technology], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Checked="CategoryChecked" Tag="technology"/>
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="cat" Content="{Binding [cat_quests], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Checked="CategoryChecked" Tag="quests"/>
+                    <RadioButton Style="{StaticResource FilterChip}" GroupName="cat" Content="{Binding [cat_combat], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Checked="CategoryChecked" Tag="combat"/>
+                </StackPanel>
+            </DockPanel>
+        </StackPanel>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <ItemsControl x:Name="PacksList">

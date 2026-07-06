@@ -334,6 +334,42 @@
     <value>Saved</value>
   </data>
   <data name="packs_search" xml:space="preserve">
-    <value>Search modpacks… (Enter)</value>
+    <value>Search modpacks…</value>
+  </data>
+  <data name="cat_all" xml:space="preserve">
+    <value>All categories</value>
+  </data>
+  <data name="cat_optimization" xml:space="preserve">
+    <value>Optimization</value>
+  </data>
+  <data name="cat_adventure" xml:space="preserve">
+    <value>Adventure</value>
+  </data>
+  <data name="cat_magic" xml:space="preserve">
+    <value>Magic</value>
+  </data>
+  <data name="cat_technology" xml:space="preserve">
+    <value>Technology</value>
+  </data>
+  <data name="cat_quests" xml:space="preserve">
+    <value>Quests</value>
+  </data>
+  <data name="cat_combat" xml:space="preserve">
+    <value>Combat</value>
+  </data>
+  <data name="sort_downloads" xml:space="preserve">
+    <value>By downloads</value>
+  </data>
+  <data name="sort_newest" xml:space="preserve">
+    <value>Newest</value>
+  </data>
+  <data name="sort_updated" xml:space="preserve">
+    <value>Recently updated</value>
+  </data>
+  <data name="sort_follows" xml:space="preserve">
+    <value>By followers</value>
+  </data>
+  <data name="versions_any" xml:space="preserve">
+    <value>Any version</value>
   </data>
 </root>

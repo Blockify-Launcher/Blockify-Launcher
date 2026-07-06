@@ -46,16 +46,22 @@ namespace BlockifyLauncher.Core.Modrinth
         private static readonly string[] KnownLoaders = { "fabric", "forge", "neoforge", "quilt" };
 
         public static async Task<List<ModpackInfo>> SearchAsync(
-            string? loader = null, string? query = null, int limit = 20)
+            string? loader = null, string? query = null,
+            string? category = null, string? gameVersion = null,
+            string? sortIndex = null, int limit = 20)
         {
-            string facets = loader == null
-                ? "[[\"project_type:modpack\"]]"
-                : $"[[\"project_type:modpack\"],[\"categories:{loader}\"]]";
+            var facets = new List<string> { "[\"project_type:modpack\"]" };
+            if (!string.IsNullOrEmpty(loader)) facets.Add($"[\"categories:{loader}\"]");
+            if (!string.IsNullOrEmpty(category)) facets.Add($"[\"categories:{category}\"]");
+            if (!string.IsNullOrEmpty(gameVersion)) facets.Add($"[\"versions:{gameVersion}\"]");
+
+            string index = sortIndex
+                ?? (string.IsNullOrEmpty(query) ? "downloads" : "relevance");
 
             string url = "https://api.modrinth.com/v2/search"
                 + "?limit=" + limit
-                + "&index=" + (string.IsNullOrEmpty(query) ? "downloads" : "relevance")
-                + "&facets=" + Uri.EscapeDataString(facets);
+                + "&index=" + index
+                + "&facets=" + Uri.EscapeDataString("[" + string.Join(",", facets) + "]");
             if (!string.IsNullOrEmpty(query))
                 url += "&query=" + Uri.EscapeDataString(query);
 
@@ -68,7 +74,7 @@ namespace BlockifyLauncher.Core.Modrinth
                 string loaderName = KnownLoaders.FirstOrDefault(l => categories.Contains(l)) ?? "";
 
                 // newest supported game version (the "versions" array is ordered oldest→newest)
-                string gameVersion = ((JArray?)hit["versions"])?.LastOrDefault()?.Value<string>() ?? "";
+                string packGameVersion = ((JArray?)hit["versions"])?.LastOrDefault()?.Value<string>() ?? "";
 
                 string? featured = hit.Value<string>("featured_gallery")
                     ?? ((JArray?)hit["gallery"])?.FirstOrDefault()?.Value<string>();
@@ -84,7 +90,7 @@ namespace BlockifyLauncher.Core.Modrinth
                     Loader = loaderName.Length > 0
                         ? char.ToUpper(loaderName[0]) + loaderName[1..]
                         : "",
-                    GameVersion = gameVersion
+                    GameVersion = packGameVersion
                 });
             }
             return result;

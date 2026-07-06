@@ -284,6 +284,36 @@
         </Style.Triggers>
     </Style>
 
+    <!-- Window controls: quiet rounded, close turns red -->
+    <Style x:Key="WinControl" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="#8CFFFFFF"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" Background="Transparent" CornerRadius="8" Margin="2,0">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#22FFFFFF"/>
+                            <Setter Property="Foreground" Value="#FFF"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                                <Condition Property="Tag" Value="close"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bg" Property="Background" Value="#E6C0392B"/>
+                            <Setter Property="Foreground" Value="#FFF"/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Switch toggle (CheckBox): pill with sliding knob, green when on -->
     <Style x:Key="SwitchToggle" TargetType="CheckBox">
         <Setter Property="Cursor" Value="Hand"/>

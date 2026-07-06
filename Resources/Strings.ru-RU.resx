@@ -334,6 +334,42 @@
     <value>Сохранено</value>
   </data>
   <data name="packs_search" xml:space="preserve">
-    <value>Поиск сборок… (Enter)</value>
+    <value>Поиск сборок…</value>
+  </data>
+  <data name="cat_all" xml:space="preserve">
+    <value>Все категории</value>
+  </data>
+  <data name="cat_optimization" xml:space="preserve">
+    <value>Оптимизация</value>
+  </data>
+  <data name="cat_adventure" xml:space="preserve">
+    <value>Приключения</value>
+  </data>
+  <data name="cat_magic" xml:space="preserve">
+    <value>Магия</value>
+  </data>
+  <data name="cat_technology" xml:space="preserve">
+    <value>Техника</value>
+  </data>
+  <data name="cat_quests" xml:space="preserve">
+    <value>Квесты</value>
+  </data>
+  <data name="cat_combat" xml:space="preserve">
+    <value>Битвы</value>
+  </data>
+  <data name="sort_downloads" xml:space="preserve">
+    <value>По загрузкам</value>
+  </data>
+  <data name="sort_newest" xml:space="preserve">
+    <value>Новые</value>
+  </data>
+  <data name="sort_updated" xml:space="preserve">
+    <value>Обновлённые</value>
+  </data>
+  <data name="sort_follows" xml:space="preserve">
+    <value>По подписчикам</value>
+  </data>
+  <data name="versions_any" xml:space="preserve">
+    <value>Любая версия</value>
   </data>
 </root>
