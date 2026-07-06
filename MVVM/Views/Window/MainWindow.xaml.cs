@@ -115,12 +115,21 @@ namespace BlockifyLauncher
             MinecraftVerisonComboBox.SelectedIndex = 0;
         }
 
-        // Pixel-art vibe background: auto-picked by time of day, rendered once.
-        private void ApplyVibeBackground()
+        // Pixel-art vibe background: from settings, "auto" = by time of day.
+        public void ApplyVibeBackground()
         {
             try
             {
-                var scene = Core.Vibe.VibeScene.Render(Core.Vibe.VibeScene.ForNow());
+                var kind = new Properties.Settings().GetVibe()?.ToLowerInvariant() switch
+                {
+                    "ocean" => Core.Vibe.VibeKind.Ocean,
+                    "sunset" => Core.Vibe.VibeKind.Sunset,
+                    "nether" => Core.Vibe.VibeKind.Nether,
+                    "cherry" => Core.Vibe.VibeKind.Cherry,
+                    "end" => Core.Vibe.VibeKind.End,
+                    _ => Core.Vibe.VibeScene.ForNow()
+                };
+                var scene = Core.Vibe.VibeScene.Render(kind);
                 var brush = new System.Windows.Media.ImageBrush(scene)
                 {
                     Stretch = System.Windows.Media.Stretch.UniformToFill

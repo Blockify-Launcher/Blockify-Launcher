@@ -1,0 +1,118 @@
+<Page x:Class="BlockifyLauncher.MVVM.Views.Pages.PacksPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
+      xmlns:lang="clr-namespace:BlockifyLauncher.Resources"
+      xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
+      mc:Ignorable="d"
+      d:DesignHeight="555" d:DesignWidth="1100"
+      Title="PacksPage" Loaded="LoadingPage">
+
+    <Page.Resources>
+        <!-- pill filter chip -->
+        <Style x:Key="FilterChip" TargetType="RadioButton">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#9FB2C0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,0,7,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Pill" CornerRadius="999" Padding="14,6" Background="#0D0F12"
+                                BorderBrush="#17FFFFFF" BorderThickness="1">
+                            <ContentPresenter TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#FFF"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{StaticResource GreenAccent}"/>
+                                <Setter TargetName="Pill" Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="#FFF"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <controls:WindowBlur Margin="5" BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur">
+            <Border Background="#C0121212" CornerRadius="30"
+                    BorderBrush="#3F5A5A5A" BorderThickness="1">
+                <Grid Margin="18,14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" Margin="4,0,0,12">
+                        <RadioButton Style="{StaticResource FilterChip}" Content="{Binding [packs_all], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                     IsChecked="True" Checked="FilterChecked" Tag=""/>
+                        <RadioButton Style="{StaticResource FilterChip}" Content="Fabric" Checked="FilterChecked" Tag="fabric"/>
+                        <RadioButton Style="{StaticResource FilterChip}" Content="Forge" Checked="FilterChecked" Tag="forge"/>
+                        <RadioButton Style="{StaticResource FilterChip}" Content="NeoForge" Checked="FilterChecked" Tag="neoforge"/>
+                        <RadioButton Style="{StaticResource FilterChip}" Content="Quilt" Checked="FilterChecked" Tag="quilt"/>
+                        <TextBlock x:Name="StatusText" Foreground="#9FB2C0" FontSize="12" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                    </StackPanel>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl x:Name="PacksList">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="2"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#B80E1114" BorderBrush="#17FFFFFF" BorderThickness="1"
+                                            CornerRadius="16" Margin="4" Padding="10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="76"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border Width="72" Height="72" CornerRadius="10" VerticalAlignment="Top">
+                                                <Border.Background>
+                                                    <ImageBrush ImageSource="{Binding IconUrl}" Stretch="UniformToFill"/>
+                                                </Border.Background>
+                                            </Border>
+
+                                            <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                                <TextBlock Text="{Binding Title}" Foreground="#FFF" FontSize="15" FontWeight="SemiBold"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Description}" Foreground="#9FB2C0" FontSize="11.5"
+                                                           TextWrapping="Wrap" MaxHeight="34" Margin="0,3,0,6" TextTrimming="CharacterEllipsis"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Border BorderBrush="#6600B558" BorderThickness="1" CornerRadius="5" Padding="6,1" Margin="0,0,6,0">
+                                                        <TextBlock Text="{Binding Loader}" Foreground="#00B558" FontSize="10"/>
+                                                    </Border>
+                                                    <Border BorderBrush="#28FFFFFF" BorderThickness="1" CornerRadius="5" Padding="6,1" Margin="0,0,6,0">
+                                                        <TextBlock Text="{Binding GameVersion}" Foreground="#9FB2C0" FontSize="10"/>
+                                                    </Border>
+                                                    <TextBlock Text="⤓" Foreground="#5F7280" FontSize="11" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding DownloadsText}" Foreground="#5F7280" FontSize="11"
+                                                               VerticalAlignment="Center" Margin="3,0,0,0"/>
+                                                    <Button Content="{Binding [packs_open], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                                            Style="{StaticResource EmeraldButton}" FontSize="11.5" Height="32" Padding="12,0"
+                                                            Margin="12,0,0,0" Click="OpenPackPage"
+                                                            ToolTip="{Binding PageUrl}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </controls:WindowBlur>
+    </Grid>
+</Page>

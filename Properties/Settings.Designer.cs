@@ -178,5 +178,17 @@ namespace BlockifyLauncher.Properties {
                 this["UserLastID"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("auto")]
+        public string Vibe {
+            get {
+                return ((string)(this["Vibe"]));
+            }
+            set {
+                this["Vibe"] = value;
+            }
+        }
     }
 }

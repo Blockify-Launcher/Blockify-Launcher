@@ -19,8 +19,8 @@
                          Maximum="{Binding Maximum}">
                 <ProgressBar.Foreground>
                     <LinearGradientBrush StartPoint="0 0" EndPoint="1 0">
-                        <GradientStop Color="#590090" Offset="0.0"/>
-                        <GradientStop Color="#7C0090" Offset="1.0"/>
+                        <GradientStop Color="#9BFF6B" Offset="0.0"/>
+                        <GradientStop Color="#1F8F3A" Offset="1.0"/>
                     </LinearGradientBrush>
                 </ProgressBar.Foreground>
             </ProgressBar>

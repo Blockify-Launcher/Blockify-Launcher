@@ -99,6 +99,10 @@
                                              ToolTip="{Binding [nav_home], Source={x:Static lang:ResxLocalizationProvider.Instance}}">
                                     <Image Source="{StaticResource HomeDrawingImage}" Height="26"/>
                                 </RadioButton>
+                                <RadioButton Style="{StaticResource HotbarSlot}" Command="{Binding PacksCommand}" Margin="0,10,0,0"
+                                             ToolTip="{Binding [nav_packs], Source={x:Static lang:ResxLocalizationProvider.Instance}}">
+                                    <Image Source="{StaticResource CategoryDrawingImage}" Height="24"/>
+                                </RadioButton>
                                 <RadioButton Style="{StaticResource HotbarSlot}" Command="{Binding SettingCommand}" Margin="0,10,0,0"
                                              ToolTip="{Binding [nav_settings], Source={x:Static lang:ResxLocalizationProvider.Instance}}">
                                     <Image Source="{StaticResource SettingDrawingImage}" Height="26"/>

@@ -243,4 +243,37 @@
   <data name="nav_settings" xml:space="preserve">
     <value>Настройки</value>
   </data>
+  <data name="vibe_label" xml:space="preserve">
+    <value>Вайб фона</value>
+  </data>
+  <data name="vibe_auto" xml:space="preserve">
+    <value>Авто (время суток)</value>
+  </data>
+  <data name="vibe_ocean" xml:space="preserve">
+    <value>Океан</value>
+  </data>
+  <data name="vibe_sunset" xml:space="preserve">
+    <value>Закат</value>
+  </data>
+  <data name="vibe_nether" xml:space="preserve">
+    <value>Незер</value>
+  </data>
+  <data name="vibe_cherry" xml:space="preserve">
+    <value>Сакура</value>
+  </data>
+  <data name="vibe_end" xml:space="preserve">
+    <value>Энд</value>
+  </data>
+  <data name="nav_packs" xml:space="preserve">
+    <value>Сборки</value>
+  </data>
+  <data name="packs_all" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="packs_open" xml:space="preserve">
+    <value>Открыть страницу</value>
+  </data>
+  <data name="packs_offline" xml:space="preserve">
+    <value>Modrinth недоступен. Проверь подключение.</value>
+  </data>
 </root>

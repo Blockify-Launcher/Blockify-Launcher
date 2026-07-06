@@ -61,6 +61,36 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             // Generate element
             GenarateElement_CheckBox();
             FillLanguageComboBox();
+            FillVibeComboBox();
+        }
+
+        private static readonly string[] VibeKeys = { "auto", "ocean", "sunset", "nether", "cherry", "end" };
+
+        private void FillVibeComboBox()
+        {
+            ComboBoxVibe.Items.Clear();
+            foreach (var key in VibeKeys)
+                ComboBoxVibe.Items.Add(new ComboBoxItem
+                {
+                    Content = ResxLocalizationProvider.Instance["vibe_" + key],
+                    Tag = key
+                });
+
+            string current = new Properties.Settings().GetVibe() ?? "auto";
+            foreach (ComboBoxItem item in ComboBoxVibe.Items)
+                if ((string)item.Tag == current)
+                {
+                    ComboBoxVibe.SelectedItem = item;
+                    break;
+                }
+        }
+
+        private void ComboBoxVibeSelect(object sender, SelectionChangedEventArgs e)
+        {
+            if (((ComboBox)sender).SelectedItem is not ComboBoxItem item) return;
+
+            new Properties.Settings().SetVibe((string)item.Tag);
+            mainWindow.ApplyVibeBackground();
         }
 
         private static readonly Regex onlyNumbers = new Regex("[^0-9.-]+");

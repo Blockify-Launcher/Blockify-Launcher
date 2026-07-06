@@ -41,5 +41,8 @@
     <Setting Name="UserLastID" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="Vibe" Type="System.String" Scope="User">
+      <Value Profile="(Default)">auto</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

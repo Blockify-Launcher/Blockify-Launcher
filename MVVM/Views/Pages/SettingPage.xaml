@@ -77,8 +77,14 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="20,5">
                                 <Label Content="{Binding [launcher_language], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <ComboBox Style="{StaticResource CustomComboBox}" Width="200" Tag="SettingComboBox" Margin="10,0,0,0" BorderThickness="1" 
+                                <ComboBox Style="{StaticResource CustomComboBox}" Width="200" Tag="SettingComboBox" Margin="10,0,0,0" BorderThickness="1"
                                           SelectionChanged="ComboBoxLauncherLanguageSelect" x:Name="ComboBoxLauncherLanguage">
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="20,5">
+                                <Label Content="{Binding [vibe_label], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <ComboBox Style="{StaticResource CustomComboBox}" Width="200" Tag="SettingComboBox" Margin="10,0,0,0" BorderThickness="1"
+                                          SelectionChanged="ComboBoxVibeSelect" x:Name="ComboBoxVibe">
                                 </ComboBox>
                             </StackPanel>
                             <Rectangle Fill="#4C5A5A5A" Height="1" HorizontalAlignment="Stretch"/>

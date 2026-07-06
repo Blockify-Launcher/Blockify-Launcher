@@ -30,6 +30,9 @@
             <DataTemplate DataType="{x:Type viewModel_Pages:SettingModel}">
                 <view_Pages:SettingPage/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModel_Pages:PacksModel}">
+                <view_Pages:PacksPage/>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type viewModel_Pages:AccountModel}">
                 <view_Pages:AccountPages/>
             </DataTemplate>

@@ -69,6 +69,10 @@ namespace BlockifyLauncher.Properties {
         public void SetMemoryRAM(int RAM) => this.UseRam = RAM;
         public int  GetMemoryRAM() => this.UseRam;
 
+        /* Вайб фону лаунчера: auto | ocean | sunset | nether | cherry | end */
+        public void SetVibe(string vibe) => this.Vibe = vibe;
+        public string GetVibe() => this.Vibe;
+
         /* Розміри екрану гри */
         public void SetSettingDisplayGame(Display display)
         {
