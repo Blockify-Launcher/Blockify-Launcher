@@ -98,7 +98,7 @@ namespace BlockifyLauncher.Core.Vibe
             }
         }
 
-        public static WriteableBitmap Render(VibeKind kind, int w = 880, int h = 495)
+        public static WriteableBitmap Render(VibeKind kind, int w = 1600, int h = 900)
         {
             var sc = GetScene(kind);
             var r = new Rng(sc.Seed);
@@ -130,17 +130,21 @@ namespace BlockifyLauncher.Core.Vibe
                     }
             }
 
-            // sky gradient (multi-stop, per row)
+            // sky gradient (multi-stop, per row). Channels must be signed ints:
+            // uint subtraction underflows on descending gradients (rainbow-stripe bug).
             for (int y = 0; y < h; y++)
             {
                 double t = (double)y / h * (sc.Sky.Length - 1);
                 int i = Math.Min(sc.Sky.Length - 2, (int)t);
                 double f = t - i;
                 uint c1 = sc.Sky[i], c2 = sc.Sky[i + 1];
-                uint cr = (uint)(((c1 >> 16) & 0xFF) + (((c2 >> 16) & 0xFF) - ((c1 >> 16) & 0xFF)) * f);
-                uint cg = (uint)(((c1 >> 8) & 0xFF) + (((c2 >> 8) & 0xFF) - ((c1 >> 8) & 0xFF)) * f);
-                uint cb = (uint)((c1 & 0xFF) + ((c2 & 0xFF) - (c1 & 0xFF)) * f);
-                uint row = 0xFF000000 | (cr << 16) | (cg << 8) | cb;
+                int r1 = (int)((c1 >> 16) & 0xFF), r2 = (int)((c2 >> 16) & 0xFF);
+                int g1 = (int)((c1 >> 8) & 0xFF), g2 = (int)((c2 >> 8) & 0xFF);
+                int b1 = (int)(c1 & 0xFF), b2 = (int)(c2 & 0xFF);
+                uint row = 0xFF000000
+                    | ((uint)(r1 + (r2 - r1) * f) << 16)
+                    | ((uint)(g1 + (g2 - g1) * f) << 8)
+                    | (uint)(b1 + (b2 - b1) * f);
                 for (int x = 0; x < w; x++) px[y * w + x] = row;
             }
 
@@ -268,6 +272,21 @@ namespace BlockifyLauncher.Core.Vibe
             for (int i = 0; i < 20; i++)
                 Blend((int)(r.Next() * w), (int)(r.Next() * h * .6), 3, 3,
                     ((uint)(64 + r.Next() * 128) << 24) | (sc.Spark & 0x00FFFFFF));
+
+            // mood pass: dim the whole scene (stronger at the bottom) so the
+            // glass UI stays readable and colors keep the mockup's depth
+            for (int y = 0; y < h; y++)
+            {
+                double k = 0.90 - 0.22 * ((double)y / h);
+                for (int x = 0; x < w; x++)
+                {
+                    uint c = px[y * w + x];
+                    px[y * w + x] = 0xFF000000
+                        | ((uint)(((c >> 16) & 0xFF) * k) << 16)
+                        | ((uint)(((c >> 8) & 0xFF) * k) << 8)
+                        | (uint)((c & 0xFF) * k);
+                }
+            }
 
             var bmp = new WriteableBitmap(w, h, 96, 96, PixelFormats.Bgra32, null);
             bmp.WritePixels(new Int32Rect(0, 0, w, h), px, w * 4, 0);

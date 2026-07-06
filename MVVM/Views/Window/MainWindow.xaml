@@ -36,7 +36,7 @@
                 <Border Style="{StaticResource WindowBorderStyle}" Margin="-22,-62,-22,-20" Grid.RowSpan="10"
                         x:Name="InnerBlurContainer"/>
 
-                <Border Grid.Row="1" Style="{StaticResource PanelBorder}" CornerRadius="16" Background="{StaticResource GlassPanel}"
+                <Border Grid.Row="1" Style="{StaticResource PanelBorder}" CornerRadius="16" Background="#EB0D1013"
                         BorderBrush="{StaticResource GlassLine}" BorderThickness="1"
                         Height="78" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Grid Margin="20,10">
@@ -93,7 +93,7 @@
                     <Grid>
                         <!-- Hotbar navigation rail: inventory slots, active = selector frame -->
                         <Border Width="74" CornerRadius="18" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                Background="{StaticResource GlassPanel}" BorderBrush="{StaticResource GlassLine}" BorderThickness="1">
+                                Background="#EB0D1013" BorderBrush="{StaticResource GlassLine}" BorderThickness="1">
                             <StackPanel Margin="10,12">
                                 <RadioButton Style="{StaticResource HotbarSlot}" Command="{Binding MainCommand}" x:Name="homeRadioButton"
                                              ToolTip="{Binding [nav_home], Source={x:Static lang:ResxLocalizationProvider.Instance}}">
@@ -117,7 +117,7 @@
                 </Grid>
 
                 <!-- Mob parade strip: pixel mobs stroll above the dock -->
-                <Canvas x:Name="ParadeCanvas" Height="44" VerticalAlignment="Bottom" Margin="0,0,0,-14"
+                <Canvas x:Name="ParadeCanvas" Height="44" VerticalAlignment="Bottom" Margin="0,0,0,2"
                         IsHitTestVisible="False" ClipToBounds="False"/>
 
             </Grid>

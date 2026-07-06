@@ -47,11 +47,11 @@
         </StackPanel>
 
         <!-- news -->
-        <controls:WindowBlur Grid.Row="1"
+        <controls:WindowBlur Grid.Row="1" VerticalAlignment="Top"
                 BlurRadius="25" Magnification="0.15" Background="Transparent" x:Name="Blur_WindowBlur_Two">
             <Border Background="#C0121212" CornerRadius="15" SizeChanged="ResizeStackPanelNew"
-                 BorderBrush="#3F5A5A5A" BorderThickness="1">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" x:Name="StackPanelNews"/>
+                 BorderBrush="#3F5A5A5A" BorderThickness="1" MinHeight="120">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" x:Name="StackPanelNews" Margin="6,10"/>
             </Border>
         </controls:WindowBlur>
 
