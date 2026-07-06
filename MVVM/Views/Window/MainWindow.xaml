@@ -38,7 +38,7 @@
 
                 <Border Grid.Row="1" Style="{StaticResource PanelBorder}" CornerRadius="16" Background="#EB0D1013"
                         BorderBrush="{StaticResource GlassLine}" BorderThickness="1"
-                        Height="78" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        Height="78" HorizontalAlignment="Stretch" Margin="100,0,2,0" VerticalAlignment="Center">
                     <Grid Margin="20,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>

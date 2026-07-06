@@ -19,18 +19,8 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         public MainPage()
         {
             InitializeComponent();
-            
-            SetBlurContainer();
         }
 
-
-        private void SetBlurContainer()
-        {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            Blur_WindowBlur.BlurContainer = mainWindow.MainBorder;
-            Blur_WindowBlur_Two.BlurContainer = mainWindow.MainBorder;
-        }
-        
 
         /*private async void UpdateStackPanelNews()
         {

@@ -22,7 +22,7 @@
             </DrawingBrush.Drawing>
         </DrawingBrush>
         <Style x:Key="SettingsPanel" TargetType="Border">
-            <Setter Property="Background" Value="#B80E1114"/>
+            <Setter Property="Background" Value="#C90E1114"/>
             <Setter Property="BorderBrush" Value="#17FFFFFF"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="16"/>
@@ -38,10 +38,7 @@
     </Page.Resources>
 
     <Grid>
-        <controls:WindowBlur Margin="5" BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur">
-            <Border Background="#C0121212" CornerRadius="30"
-                    BorderBrush="#3F5A5A5A" BorderThickness="1">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <UniformGrid Columns="2">
 
                         <!-- Display -->
@@ -86,7 +83,7 @@
                                 <DockPanel Margin="0,4">
                                     <Label Style="{StaticResource RowLabel}" Content="{Binding [ram_utilization], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <Slider x:Name="SliderRam" Width="140" VerticalAlignment="Center" Margin="0,0,10,0"
+                                        <Slider x:Name="SliderRam" Width="150" VerticalAlignment="Center" Margin="0,0,10,0" Style="{StaticResource GreenSlider}"
                                                 TickFrequency="512" IsSnapToTickEnabled="True" ValueChanged="SliderRAMValueChanged"/>
                                         <Label Content="{Binding ElementName=SliderRam, Path=Value, StringFormat={}{0}}" Foreground="#9FB2C0" FontWeight="SemiBold" VerticalAlignment="Center" Padding="0"/>
                                     </StackPanel>
@@ -161,7 +158,5 @@
 
                     </UniformGrid>
                 </ScrollViewer>
-            </Border>
-        </controls:WindowBlur>
     </Grid>
 </Page>

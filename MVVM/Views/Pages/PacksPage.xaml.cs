@@ -18,7 +18,6 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         public PacksPage()
         {
             InitializeComponent();
-            Blur_WindowBlur.BlurContainer = mainWindow.MainBorder;
         }
 
         private async void LoadingPage(object sender, RoutedEventArgs e)

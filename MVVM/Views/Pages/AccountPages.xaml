@@ -13,7 +13,7 @@
 
     <Grid>
         <controls:WindowBlur BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur" Width="540" Height="330">
-            <Border CornerRadius="15" Background="#C0121212" BorderBrush="#3F5A5A5A" BorderThickness="1">
+            <Border CornerRadius="16" Background="#EE111417" BorderBrush="#2BFFFFFF" BorderThickness="1">
                 <Grid Margin="15,10,15,15">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"/>
@@ -87,21 +87,11 @@
                             <ColumnDefinition Width="210"/>
                         </Grid.ColumnDefinitions>
 
-                        <Button x:Name="SaveAccountButton" Content="{Binding [save_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Height="35" VerticalAlignment="Bottom" Margin="2,0"
-                                Cursor="Hand" Tag="CustomBut" Click="SaveUserAccount" IsEnabled="False">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource CustomButton}">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsEnabled" Value="False">
-                                            <Setter Property="Opacity" Value="0.45"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
+                        <Button x:Name="SaveAccountButton" Content="{Binding [save_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Height="38" VerticalAlignment="Bottom" Margin="2,0"
+                                FontSize="13" Style="{StaticResource GhostButton}" Click="SaveUserAccount" IsEnabled="False"/>
 
-                        <Button Grid.Column="2" Content="{Binding [add_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Height="35" VerticalAlignment="Bottom" Margin="5,0,2,0"
-                                Cursor="Hand" Style="{StaticResource CustomButton}" Tag="CustomButAdd"
+                        <Button Grid.Column="2" Content="{Binding [add_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Height="42" VerticalAlignment="Bottom" Margin="5,0,2,0"
+                                FontSize="13" Style="{StaticResource EmeraldButton}"
                                 Click="ButtonClickAddNewAccount"/>
                     </Grid>
                 </Grid>

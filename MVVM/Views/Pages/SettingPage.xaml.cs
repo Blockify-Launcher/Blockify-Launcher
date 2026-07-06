@@ -31,10 +31,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         public SettingPage()
         {
             InitializeComponent();
-            Blur_WindowBlur.BlurContainer = mainWindow.MainBorder;
             DataContext = this;
-
-            //new OutVersionList(); 
         }
 
         private void LoadingPages(object sender, RoutedEventArgs e)
@@ -139,10 +136,10 @@ namespace BlockifyLauncher.MVVM.Views.Pages
                 _version_list.Add(new CheckBox()
                 {
                     Name = $"_version_checkBox_{i++}",
-                    Content = $"Display {ProfileConverter.ToString(item)} (\"{ProfileConverter.ToString(item)}\")",
+                    Content = $"{ResxLocalizationProvider.Instance["show_versions_prefix"]} {ProfileConverter.ToString(item)}",
                     Style = (System.Windows.Style)FindResource("CustomCheckBox"),
                     Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255)),
-                    FontSize = 20
+                    FontSize = 14
                 });
             }
         }

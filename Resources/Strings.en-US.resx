@@ -303,4 +303,7 @@
   <data name="server_offline" xml:space="preserve">
     <value>offline</value>
   </data>
+  <data name="show_versions_prefix" xml:space="preserve">
+    <value>Show</value>
+  </data>
 </root>

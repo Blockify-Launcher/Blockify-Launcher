@@ -5,7 +5,6 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
       xmlns:lang="clr-namespace:BlockifyLauncher.Resources"
-      xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
       mc:Ignorable="d"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="MainPage" Loaded="LoadingMainPage">
@@ -26,17 +25,25 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Margin" Value="0,0,0,5"/>
         </Style>
+        <Style x:Key="QuickCard" TargetType="Border">
+            <Setter Property="Background" Value="#C90E1114"/>
+            <Setter Property="BorderBrush" Value="#17FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="16,10"/>
+        </Style>
     </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- section header -->
-        <StackPanel Margin="6,0,0,10" HorizontalAlignment="Left">
+        <StackPanel Margin="8,0,0,10" HorizontalAlignment="Left">
             <TextBlock Text="{Binding [news_caption], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
                        Foreground="#D5E2EA" FontSize="12" FontWeight="Bold" Margin="0,0,0,5">
                 <TextBlock.Effect>
@@ -46,73 +53,66 @@
             <Rectangle Height="4" Fill="{StaticResource PixelRule}"/>
         </StackPanel>
 
-        <!-- news -->
-        <controls:WindowBlur Grid.Row="1" VerticalAlignment="Top"
-                BlurRadius="25" Magnification="0.15" Background="Transparent" x:Name="Blur_WindowBlur_Two">
-            <Border Background="#C0121212" CornerRadius="15" SizeChanged="ResizeStackPanelNew"
-                 BorderBrush="#3F5A5A5A" BorderThickness="1" MinHeight="120">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" x:Name="StackPanelNews" Margin="6,10"/>
-            </Border>
-        </controls:WindowBlur>
+        <!-- news cards float directly on the world -->
+        <Grid Grid.Row="1" SizeChanged="ResizeStackPanelNew">
+            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" x:Name="StackPanelNews"/>
+        </Grid>
 
-        <!-- quick row: continue / stats / favorite server -->
-        <controls:WindowBlur Grid.Row="2" Margin="0,14,0,0"
-                BlurRadius="25" Magnification="0.15" Background="Transparent" x:Name="Blur_WindowBlur">
-            <Border Background="#C0121212" CornerRadius="15" BorderBrush="#3F5A5A5A" BorderThickness="1" Height="86">
-                <Grid Margin="16,0">
+        <!-- quick row: three separate glass cards -->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.6*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- continue -->
+            <Border Style="{StaticResource QuickCard}">
+                <Grid x:Name="ContinueSection">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1.5*"/>
-                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-
-                    <!-- continue -->
-                    <Grid x:Name="ContinueSection" VerticalAlignment="Center">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Style="{StaticResource QuickCap}"
-                                       Text="{Binding [quick_continue], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                            <TextBlock x:Name="ContinueTitle" Foreground="#FFF" FontSize="15" FontWeight="SemiBold"
-                                       TextTrimming="CharacterEllipsis"/>
-                            <TextBlock x:Name="ContinueSub" Foreground="#5F7280" FontSize="10.5" Margin="0,3,0,0"/>
-                        </StackPanel>
-                        <Button Grid.Column="1" Content="▶" Width="46" Height="46" FontSize="14" Margin="12,0,10,0"
-                                Style="{StaticResource EmeraldButton}" Click="ContinueClick"
-                                ToolTip="{Binding [quick_continue], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                    </Grid>
-
-                    <Rectangle Grid.Column="1" Width="1" Fill="#2BFFFFFF" Margin="14,14"/>
-
-                    <!-- stats -->
-                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                    <StackPanel VerticalAlignment="Center">
                         <TextBlock Style="{StaticResource QuickCap}"
-                                   Text="{Binding [quick_stats], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock x:Name="StatCount" Foreground="#FFF" FontSize="19" FontWeight="Bold"/>
-                            <TextBlock x:Name="StatLabel" Foreground="#9FB2C0" FontSize="11" VerticalAlignment="Bottom" Margin="7,0,0,3"/>
-                        </StackPanel>
-                        <TextBlock x:Name="StatSub" Foreground="#5F7280" FontSize="10.5" Margin="0,2,0,0"/>
+                                   Text="{Binding [quick_continue], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                        <TextBlock x:Name="ContinueTitle" Foreground="#FFF" FontSize="15" FontWeight="SemiBold"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="ContinueSub" Foreground="#5F7280" FontSize="10.5" Margin="0,3,0,0"/>
                     </StackPanel>
-
-                    <Rectangle Grid.Column="3" Width="1" Fill="#2BFFFFFF" Margin="14,14"/>
-
-                    <!-- favorite server -->
-                    <StackPanel Grid.Column="4" VerticalAlignment="Center">
-                        <TextBlock Style="{StaticResource QuickCap}"
-                                   Text="{Binding [quick_server], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                        <StackPanel Orientation="Horizontal">
-                            <Ellipse x:Name="ServerDot" Width="8" Height="8" Fill="#5F7280" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="ServerHost" Foreground="#FFF" FontSize="13.5" FontWeight="SemiBold" Margin="7,0,0,0"/>
-                        </StackPanel>
-                        <TextBlock x:Name="ServerStatus" Foreground="#5F7280" FontSize="10.5" Margin="15,3,0,0"/>
-                    </StackPanel>
+                    <Button Grid.Column="1" Content="▶" Width="46" Height="46" FontSize="14" Margin="12,0,0,0"
+                            Style="{StaticResource EmeraldButton}" Click="ContinueClick"
+                            ToolTip="{Binding [quick_continue], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
                 </Grid>
             </Border>
-        </controls:WindowBlur>
+
+            <!-- stats -->
+            <Border Grid.Column="2" Style="{StaticResource QuickCard}">
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource QuickCap}"
+                               Text="{Binding [quick_stats], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="StatCount" Foreground="#FFF" FontSize="19" FontWeight="Bold"/>
+                        <TextBlock x:Name="StatLabel" Foreground="#9FB2C0" FontSize="11" VerticalAlignment="Bottom" Margin="7,0,0,3"/>
+                    </StackPanel>
+                    <TextBlock x:Name="StatSub" Foreground="#5F7280" FontSize="10.5" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- favorite server -->
+            <Border Grid.Column="4" Style="{StaticResource QuickCard}">
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource QuickCap}"
+                               Text="{Binding [quick_server], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse x:Name="ServerDot" Width="8" Height="8" Fill="#5F7280" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="ServerHost" Foreground="#FFF" FontSize="13.5" FontWeight="SemiBold" Margin="7,0,0,0"/>
+                    </StackPanel>
+                    <TextBlock x:Name="ServerStatus" Foreground="#5F7280" FontSize="10.5" Margin="15,3,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Page>

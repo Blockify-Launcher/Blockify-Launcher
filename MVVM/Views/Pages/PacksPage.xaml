@@ -42,10 +42,7 @@
     </Page.Resources>
 
     <Grid>
-        <controls:WindowBlur Margin="5" BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur">
-            <Border Background="#C0121212" CornerRadius="30"
-                    BorderBrush="#3F5A5A5A" BorderThickness="1">
-                <Grid Margin="18,14">
+                <Grid Margin="2,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
@@ -70,8 +67,8 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="#B80E1114" BorderBrush="#17FFFFFF" BorderThickness="1"
-                                            CornerRadius="16" Margin="4" Padding="10">
+                                    <Border Background="#C90E1114" BorderBrush="#17FFFFFF" BorderThickness="1"
+                                            CornerRadius="16" Margin="5" Padding="10">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="76"/>
@@ -112,7 +109,5 @@
                         </ItemsControl>
                     </ScrollViewer>
                 </Grid>
-            </Border>
-        </controls:WindowBlur>
     </Grid>
 </Page>
