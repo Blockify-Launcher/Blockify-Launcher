@@ -9,6 +9,7 @@ namespace BlockifyLauncher.Core.News
     {
         public string Title { get; set; } = "";
         public string Subtitle { get; set; } = "";
+        public string Text { get; set; } = "";
         public DateTime Date { get; set; }
         public string? Link { get; set; }
         public string? ImageUrl { get; set; }
@@ -99,6 +100,7 @@ namespace BlockifyLauncher.Core.News
                 {
                     Title = e.Value<string>("title") ?? "",
                     Subtitle = "MOJANG · " + date.ToString("d MMM yyyy"),
+                    Text = e.Value<string>("text") ?? "",
                     Date = date,
                     Link = e.Value<string>("readMoreLink"),
                     ImageUrl = imageUrl,
@@ -120,6 +122,7 @@ namespace BlockifyLauncher.Core.News
                 {
                     Title = e.Value<string>("title") ?? "",
                     Subtitle = "BLOCKIFY · " + date.ToString("d MMM yyyy"),
+                    Text = e.Value<string>("description") ?? "",
                     Date = date,
                     Link = e.Value<string>("link"),
                     ImageUrl = e.Value<string>("image"),
