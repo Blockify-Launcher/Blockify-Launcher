@@ -142,10 +142,11 @@
         <Style.Setters>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type RadioButton}">
-                        <StackPanel Orientation="Horizontal" Opacity="80" Name="RadionButtonStackPanel">
+                        <StackPanel Orientation="Horizontal" Opacity="0.65" Name="RadionButtonStackPanel">
                             <Image Name="RadioBoxImage" Height="15" VerticalAlignment="Center">
                                 <Image.Source>
                                     <DrawingImage>
@@ -183,7 +184,7 @@
                         </StackPanel>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="RadionButtonStackPanel" Property="Opacity" Value="100"/>
+                                <Setter TargetName="RadionButtonStackPanel" Property="Opacity" Value="1"/>
                                 <Setter TargetName="RadioBoxImage" Property="Source">
                                     <Setter.Value>
                                         <DrawingImage>
@@ -211,9 +212,9 @@
                                                             </GeometryDrawing.Geometry>
                                                         </GeometryDrawing>
                                                     </DrawingGroup>
-                                                    <GeometryDrawing Brush="#FF1D1D1D">
+                                                    <GeometryDrawing Brush="#FF00B558">
                                                         <GeometryDrawing.Geometry>
-                                                            <EllipseGeometry RadiusX="10" RadiusY="10" Center="13,13" />
+                                                            <EllipseGeometry RadiusX="7" RadiusY="7" Center="13,13" />
                                                         </GeometryDrawing.Geometry>
                                                     </GeometryDrawing>
                                                     <GeometryDrawing>
@@ -408,7 +409,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                    <Border Margin="2" Background="{TemplateBinding Background}"
+                    <Border Margin="2" Background="{TemplateBinding Background}" CornerRadius="6"
                             Padding="2" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                         <ContentPresenter>
                             <ContentPresenter.Content>
@@ -422,6 +423,10 @@
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="#CC3E3E3E"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#7F009046"/>
+                <Setter Property="BorderBrush" Value="#CC00B558"/>
             </Trigger>
         </Style.Triggers>
     </Style>

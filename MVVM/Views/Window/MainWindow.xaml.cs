@@ -1,6 +1,7 @@
 ﻿using BlockifyLauncher.Core.ResizeForm;
 using BlockifyLauncher.MVVM.Views.Pages.Func.Setting;
 using BlockifyLauncher.Properties;
+using BlockifyLauncher.Resources;
 using BlockifyLib.Launcher.Downloader;
 using BlockifyLib.Launcher.Minecraft.Auth;
 using BlockifyLib.Launcher.src;
@@ -75,7 +76,7 @@ namespace BlockifyLauncher
             if (MinecraftAccountComboBox.Items.Count > 0)
                 MinecraftAccountComboBox.SelectedIndex = index;
             else
-                MinecraftAccountComboBox.Text = "None...";
+                MinecraftAccountComboBox.Text = ResxLocalizationProvider.Instance["none_account"];
 
             MinecraftAccountComboBox.Items.Add(new Separator()
             {
@@ -85,7 +86,7 @@ namespace BlockifyLauncher
             var navButton_account = new Button()
             {
                 Style = (Style)Application.Current.FindResource("ButtonComboBoxAccount"),
-                Content = "Account Setting"
+                Content = ResxLocalizationProvider.Instance["account_setting"]
             };
             navButton_account.SetBinding(Button.CommandProperty, new Binding("AccountCommand"));
 
@@ -120,14 +121,47 @@ namespace BlockifyLauncher
 
         private string GameLauncherName = "BlockifyLauncher";
         private string GameLauncherVersion = "1";
-        private async Task<Process> StartGame()
+
+        // Resolve the launch session for the selected account:
+        // offline accounts as-is, Microsoft accounts get a fresh token.
+        private async Task<Session> ResolveLaunchSession()
+        {
+            SessionStruct selected = account!.GetAllUserArray()[MinecraftAccountComboBox.SelectedIndex];
+
+            if (selected.UserType != "msa")
+                return Session.GetOfflineSession(selected.Username ?? string.Empty);
+
+            var loginHandler = BlockifyLib.Launcher.Microsoft.JELoginHandlerBuilder.BuildDefault();
+
+            BlockifyLib.Launcher.XboxAuthNet.Game.Accounts.IXboxGameAccount? xboxAccount = null;
+            if (!string.IsNullOrEmpty(selected.Xuid) &&
+                loginHandler.AccountManager.GetAccounts().TryGetAccount(selected.Xuid, out var found))
+                xboxAccount = found;
+
+            try
+            {
+                return xboxAccount != null
+                    ? await loginHandler.AuthenticateSilently(xboxAccount)
+                    : await loginHandler.AuthenticateSilently();
+            }
+            catch
+            {
+                // Refresh token expired or missing — fall back to interactive sign-in.
+                return xboxAccount != null
+                    ? await loginHandler.AuthenticateInteractively(xboxAccount)
+                    : await loginHandler.AuthenticateInteractively();
+            }
+        }
+
+        private async Task<Process?> StartGame()
         {
             Display display = setting.GetSettingDisplayGame();
-            Process process = await setting.launcher
+            Session session = await ResolveLaunchSession();
+            return await setting.launcher
                 .CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(),
                 new LaunchOption
                 {
-                    Session = Session.GetOfflineSession(MinecraftAccountComboBox.Items[MinecraftAccountComboBox.SelectedIndex].ToString()),
+                    Session = session,
                     MaximumRamMb = setting.GetMemoryRAM(),
 
                     VersionType = this.GameLauncherName,
@@ -138,29 +172,54 @@ namespace BlockifyLauncher
                     ScreenHeight = display.h,
                     FullScreen = setting.GetFullScrean(),
                 });
-            return process ?? new Process();
         }
 
         private async void ButtonClickStartGame(object sender, RoutedEventArgs e)
         {
+            var lang = ResxLocalizationProvider.Instance;
+
+            if (MinecraftVerisonComboBox.SelectedIndex < 0)
+            {
+                new MessageBox(lang["error_no_version"], MessageBox.TypeMessage.Error).ShowDialog();
+                return;
+            }
+
+            if (MinecraftAccountComboBox.SelectedIndex < 0 ||
+                MinecraftAccountComboBox.Items[MinecraftAccountComboBox.SelectedIndex] is not string)
+            {
+                new MessageBox(lang["error_no_account"], MessageBox.TypeMessage.Error).ShowDialog();
+                return;
+            }
+
             /* This code would increase download speed. */
             System.Net.ServicePointManager.DefaultConnectionLimit = 256;
 
+            Start.IsEnabled = false;
             ProgressBarLoad.Activ = "Use";
 
-            //var processUtil = new ProcessUtil(await StartGame());
-            //processUtil.StartWithEvents();
-            var process = await StartGame();
-            process.Start();
+            try
+            {
+                var process = await StartGame();
+                if (process == null)
+                    throw new InvalidOperationException(lang["error_start_failed"]);
 
-            ProgressBarLoad.Activ = "Сlose";
+                process.Start();
 
-            var _discordController = App._discordController;
-            _discordController.UpdateDiscordActivity("play");//MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString());
+                App._discordController?.UpdateDiscordActivity("play");
 
-            /*Closing the Launcher after launching minecraft.*/
-            if (new Properties.Settings().GetHideLauncher() == 0)
-                this.Close();
+                /*Closing the Launcher after launching minecraft.*/
+                if (new Properties.Settings().GetHideLauncher() == 0)
+                    this.Close();
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
+            }
+            finally
+            {
+                ProgressBarLoad.Activ = "Сlose";
+                Start.IsEnabled = true;
+            }
         }
 
         private void LauncherFileChanged(DownloadFileChangedEventArgs e)

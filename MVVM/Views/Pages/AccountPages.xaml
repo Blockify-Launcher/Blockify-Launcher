@@ -5,82 +5,104 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
       xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel"
+      xmlns:lang="clr-namespace:BlockifyLauncher.Resources"
       xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="AccountPages" Margin="0, 0, 60, 0" DataContext="{StaticResource currentViewModel}">
 
     <Grid>
-        <controls:WindowBlur BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur" Width="500" Height="300">
+        <controls:WindowBlur BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur" Width="540" Height="330">
             <Border CornerRadius="15" Background="#C0121212" BorderBrush="#3F5A5A5A" BorderThickness="1">
-                <Grid Margin="10">
+                <Grid Margin="15,10,15,15">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="55"/>
+                        <RowDefinition Height="50"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="47"/>
                     </Grid.RowDefinitions>
 
                     <Grid VerticalAlignment="Center">
-                        <Button x:Name="LastPageButton" Cursor="Hand" HorizontalAlignment="Left" Margin="20,0">
+                        <Button x:Name="LastPageButton" Cursor="Hand" HorizontalAlignment="Left" Margin="10,0">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border Height="20" Width="Auto">
+                                                <Border Height="20" Width="Auto" Background="Transparent">
                                                     <Image Source="{StaticResource Arrow___LeftDrawingImage}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
                                             </ControlTemplate>
                                         </Setter.Value>
                                     </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="0.7"/>
+                                        </Trigger>
+                                    </Style.Triggers>
                                 </Style>
                             </Button.Style>
                         </Button>
-                        <Label Content="Account setting" Foreground="White" FontWeight="Bold" FontSize="18" HorizontalAlignment="Center"/>
+                        <Label Content="{Binding [account_setting], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="White" FontWeight="Bold" FontSize="18" HorizontalAlignment="Center"/>
                     </Grid>
 
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="21"/>
+                            <ColumnDefinition Width="210"/>
                         </Grid.ColumnDefinitions>
 
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition Height="40"/>
-                            </Grid.RowDefinitions>
+                        <ListBox x:Name="AccountList" Style="{StaticResource ListBoxAccount}"
+                                 ItemContainerStyle="{StaticResource ListBoxAccount_Item}">
+                        </ListBox>
 
-                            <ListBox x:Name="AccountList" Style="{StaticResource ListBoxAccount}"
-                                     ItemContainerStyle="{StaticResource ListBoxAccount_Item}">
-                            </ListBox>
-                            <Button Content="Save account" VerticalAlignment="Bottom" Margin="5,0" Grid.Row="1"
-                                    Cursor="Hand" Style="{StaticResource CustomButton}" Tag="CustomBut" Click="SaveUserAccount"/>
-                                
-                            <StackPanel>
-                            </StackPanel>
-                            
-                        </Grid>
-                        
-                        <Grid Grid.Column="1">
-                            <Rectangle Fill="#665A5A5A" Width="2" VerticalAlignment="Stretch"/>
-                        </Grid>
-                        
-                        <Grid Grid.Column="2">
-                            <StackPanel Margin="10,10">
-                                <Label Content="UserName" Foreground="White"/>
-                                <TextBox x:Name="UserNameTextBox" Style="{StaticResource CustomTextBox}" BorderBrush="#3F5A5A5A"/>
-                                <RadioButton Style="{StaticResource CustomRadioButton}" Content="Login without password" x:Name="LoginNotPassword"/>
-                                <RadioButton Style="{StaticResource CustomRadioButton}" Content="Login through Microsoft" x:Name="LoginMicrosoft"/>
-                                <!--
-                                <RadioButton Style="{StaticResource CustomRadioButton}" Content="Login through Mojang" x:Name="LoginMojang"/>
-                                -->
-                            </StackPanel>
+                        <Rectangle Grid.Column="1" Fill="#665A5A5A" Width="1" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
 
-                            <Button Content="+ Add account" VerticalAlignment="Bottom" Margin="5,0"
-                                    Cursor="Hand" Style="{StaticResource CustomButton}" Tag="CustomButAdd"
-                                    Click="ButtonClickAddNewAccount"/>         
-                        </Grid>
+                        <StackPanel Grid.Column="2" Margin="5,0,0,0">
+                            <Label Content="{Binding [username], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="White" Padding="2,0,0,3"/>
+                            <TextBox x:Name="UserNameTextBox" Height="30" BorderBrush="#3F5A5A5A"
+                                     IsEnabled="{Binding IsChecked, ElementName=LoginNotPassword}">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox" BasedOn="{StaticResource CustomTextBox}">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="Opacity" Value="0.4"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                            <RadioButton Style="{StaticResource CustomRadioButton}" Content="{Binding [login_without_password], Source={x:Static lang:ResxLocalizationProvider.Instance}}" x:Name="LoginNotPassword" IsChecked="True" Margin="0,14,0,0"/>
+                            <RadioButton Style="{StaticResource CustomRadioButton}" Content="{Binding [login_microsoft], Source={x:Static lang:ResxLocalizationProvider.Instance}}" x:Name="LoginMicrosoft" Margin="0,8,0,0"/>
+                            <!--
+                            <RadioButton Style="{StaticResource CustomRadioButton}" Content="Login through Mojang" x:Name="LoginMojang"/>
+                            -->
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="21"/>
+                            <ColumnDefinition Width="210"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="SaveAccountButton" Content="{Binding [save_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Height="35" VerticalAlignment="Bottom" Margin="2,0"
+                                Cursor="Hand" Tag="CustomBut" Click="SaveUserAccount" IsEnabled="False">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource CustomButton}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Opacity" Value="0.45"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <Button Grid.Column="2" Content="{Binding [add_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Height="35" VerticalAlignment="Bottom" Margin="5,0,2,0"
+                                Cursor="Hand" Style="{StaticResource CustomButton}" Tag="CustomButAdd"
+                                Click="ButtonClickAddNewAccount"/>
                     </Grid>
                 </Grid>
             </Border>

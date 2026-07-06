@@ -58,7 +58,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,100,0" >
-                            <Label Content="Name : " Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
+                            <Label Content="{Binding [account], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
                                    Margin="0,0,10,0"/>
                             <ComboBox Width="190" Height="Auto" Style="{StaticResource CustomComboBox}" x:Name="MinecraftAccountComboBox">
                                 <Separator Style="{StaticResource MenuSeparatorStyle}"/>

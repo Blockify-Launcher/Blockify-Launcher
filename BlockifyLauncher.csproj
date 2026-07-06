@@ -29,7 +29,9 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="libs/BlockifyLib/BlockifyLib.csproj" />
+		<ProjectReference Include="libs/BlockifyLib/BlockifyLib.csproj">
+		  <TreatAsUsed>true</TreatAsUsed>
+		</ProjectReference>
 	</ItemGroup>
 
   <ItemGroup>
@@ -70,8 +72,10 @@
     <PackageReference Include="dotenv.net" Version="3.2.1" />
     <PackageReference Include="LZMA-SDK" Version="22.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.67.2" />
-    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.67.2" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.68.0">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.68.0" />
     <PackageReference Include="NETStandard.Library" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />

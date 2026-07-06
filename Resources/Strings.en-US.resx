@@ -117,10 +117,118 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="account" xml:space="preserve">
+    <value>Account :</value>
+  </data>
+  <data name="apply_button" xml:space="preserve">
+    <value>Apply </value>
+  </data>
+  <data name="display_height" xml:space="preserve">
+    <value>height</value>
+  </data>
+  <data name="display_width" xml:space="preserve">
+    <value>width</value>
+  </data>
   <data name="start_game" xml:space="preserve">
     <value>Start</value>
   </data>
   <data name="version" xml:space="preserve">
     <value>Minecraft version : </value>
+  </data>
+  <data name="account_setting" xml:space="preserve">
+    <value>Account Setting</value>
+  </data>
+  <data name="none_account" xml:space="preserve">
+    <value>None...</value>
+  </data>
+  <data name="error_no_version" xml:space="preserve">
+    <value>Select a Minecraft version first.</value>
+  </data>
+  <data name="error_no_account" xml:space="preserve">
+    <value>Select an account first.</value>
+  </data>
+  <data name="error_start_failed" xml:space="preserve">
+    <value>Failed to create the game process.</value>
+  </data>
+  <data name="display_section" xml:space="preserve">
+    <value>Display</value>
+  </data>
+  <data name="fullscreen" xml:space="preserve">
+    <value>Fullscreen</value>
+  </data>
+  <data name="system_section" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="ram_utilization" xml:space="preserve">
+    <value>RAM utilization</value>
+  </data>
+  <data name="minecraft_path" xml:space="preserve">
+    <value>Minecraft path</value>
+  </data>
+  <data name="path_button" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="java_version" xml:space="preserve">
+    <value>Java version</value>
+  </data>
+  <data name="edit_button" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="launcher_setting_section" xml:space="preserve">
+    <value>Launcher settings</value>
+  </data>
+  <data name="hide_launcher" xml:space="preserve">
+    <value>Hide the launcher</value>
+  </data>
+  <data name="hide" xml:space="preserve">
+    <value>hide</value>
+  </data>
+  <data name="show" xml:space="preserve">
+    <value>show</value>
+  </data>
+  <data name="launcher_language" xml:space="preserve">
+    <value>Launcher language</value>
+  </data>
+  <data name="version_list" xml:space="preserve">
+    <value>Version list : </value>
+  </data>
+  <data name="save_account" xml:space="preserve">
+    <value>Save account</value>
+  </data>
+  <data name="username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="login_without_password" xml:space="preserve">
+    <value>Login without password</value>
+  </data>
+  <data name="login_microsoft" xml:space="preserve">
+    <value>Login through Microsoft</value>
+  </data>
+  <data name="add_account" xml:space="preserve">
+    <value>+ Add account</value>
+  </data>
+  <data name="delete_account" xml:space="preserve">
+    <value>Delete account</value>
+  </data>
+  <data name="error_title" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="notif_create_account" xml:space="preserve">
+    <value>Create new account</value>
+  </data>
+  <data name="notif_create_account_body" xml:space="preserve">
+    <value>A new account "{0}" has been created.</value>
+  </data>
+  <data name="notif_edit_account" xml:space="preserve">
+    <value>Edit account</value>
+  </data>
+  <data name="notif_edit_account_body" xml:space="preserve">
+    <value>A new username has been set: "{0}".</value>
+  </data>
+  <data name="error_microsoft_login" xml:space="preserve">
+    <value>Microsoft sign-in failed. Make sure the account owns Minecraft: Java Edition.</value>
+  </data>
+  <data name="error_empty_username" xml:space="preserve">
+    <value>Enter a username first.</value>
   </data>
 </root>

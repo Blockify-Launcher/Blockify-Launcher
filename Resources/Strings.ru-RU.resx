@@ -123,4 +123,112 @@
   <data name="version" xml:space="preserve">
     <value>Minecraft версия : </value>
   </data>
+  <data name="account" xml:space="preserve">
+    <value>Аккаунт :</value>
+  </data>
+  <data name="apply_button" xml:space="preserve">
+    <value>Применить</value>
+  </data>
+  <data name="display_height" xml:space="preserve">
+    <value>высота</value>
+  </data>
+  <data name="display_width" xml:space="preserve">
+    <value>ширина</value>
+  </data>
+  <data name="account_setting" xml:space="preserve">
+    <value>Настройки аккаунта</value>
+  </data>
+  <data name="none_account" xml:space="preserve">
+    <value>Нет...</value>
+  </data>
+  <data name="error_no_version" xml:space="preserve">
+    <value>Сначала выберите версию Minecraft.</value>
+  </data>
+  <data name="error_no_account" xml:space="preserve">
+    <value>Сначала выберите аккаунт.</value>
+  </data>
+  <data name="error_start_failed" xml:space="preserve">
+    <value>Не удалось создать процесс игры.</value>
+  </data>
+  <data name="display_section" xml:space="preserve">
+    <value>Дисплей</value>
+  </data>
+  <data name="fullscreen" xml:space="preserve">
+    <value>Полный экран</value>
+  </data>
+  <data name="system_section" xml:space="preserve">
+    <value>Система</value>
+  </data>
+  <data name="ram_utilization" xml:space="preserve">
+    <value>Выделение памяти (RAM)</value>
+  </data>
+  <data name="minecraft_path" xml:space="preserve">
+    <value>Папка Minecraft</value>
+  </data>
+  <data name="path_button" xml:space="preserve">
+    <value>Обзор</value>
+  </data>
+  <data name="java_version" xml:space="preserve">
+    <value>Версия Java</value>
+  </data>
+  <data name="edit_button" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="launcher_setting_section" xml:space="preserve">
+    <value>Настройки лаунчера</value>
+  </data>
+  <data name="hide_launcher" xml:space="preserve">
+    <value>Скрывать лаунчер</value>
+  </data>
+  <data name="hide" xml:space="preserve">
+    <value>скрывать</value>
+  </data>
+  <data name="show" xml:space="preserve">
+    <value>показывать</value>
+  </data>
+  <data name="launcher_language" xml:space="preserve">
+    <value>Язык лаунчера</value>
+  </data>
+  <data name="version_list" xml:space="preserve">
+    <value>Список версий : </value>
+  </data>
+  <data name="save_account" xml:space="preserve">
+    <value>Сохранить аккаунт</value>
+  </data>
+  <data name="username" xml:space="preserve">
+    <value>Имя пользователя</value>
+  </data>
+  <data name="login_without_password" xml:space="preserve">
+    <value>Вход без пароля</value>
+  </data>
+  <data name="login_microsoft" xml:space="preserve">
+    <value>Вход через Microsoft</value>
+  </data>
+  <data name="add_account" xml:space="preserve">
+    <value>+ Добавить аккаунт</value>
+  </data>
+  <data name="delete_account" xml:space="preserve">
+    <value>Удалить аккаунт</value>
+  </data>
+  <data name="error_title" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="notif_create_account" xml:space="preserve">
+    <value>Новый аккаунт</value>
+  </data>
+  <data name="notif_create_account_body" xml:space="preserve">
+    <value>Создан новый аккаунт «{0}».</value>
+  </data>
+  <data name="notif_edit_account" xml:space="preserve">
+    <value>Изменение аккаунта</value>
+  </data>
+  <data name="notif_edit_account_body" xml:space="preserve">
+    <value>Установлено новое имя «{0}».</value>
+  </data>
+  <data name="error_microsoft_login" xml:space="preserve">
+    <value>Вход через Microsoft не удался. Убедитесь, что на аккаунте куплена Minecraft: Java Edition.</value>
+  </data>
+  <data name="error_empty_username" xml:space="preserve">
+    <value>Сначала введите имя пользователя.</value>
+  </data>
 </root>
