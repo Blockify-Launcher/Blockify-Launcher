@@ -10,6 +10,19 @@
       Title="SettingPage" Loaded="LoadingPages">
 
     <Page.Resources>
+        <Style x:Key="SettingsPanel" TargetType="Border">
+            <Setter Property="Background" Value="#C90E1114"/>
+            <Setter Property="BorderBrush" Value="#17FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        <Style x:Key="PanelCap" TargetType="Label">
+            <Setter Property="Foreground" Value="#D5E2EA"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="0,0,10,0"/>
+        </Style>
         <DrawingBrush x:Key="PixelRuleDim" TileMode="Tile" Viewport="0,0,10,4" ViewportUnits="Absolute" Stretch="None">
             <DrawingBrush.Drawing>
                 <GeometryDrawing Brush="#8C00B558">
@@ -19,14 +32,6 @@
                 </GeometryDrawing>
             </DrawingBrush.Drawing>
         </DrawingBrush>
-        <Style x:Key="SettingsPanel" TargetType="Border">
-            <Setter Property="Background" Value="#C90E1114"/>
-            <Setter Property="BorderBrush" Value="#17FFFFFF"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="16"/>
-            <Setter Property="Padding" Value="16,13"/>
-            <Setter Property="Margin" Value="6"/>
-        </Style>
         <Style x:Key="RowLabel" TargetType="Label">
             <Setter Property="Foreground" Value="#D9E2E8"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
@@ -38,144 +43,251 @@
             <Setter Property="FontSize" Value="10.5"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
+        <!-- sidebar nav item -->
+        <Style x:Key="NavItem" TargetType="RadioButton">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#9FB2C0"/>
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bg" CornerRadius="10" Padding="13,9" Margin="0,0,0,5" Background="Transparent">
+                            <ContentPresenter TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#14FFFFFF"/>
+                                <Setter Property="Foreground" Value="#FFF"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource GreenAccent}"/>
+                                <Setter Property="Foreground" Value="#FFF"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
 
     <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <UniformGrid Columns="2">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="176"/>
+            <ColumnDefinition Width="14"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-                <!-- Display -->
-                <Border Style="{StaticResource SettingsPanel}">
-                    <StackPanel>
-                        <DockPanel Margin="0,0,0,12">
-                            <Image Source="{StaticResource DisplayDrawingImage}" Height="18" DockPanel.Dock="Left"/>
-                            <Label Content="{Binding [display_section], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="#D5E2EA" FontWeight="Bold" Padding="8,0,10,0"/>
-                            <Rectangle Height="4" Fill="{StaticResource PixelRuleDim}" VerticalAlignment="Center"/>
-                        </DockPanel>
+        <!-- sidebar -->
+        <Border Background="#C90E1114" BorderBrush="#17FFFFFF" BorderThickness="1" CornerRadius="14" Padding="8,10">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Bottom" x:Name="VersionLabel" Foreground="#5F7280" FontSize="10"
+                           HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                <StackPanel>
+                    <RadioButton Style="{StaticResource NavItem}" IsChecked="True" Checked="SectionChecked" Tag="game"
+                                 Content="{Binding [sec_game], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                    <RadioButton Style="{StaticResource NavItem}" Checked="SectionChecked" Tag="java"
+                                 Content="{Binding [sec_java], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                    <RadioButton Style="{StaticResource NavItem}" Checked="SectionChecked" Tag="launcher"
+                                 Content="{Binding [sec_launcher], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                    <RadioButton Style="{StaticResource NavItem}" Checked="SectionChecked" Tag="versions"
+                                 Content="{Binding [sec_versions], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                    <RadioButton Style="{StaticResource NavItem}" Checked="SectionChecked" Tag="data"
+                                 Content="{Binding [sec_data], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
 
-                        <DockPanel Margin="0,4">
-                            <Label Style="{StaticResource RowLabel}" Content="{Binding [display_size], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <TextBox x:Name="WidthScrean" Height="32" Width="80" Style="{StaticResource CustomTextBox}" BorderBrush="#3F5A5A5A" BorderThickness="1"
-                                         PreviewTextInput="NumsPreviewTextInput"/>
-                                <Label Content="⨉" VerticalAlignment="Center" FontWeight="Bold" FontSize="14" Foreground="White"/>
-                                <TextBox x:Name="HeightScrean" Height="32" Width="80" Style="{StaticResource CustomTextBox}" BorderBrush="#3F5A5A5A" BorderThickness="1"
-                                         PreviewTextInput="NumsPreviewTextInput"/>
-                            </StackPanel>
-                        </DockPanel>
+        <!-- panes -->
+        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+            <Grid>
 
-                        <DockPanel Margin="0,8,0,4">
-                            <CheckBox x:Name="FullScreanCheckBox" Content="{Binding [fullscreen], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
-                                      Style="{StaticResource SwitchToggle}" DockPanel.Dock="Left" VerticalAlignment="Center"/>
-                            <Button HorizontalAlignment="Right" Content="{Binding [apply_button], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
-                                    Click="ApplySettingScrean" FontSize="12"
-                                    Width="110" Height="38" Style="{StaticResource EmeraldButton}"/>
-                        </DockPanel>
-                    </StackPanel>
-                </Border>
+                <!-- GAME -->
+                <StackPanel x:Name="PaneGame">
+                    <Border Style="{StaticResource SettingsPanel}">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,10">
+                                <Label Style="{StaticResource PanelCap}" Content="{Binding [screen_section], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <Rectangle Height="4" Fill="{StaticResource PixelRuleDim}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,4">
+                                <Label Style="{StaticResource RowLabel}" Content="{Binding [display_size], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <TextBox x:Name="WidthScrean" Height="32" Width="80" Style="{StaticResource CustomTextBox}" BorderBrush="#3F5A5A5A" BorderThickness="1"
+                                             PreviewTextInput="NumsPreviewTextInput"/>
+                                    <Label Content="⨉" VerticalAlignment="Center" FontWeight="Bold" FontSize="14" Foreground="White"/>
+                                    <TextBox x:Name="HeightScrean" Height="32" Width="80" Style="{StaticResource CustomTextBox}" BorderBrush="#3F5A5A5A" BorderThickness="1"
+                                             PreviewTextInput="NumsPreviewTextInput"/>
+                                </StackPanel>
+                            </DockPanel>
+                            <DockPanel Margin="0,8,0,2">
+                                <CheckBox x:Name="FullScreanCheckBox" Content="{Binding [fullscreen], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                          Style="{StaticResource SwitchToggle}" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                                <Button HorizontalAlignment="Right" Content="{Binding [apply_button], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                        Click="ApplySettingScrean" FontSize="12"
+                                        Width="110" Height="38" Style="{StaticResource EmeraldButton}"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
 
-                <!-- System -->
-                <Border Style="{StaticResource SettingsPanel}">
-                    <StackPanel>
-                        <DockPanel Margin="0,0,0,12">
-                            <Image Source="{StaticResource KeyDrawingImage}" Height="18" DockPanel.Dock="Left"/>
-                            <Label Content="{Binding [system_section], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="#D5E2EA" FontWeight="Bold" Padding="8,0,10,0"/>
-                            <Rectangle Height="4" Fill="{StaticResource PixelRuleDim}" VerticalAlignment="Center"/>
-                        </DockPanel>
+                    <Border Style="{StaticResource SettingsPanel}">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,10">
+                                <Label Style="{StaticResource PanelCap}" Content="{Binding [perf_section], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <Rectangle Height="4" Fill="{StaticResource PixelRuleDim}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,4">
+                                <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center">
+                                    <Label Style="{StaticResource RowLabel}" Content="{Binding [ram_utilization], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{Binding [ram_hint], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Slider x:Name="SliderRam" Width="150" VerticalAlignment="Center" Margin="0,0,10,0" Style="{StaticResource GreenSlider}"
+                                            TickFrequency="512" IsSnapToTickEnabled="True" ValueChanged="SliderRAMValueChanged"/>
+                                    <TextBlock x:Name="RamValueText" Foreground="#9FB2C0" FontWeight="SemiBold" VerticalAlignment="Center" FontSize="13"/>
+                                </StackPanel>
+                            </DockPanel>
+                            <DockPanel Margin="0,8,0,2">
+                                <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center" MaxWidth="360" HorizontalAlignment="Left">
+                                    <Label Style="{StaticResource RowLabel}" Content="{Binding [jvm_aikar], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{Binding [jvm_aikar_hint], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                                </StackPanel>
+                                <CheckBox x:Name="SwitchAikar" Style="{StaticResource SwitchToggle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                          Checked="AikarChanged" Unchecked="AikarChanged"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
 
-                        <DockPanel Margin="0,4">
-                            <Label Style="{StaticResource RowLabel}" Content="{Binding [ram_utilization], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Slider x:Name="SliderRam" Width="150" VerticalAlignment="Center" Margin="0,0,10,0" Style="{StaticResource GreenSlider}"
-                                        TickFrequency="512" IsSnapToTickEnabled="True" ValueChanged="SliderRAMValueChanged"/>
-                                <TextBlock x:Name="RamValueText" Foreground="#9FB2C0" FontWeight="SemiBold" VerticalAlignment="Center" FontSize="13"/>
-                            </StackPanel>
-                        </DockPanel>
+                    <Border Style="{StaticResource SettingsPanel}">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,10">
+                                <Label Style="{StaticResource PanelCap}" Content="{Binding [behavior_section], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <Rectangle Height="4" Fill="{StaticResource PixelRuleDim}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,4">
+                                <Label Style="{StaticResource RowLabel}" Content="{Binding [hide_launcher], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <ComboBox Style="{StaticResource CustomComboBox}" Width="180" Height="32" Tag="SettingComboBox" HorizontalAlignment="Right" BorderThickness="1"
+                                          x:Name="ComboBoxDisplayForm" SelectionChanged="ComboBoxDisplayFormSelect">
+                                    <ComboBoxItem Content="{Binding [hide], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                                    <ComboBoxItem Content="{Binding [show], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                                </ComboBox>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
 
-                        <DockPanel Margin="0,4">
-                            <Label Style="{StaticResource RowLabel}" Content="{Binding [java_version], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
-                            <ComboBox x:Name="JavaVersion" Style="{StaticResource CustomComboBox}" Width="230" Height="32" Tag="SettingComboBox" HorizontalAlignment="Right" BorderThickness="1"
-                                      SelectionChanged="JavaVersionSelect"/>
-                        </DockPanel>
+                <!-- JAVA & FILES -->
+                <StackPanel x:Name="PaneJava" Visibility="Collapsed">
+                    <Border Style="{StaticResource SettingsPanel}">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,10">
+                                <Label Style="{StaticResource PanelCap}" Content="Java" DockPanel.Dock="Left"/>
+                                <Rectangle Height="4" Fill="{StaticResource PixelRuleDim}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,4">
+                                <Label Style="{StaticResource RowLabel}" Content="{Binding [java_version], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <ComboBox x:Name="JavaVersion" Style="{StaticResource CustomComboBox}" Width="280" Height="32" Tag="SettingComboBox" HorizontalAlignment="Right" BorderThickness="1"
+                                          SelectionChanged="JavaVersionSelect"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource SettingsPanel}">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,10">
+                                <Label Style="{StaticResource PanelCap}" Content="Minecraft" DockPanel.Dock="Left"/>
+                                <Rectangle Height="4" Fill="{StaticResource PixelRuleDim}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,4">
+                                <Label Style="{StaticResource RowLabel}" Content="{Binding [minecraft_path], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <TextBox Width="260" Height="32" Style="{StaticResource CustomTextBox}" BorderBrush="#725B5B5B" x:Name="MinecraftPath_TextBox"
+                                             IsReadOnly="True" FontSize="11"/>
+                                    <Button Content="…" Width="38" Height="35" FontSize="13" Margin="8,0,0,0" Style="{StaticResource GhostButton}"
+                                            Click="PathMinecraft"/>
+                                </StackPanel>
+                            </DockPanel>
+                            <TextBlock Style="{StaticResource RowHint}" Margin="0,3,0,0"
+                                       Text="{Binding [restart_required], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
 
-                        <DockPanel Margin="0,4">
-                            <Label Style="{StaticResource RowLabel}" Content="{Binding [minecraft_path], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <TextBox Width="192" Height="32" Style="{StaticResource CustomTextBox}" BorderBrush="#725B5B5B" x:Name="MinecraftPath_TextBox"
-                                         IsReadOnly="True" FontSize="11"/>
-                                <Button Content="…" Width="36" Height="34" FontSize="13" Margin="8,0,0,0" Style="{StaticResource GhostButton}"
-                                        Click="PathMinecraft"/>
-                            </StackPanel>
-                        </DockPanel>
-                        <TextBlock Style="{StaticResource RowHint}" Margin="0,3,0,0"
-                                   Text="{Binding [restart_required], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                    </StackPanel>
-                </Border>
+                <!-- LAUNCHER -->
+                <StackPanel x:Name="PaneLauncher" Visibility="Collapsed">
+                    <Border Style="{StaticResource SettingsPanel}">
+                        <StackPanel>
+                            <DockPanel Margin="0,4">
+                                <Label Style="{StaticResource RowLabel}" Content="{Binding [launcher_language], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <ComboBox Style="{StaticResource CustomComboBox}" Width="180" Height="32" Tag="SettingComboBox" HorizontalAlignment="Right" BorderThickness="1"
+                                          SelectionChanged="ComboBoxLauncherLanguageSelect" x:Name="ComboBoxLauncherLanguage"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,4">
+                                <Label Style="{StaticResource RowLabel}" Content="{Binding [vibe_label], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <ComboBox Style="{StaticResource CustomComboBox}" Width="180" Height="32" Tag="SettingComboBox" HorizontalAlignment="Right" BorderThickness="1"
+                                          SelectionChanged="ComboBoxVibeSelect" x:Name="ComboBoxVibe"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,7">
+                                <Label Style="{StaticResource RowLabel}" Content="{Binding [parade_label], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <CheckBox x:Name="SwitchParade" Style="{StaticResource SwitchToggle}" HorizontalAlignment="Right"
+                                          Checked="ParadeChanged" Unchecked="ParadeChanged"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,7">
+                                <Label Style="{StaticResource RowLabel}" Content="{Binding [discord_label], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <CheckBox x:Name="SwitchDiscord" Style="{StaticResource SwitchToggle}" HorizontalAlignment="Right"
+                                          Checked="DiscordChanged" Unchecked="DiscordChanged"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,4">
+                                <Label Style="{StaticResource RowLabel}" Content="{Binding [favorite_server_label], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
+                                <TextBox x:Name="FavoriteServerTextBox" Width="180" Height="32" Style="{StaticResource CustomTextBox}" FontSize="12"
+                                         BorderBrush="#3F5A5A5A" BorderThickness="1" HorizontalAlignment="Right"
+                                         LostFocus="FavoriteServerChanged"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
 
-                <!-- Launcher -->
-                <Border Style="{StaticResource SettingsPanel}">
-                    <StackPanel>
-                        <DockPanel Margin="0,0,0,12">
-                            <Image Source="{StaticResource CategoryDrawingImage}" Height="18" DockPanel.Dock="Left"/>
-                            <Label Content="{Binding [launcher_setting_section], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="#D5E2EA" FontWeight="Bold" Padding="8,0,10,0"/>
-                            <Rectangle Height="4" Fill="{StaticResource PixelRuleDim}" VerticalAlignment="Center"/>
-                        </DockPanel>
+                <!-- VERSIONS -->
+                <StackPanel x:Name="PaneVersions" Visibility="Collapsed">
+                    <Border Style="{StaticResource SettingsPanel}">
+                        <StackPanel>
+                            <CheckBox x:Name="SwitchSnapshots" Style="{StaticResource SwitchToggle}" Margin="2,7"
+                                      Content="{Binding [show_snapshots], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                      Checked="VersionFilterChanged" Unchecked="VersionFilterChanged"/>
+                            <CheckBox x:Name="SwitchBetas" Style="{StaticResource SwitchToggle}" Margin="2,7"
+                                      Content="{Binding [show_betas], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                      Checked="VersionFilterChanged" Unchecked="VersionFilterChanged"/>
+                            <CheckBox x:Name="SwitchAlphas" Style="{StaticResource SwitchToggle}" Margin="2,7"
+                                      Content="{Binding [show_alphas], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                      Checked="VersionFilterChanged" Unchecked="VersionFilterChanged"/>
+                            <TextBlock Style="{StaticResource RowHint}" Margin="2,8,0,0"
+                                       Text="{Binding [releases_always], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
 
-                        <DockPanel Margin="0,4">
-                            <Label Style="{StaticResource RowLabel}" Content="{Binding [hide_launcher], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
-                            <ComboBox Style="{StaticResource CustomComboBox}" Width="180" Height="32" Tag="SettingComboBox" HorizontalAlignment="Right" BorderThickness="1"
-                                      x:Name="ComboBoxDisplayForm" SelectionChanged="ComboBoxDisplayFormSelect">
-                                <ComboBoxItem Content="{Binding [hide], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                                <ComboBoxItem Content="{Binding [show], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                            </ComboBox>
-                        </DockPanel>
+                <!-- DATA -->
+                <StackPanel x:Name="PaneData" Visibility="Collapsed">
+                    <Border Style="{StaticResource SettingsPanel}">
+                        <StackPanel>
+                            <DockPanel Margin="0,4">
+                                <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center">
+                                    <Label Style="{StaticResource RowLabel}" Content="{Binding [cache_label], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                                    <TextBlock x:Name="CacheSizeText" Style="{StaticResource RowHint}"/>
+                                </StackPanel>
+                                <Button HorizontalAlignment="Right" Content="{Binding [clear_cache], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                        Style="{StaticResource GhostButton}" FontSize="12" Height="36" Padding="16,0" Click="ClearCacheClick"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,10,0,4">
+                                <Button DockPanel.Dock="Left" Content="{Binding [open_data], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                        Style="{StaticResource GhostButton}" FontSize="12" Height="36" Padding="16,0" Click="OpenDataClick"/>
+                                <Button HorizontalAlignment="Right" Content="{Binding [check_updates], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                        Style="{StaticResource EmeraldButton}" FontSize="12" Height="40" Padding="16,0" Click="CheckUpdatesClick"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
 
-                        <DockPanel Margin="0,4">
-                            <Label Style="{StaticResource RowLabel}" Content="{Binding [launcher_language], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
-                            <ComboBox Style="{StaticResource CustomComboBox}" Width="180" Height="32" Tag="SettingComboBox" HorizontalAlignment="Right" BorderThickness="1"
-                                      SelectionChanged="ComboBoxLauncherLanguageSelect" x:Name="ComboBoxLauncherLanguage"/>
-                        </DockPanel>
-
-                        <DockPanel Margin="0,4">
-                            <Label Style="{StaticResource RowLabel}" Content="{Binding [vibe_label], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
-                            <ComboBox Style="{StaticResource CustomComboBox}" Width="180" Height="32" Tag="SettingComboBox" HorizontalAlignment="Right" BorderThickness="1"
-                                      SelectionChanged="ComboBoxVibeSelect" x:Name="ComboBoxVibe"/>
-                        </DockPanel>
-
-                        <DockPanel Margin="0,4">
-                            <Label Style="{StaticResource RowLabel}" Content="{Binding [favorite_server_label], Source={x:Static lang:ResxLocalizationProvider.Instance}}" DockPanel.Dock="Left"/>
-                            <TextBox x:Name="FavoriteServerTextBox" Width="180" Height="32" Style="{StaticResource CustomTextBox}" FontSize="12"
-                                     BorderBrush="#3F5A5A5A" BorderThickness="1" HorizontalAlignment="Right"
-                                     LostFocus="FavoriteServerChanged"/>
-                        </DockPanel>
-                    </StackPanel>
-                </Border>
-
-                <!-- Version list filters -->
-                <Border Style="{StaticResource SettingsPanel}">
-                    <StackPanel>
-                        <DockPanel Margin="0,0,0,12">
-                            <Image Source="{StaticResource DisplayDrawingImage}" Height="18" DockPanel.Dock="Left"/>
-                            <Label Content="{Binding [version_list], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="#D5E2EA" FontWeight="Bold" Padding="8,0,10,0"/>
-                            <Rectangle Height="4" Fill="{StaticResource PixelRuleDim}" VerticalAlignment="Center"/>
-                        </DockPanel>
-
-                        <CheckBox x:Name="SwitchSnapshots" Style="{StaticResource SwitchToggle}" Margin="2,6"
-                                  Content="{Binding [show_snapshots], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
-                                  Checked="VersionFilterChanged" Unchecked="VersionFilterChanged"/>
-                        <CheckBox x:Name="SwitchBetas" Style="{StaticResource SwitchToggle}" Margin="2,6"
-                                  Content="{Binding [show_betas], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
-                                  Checked="VersionFilterChanged" Unchecked="VersionFilterChanged"/>
-                        <CheckBox x:Name="SwitchAlphas" Style="{StaticResource SwitchToggle}" Margin="2,6"
-                                  Content="{Binding [show_alphas], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
-                                  Checked="VersionFilterChanged" Unchecked="VersionFilterChanged"/>
-
-                        <TextBlock Style="{StaticResource RowHint}" Margin="2,8,0,0"
-                                   Text="{Binding [releases_always], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                    </StackPanel>
-                </Border>
-
-            </UniformGrid>
+            </Grid>
         </ScrollViewer>
     </Grid>
 </Page>

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -13,9 +14,8 @@ using System.Globalization;
 namespace BlockifyLauncher.MVVM.Views.Pages
 {
     /// <summary>
-    /// Launcher settings: display, system (RAM/Java/game dir),
-    /// launcher behaviour and version-list filters. Everything applies live
-    /// except the game directory, which needs a restart.
+    /// Settings with sidebar sections: Game / Java & files / Launcher /
+    /// Versions / Data. Everything applies live except the game directory.
     /// </summary>
     public partial class SettingPage : Page
     {
@@ -53,6 +53,13 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             this.SwitchSnapshots.IsChecked = setting.GetShowSnapshots();
             this.SwitchBetas.IsChecked = setting.GetShowBetas();
             this.SwitchAlphas.IsChecked = setting.GetShowAlphas();
+            this.SwitchAikar.IsChecked = setting.GetJvmAikar();
+            this.SwitchParade.IsChecked = setting.GetShowParade();
+            this.SwitchDiscord.IsChecked = setting.GetDiscordRpc();
+
+            VersionLabel.Text = "Blockify " +
+                (System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.1");
+            UpdateCacheSize();
 
             FillJavaComboBox();
             FillLanguageComboBox();
@@ -61,7 +68,18 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             _loaded = true;
         }
 
-        #region display
+        private void SectionChecked(object sender, RoutedEventArgs e)
+        {
+            if (PaneGame == null) return; // fires during InitializeComponent
+            string tag = (string)((RadioButton)sender).Tag;
+            PaneGame.Visibility = tag == "game" ? Visibility.Visible : Visibility.Collapsed;
+            PaneJava.Visibility = tag == "java" ? Visibility.Visible : Visibility.Collapsed;
+            PaneLauncher.Visibility = tag == "launcher" ? Visibility.Visible : Visibility.Collapsed;
+            PaneVersions.Visibility = tag == "versions" ? Visibility.Visible : Visibility.Collapsed;
+            PaneData.Visibility = tag == "data" ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        #region game
         private static readonly Regex onlyNumbers = new Regex("[^0-9.-]+");
         private void NumsPreviewTextInput(object sender, TextCompositionEventArgs e) =>
             e.Handled = onlyNumbers.IsMatch(e.Text);
@@ -84,9 +102,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
                 new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
             }
         }
-        #endregion
 
-        #region system
         private void SliderRAMValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (!_loaded) return;
@@ -97,7 +113,14 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         private void UpdateRamText() =>
             RamValueText.Text = $"{(int)SliderRam.Value} {ResxLocalizationProvider.Instance["mb"]}";
 
-        // Detected Java installs: system default + common install roots.
+        private void AikarChanged(object sender, RoutedEventArgs e)
+        {
+            if (!_loaded) return;
+            setting.SetJvmAikar(SwitchAikar.IsChecked == true);
+        }
+        #endregion
+
+        #region java & files
         private void FillJavaComboBox()
         {
             JavaVersion.Items.Clear();
@@ -239,6 +262,21 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             mainWindow.ApplyVibeBackground();
         }
 
+        private void ParadeChanged(object sender, RoutedEventArgs e)
+        {
+            if (!_loaded) return;
+            setting.SetShowParade(SwitchParade.IsChecked == true);
+            mainWindow.ApplyParadeSetting();
+        }
+
+        private void DiscordChanged(object sender, RoutedEventArgs e)
+        {
+            if (!_loaded) return;
+            bool on = SwitchDiscord.IsChecked == true;
+            setting.SetDiscordRpc(on);
+            App.SetDiscordEnabled(on);
+        }
+
         private void FavoriteServerChanged(object sender, RoutedEventArgs e)
         {
             if (!_loaded) return;
@@ -261,6 +299,87 @@ namespace BlockifyLauncher.MVVM.Views.Pages
 
             try { await mainWindow.InitializeVersionsAsync(); }
             catch { /* offline — the filter still applies on next refresh */ }
+        }
+        #endregion
+
+        #region data
+        private static string CacheDir => Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "BlockifyLauncher");
+
+        private void UpdateCacheSize()
+        {
+            long bytes = 0;
+            try
+            {
+                if (Directory.Exists(CacheDir))
+                    foreach (var f in Directory.EnumerateFiles(CacheDir, "*", SearchOption.AllDirectories))
+                        bytes += new FileInfo(f).Length;
+            }
+            catch { /* partial size is fine */ }
+            CacheSizeText.Text = (bytes / 1024.0 / 1024.0).ToString("0.#") + " " + ResxLocalizationProvider.Instance["mb"];
+        }
+
+        private void ClearCacheClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (Directory.Exists(CacheDir))
+                    Directory.Delete(CacheDir, true);
+            }
+            catch { /* files in use — best effort */ }
+            UpdateCacheSize();
+            Notify(ResxLocalizationProvider.Instance["saved"], CacheSizeText.Text);
+        }
+
+        private void OpenDataClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Directory.CreateDirectory(CacheDir);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(CacheDir)
+                {
+                    UseShellExecute = true
+                });
+            }
+            catch { /* explorer unavailable */ }
+        }
+
+        private static readonly HttpClient Http = CreateHttp();
+        private static HttpClient CreateHttp()
+        {
+            var http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+            http.DefaultRequestHeaders.UserAgent.ParseAdd("BlockifyLauncher/0.2");
+            return http;
+        }
+
+        private async void CheckUpdatesClick(object sender, RoutedEventArgs e)
+        {
+            var lang = ResxLocalizationProvider.Instance;
+            try
+            {
+                string json = await Http.GetStringAsync(
+                    "https://api.github.com/repos/Blockify-Launcher/Blockify-Launcher/releases/latest");
+                var release = Newtonsoft.Json.Linq.JObject.Parse(json);
+                string tag = release.Value<string>("tag_name") ?? "";
+                string url = release.Value<string>("html_url") ?? "";
+
+                var current = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 1);
+                if (Version.TryParse(tag.TrimStart('v', 'V'), out var latest) && latest > current)
+                {
+                    Notify(lang["check_updates"], string.Format(lang["update_available"], tag));
+                    if (!string.IsNullOrEmpty(url))
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
+                }
+                else
+                {
+                    Notify(lang["check_updates"], lang["up_to_date"]);
+                }
+            }
+            catch
+            {
+                Notify(lang["check_updates"], lang["no_releases"]);
+            }
         }
         #endregion
 

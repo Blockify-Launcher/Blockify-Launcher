@@ -372,4 +372,64 @@
   <data name="versions_any" xml:space="preserve">
     <value>Any version</value>
   </data>
+  <data name="sec_game" xml:space="preserve">
+    <value>Game</value>
+  </data>
+  <data name="sec_java" xml:space="preserve">
+    <value>Java &amp; files</value>
+  </data>
+  <data name="sec_launcher" xml:space="preserve">
+    <value>Launcher</value>
+  </data>
+  <data name="sec_versions" xml:space="preserve">
+    <value>Versions</value>
+  </data>
+  <data name="sec_data" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="screen_section" xml:space="preserve">
+    <value>Screen</value>
+  </data>
+  <data name="perf_section" xml:space="preserve">
+    <value>Performance</value>
+  </data>
+  <data name="behavior_section" xml:space="preserve">
+    <value>Behaviour</value>
+  </data>
+  <data name="jvm_aikar" xml:space="preserve">
+    <value>Optimized JVM flags</value>
+  </data>
+  <data name="jvm_aikar_hint" xml:space="preserve">
+    <value>Aikar GC flags for smoother gameplay</value>
+  </data>
+  <data name="ram_hint" xml:space="preserve">
+    <value>4–8 GB recommended</value>
+  </data>
+  <data name="parade_label" xml:space="preserve">
+    <value>Mob parade</value>
+  </data>
+  <data name="discord_label" xml:space="preserve">
+    <value>Discord status</value>
+  </data>
+  <data name="cache_label" xml:space="preserve">
+    <value>News and artwork cache</value>
+  </data>
+  <data name="clear_cache" xml:space="preserve">
+    <value>Clear cache</value>
+  </data>
+  <data name="open_data" xml:space="preserve">
+    <value>Open data folder</value>
+  </data>
+  <data name="check_updates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="up_to_date" xml:space="preserve">
+    <value>You are up to date</value>
+  </data>
+  <data name="update_available" xml:space="preserve">
+    <value>Update {0} is available — opening the release page</value>
+  </data>
+  <data name="no_releases" xml:space="preserve">
+    <value>No releases published yet</value>
+  </data>
 </root>

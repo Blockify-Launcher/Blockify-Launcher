@@ -26,9 +26,22 @@ namespace BlockifyLauncher
                 new Properties.Settings().GetLanguage()
                 );
 
+            if (new Properties.Settings().GetDiscordRpc())
+                SetDiscordEnabled(true);
+        }
+
+        // Discord Rich Presence toggle (settings page applies it live).
+        public static void SetDiscordEnabled(bool enabled)
+        {
             try
             {
-                _discordController = new DiscordController();
+                if (enabled)
+                    _discordController ??= new DiscordController();
+                else
+                {
+                    _discordController?.Stop();
+                    _discordController = null;
+                }
             }
             catch (Exception ex)
             {

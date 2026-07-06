@@ -286,5 +286,41 @@ namespace BlockifyLauncher.Properties {
                 this["ShowAlphas"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool JvmAikar {
+            get {
+                return ((bool)(this["JvmAikar"]));
+            }
+            set {
+                this["JvmAikar"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowParade {
+            get {
+                return ((bool)(this["ShowParade"]));
+            }
+            set {
+                this["ShowParade"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DiscordRpc {
+            get {
+                return ((bool)(this["DiscordRpc"]));
+            }
+            set {
+                this["DiscordRpc"] = value;
+            }
+        }
     }
 }

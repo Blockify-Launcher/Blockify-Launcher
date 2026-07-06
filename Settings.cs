@@ -105,6 +105,14 @@ namespace BlockifyLauncher.Properties {
         public void SetShowAlphas(bool v) => this.ShowAlphas = v;
         public bool GetShowAlphas() => this.ShowAlphas;
 
+        /* JVM-прапори Aikar, парад мобів, Discord Rich Presence */
+        public void SetJvmAikar(bool v) => this.JvmAikar = v;
+        public bool GetJvmAikar() => this.JvmAikar;
+        public void SetShowParade(bool v) => this.ShowParade = v;
+        public bool GetShowParade() => this.ShowParade;
+        public void SetDiscordRpc(bool v) => this.DiscordRpc = v;
+        public bool GetDiscordRpc() => this.DiscordRpc;
+
         /* Розміри екрану гри */
         public void SetSettingDisplayGame(Display display)
         {

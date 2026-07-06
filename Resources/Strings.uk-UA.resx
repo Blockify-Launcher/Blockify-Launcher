@@ -372,4 +372,64 @@
   <data name="versions_any" xml:space="preserve">
     <value>Будь-яка версія</value>
   </data>
+  <data name="sec_game" xml:space="preserve">
+    <value>Гра</value>
+  </data>
+  <data name="sec_java" xml:space="preserve">
+    <value>Java і файли</value>
+  </data>
+  <data name="sec_launcher" xml:space="preserve">
+    <value>Лаунчер</value>
+  </data>
+  <data name="sec_versions" xml:space="preserve">
+    <value>Версії</value>
+  </data>
+  <data name="sec_data" xml:space="preserve">
+    <value>Дані</value>
+  </data>
+  <data name="screen_section" xml:space="preserve">
+    <value>Екран</value>
+  </data>
+  <data name="perf_section" xml:space="preserve">
+    <value>Продуктивність</value>
+  </data>
+  <data name="behavior_section" xml:space="preserve">
+    <value>Поведінка</value>
+  </data>
+  <data name="jvm_aikar" xml:space="preserve">
+    <value>Оптимізовані JVM-прапори</value>
+  </data>
+  <data name="jvm_aikar_hint" xml:space="preserve">
+    <value>Прапори Aikar — плавніша гра, менше фризів</value>
+  </data>
+  <data name="ram_hint" xml:space="preserve">
+    <value>рекомендуємо 4–8 ГБ</value>
+  </data>
+  <data name="parade_label" xml:space="preserve">
+    <value>Парад мобів</value>
+  </data>
+  <data name="discord_label" xml:space="preserve">
+    <value>Discord-статус</value>
+  </data>
+  <data name="cache_label" xml:space="preserve">
+    <value>Кеш новин і артів</value>
+  </data>
+  <data name="clear_cache" xml:space="preserve">
+    <value>Очистити кеш</value>
+  </data>
+  <data name="open_data" xml:space="preserve">
+    <value>Відкрити теку даних</value>
+  </data>
+  <data name="check_updates" xml:space="preserve">
+    <value>Перевірити оновлення</value>
+  </data>
+  <data name="up_to_date" xml:space="preserve">
+    <value>У вас остання версія</value>
+  </data>
+  <data name="update_available" xml:space="preserve">
+    <value>Доступне оновлення {0} — відкриваю сторінку релізу</value>
+  </data>
+  <data name="no_releases" xml:space="preserve">
+    <value>Релізів поки не опубліковано</value>
+  </data>
 </root>

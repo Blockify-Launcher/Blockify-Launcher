@@ -372,4 +372,64 @@
   <data name="versions_any" xml:space="preserve">
     <value>Любая версия</value>
   </data>
+  <data name="sec_game" xml:space="preserve">
+    <value>Игра</value>
+  </data>
+  <data name="sec_java" xml:space="preserve">
+    <value>Java и файлы</value>
+  </data>
+  <data name="sec_launcher" xml:space="preserve">
+    <value>Лаунчер</value>
+  </data>
+  <data name="sec_versions" xml:space="preserve">
+    <value>Версии</value>
+  </data>
+  <data name="sec_data" xml:space="preserve">
+    <value>Данные</value>
+  </data>
+  <data name="screen_section" xml:space="preserve">
+    <value>Экран</value>
+  </data>
+  <data name="perf_section" xml:space="preserve">
+    <value>Производительность</value>
+  </data>
+  <data name="behavior_section" xml:space="preserve">
+    <value>Поведение</value>
+  </data>
+  <data name="jvm_aikar" xml:space="preserve">
+    <value>Оптимизированные JVM-флаги</value>
+  </data>
+  <data name="jvm_aikar_hint" xml:space="preserve">
+    <value>Флаги Aikar — плавнее игра, меньше фризов</value>
+  </data>
+  <data name="ram_hint" xml:space="preserve">
+    <value>рекомендуем 4–8 ГБ</value>
+  </data>
+  <data name="parade_label" xml:space="preserve">
+    <value>Парад мобов</value>
+  </data>
+  <data name="discord_label" xml:space="preserve">
+    <value>Discord-статус</value>
+  </data>
+  <data name="cache_label" xml:space="preserve">
+    <value>Кэш новостей и артов</value>
+  </data>
+  <data name="clear_cache" xml:space="preserve">
+    <value>Очистить кэш</value>
+  </data>
+  <data name="open_data" xml:space="preserve">
+    <value>Открыть папку данных</value>
+  </data>
+  <data name="check_updates" xml:space="preserve">
+    <value>Проверить обновления</value>
+  </data>
+  <data name="up_to_date" xml:space="preserve">
+    <value>У вас последняя версия</value>
+  </data>
+  <data name="update_available" xml:space="preserve">
+    <value>Доступно обновление {0} — открываю страницу релиза</value>
+  </data>
+  <data name="no_releases" xml:space="preserve">
+    <value>Релизов пока не опубликовано</value>
+  </data>
 </root>

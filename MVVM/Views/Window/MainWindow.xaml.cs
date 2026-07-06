@@ -40,7 +40,7 @@ namespace BlockifyLauncher
         private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
             ApplyVibeBackground();
-            Core.Vibe.MobParade.Start(ParadeCanvas);
+            ApplyParadeSetting();
 
             this.ProgressBarLoad.Activ = "None";
             try
@@ -149,6 +149,26 @@ namespace BlockifyLauncher
             ButtonClickStartGame(Start, new RoutedEventArgs());
         }
 
+        // Mob parade on/off from settings, applied live.
+        public void ApplyParadeSetting()
+        {
+            ParadeCanvas.Children.Clear();
+            if (new Properties.Settings().GetShowParade())
+                Core.Vibe.MobParade.Start(ParadeCanvas);
+        }
+
+        // Aikar GC flags: community-standard JVM tuning for smooth Minecraft.
+        private static readonly string[] AikarFlags =
+        {
+            "-XX:+UseG1GC", "-XX:+ParallelRefProcEnabled", "-XX:MaxGCPauseMillis=200",
+            "-XX:+UnlockExperimentalVMOptions", "-XX:+DisableExplicitGC", "-XX:+AlwaysPreTouch",
+            "-XX:G1NewSizePercent=30", "-XX:G1MaxNewSizePercent=40", "-XX:G1HeapRegionSize=8M",
+            "-XX:G1ReservePercent=20", "-XX:G1HeapWastePercent=5", "-XX:G1MixedGCCountTarget=4",
+            "-XX:InitiatingHeapOccupancyPercent=15", "-XX:G1MixedGCLiveThresholdPercent=90",
+            "-XX:G1RSetUpdatingPauseTimePercent=5", "-XX:SurvivorRatio=32",
+            "-XX:+PerfDisableSharedMem", "-XX:MaxTenuringThreshold=1"
+        };
+
         // Pixel-art vibe background: from settings, "auto" = by time of day.
         public void ApplyVibeBackground()
         {
@@ -228,6 +248,7 @@ namespace BlockifyLauncher
                     Session = session,
                     MaximumRamMb = setting.GetMemoryRAM(),
                     JavaPath = javaPath != "javaw.exe" && System.IO.File.Exists(javaPath) ? javaPath : null,
+                    JVMArguments = new Properties.Settings().GetJvmAikar() ? AikarFlags : null,
 
                     VersionType = this.GameLauncherName,
                     GameLauncherName = this.GameLauncherName,
