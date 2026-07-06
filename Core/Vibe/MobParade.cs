@@ -8,12 +8,13 @@ namespace BlockifyLauncher.Core.Vibe
 {
     /// <summary>
     /// The mob parade: pixel creeper, pig and bee occasionally cross the screen
-    /// above the bottom dock. One translate animation + a two-frame hop each —
-    /// effectively free for the GPU.
+    /// above the bottom dock. Each mob is a two-frame sprite animation
+    /// (walk cycle / wing flap) plus one translate — effectively free for the GPU.
     /// </summary>
     public static class MobParade
     {
-        private static readonly string[] Creeper =
+        // frame A: feet apart, frame B: feet shuffled — a simple walk cycle
+        private static readonly string[] CreeperA =
         {
             "GGGGGGGG",
             "GGGGGGGG",
@@ -29,8 +30,24 @@ namespace BlockifyLauncher.Core.Vibe
             "GGG..GGG",
             "GGG..GGG"
         };
+        private static readonly string[] CreeperB =
+        {
+            "GGGGGGGG",
+            "GGGGGGGG",
+            "GKKGGKKG",
+            "GKKGGKKG",
+            "GGGKKGGG",
+            "GGKKKKGG",
+            "GGKKKKGG",
+            "GGKGGKGG",
+            "GGGGGGGG",
+            "GGGGGGGG",
+            "GGGGGGGG",
+            ".GG..GG.",
+            ".GG..GG."
+        };
 
-        private static readonly string[] Pig =
+        private static readonly string[] PigA =
         {
             "PPPPPPPP",
             "PPPPPPPP",
@@ -43,11 +60,35 @@ namespace BlockifyLauncher.Core.Vibe
             "PPP..PPP",
             "PPP..PPP"
         };
+        private static readonly string[] PigB =
+        {
+            "PPPPPPPP",
+            "PPPPPPPP",
+            "PKPPPPKP",
+            "PPPPPPPP",
+            "PPSSSSPP",
+            "PPSNNSPP",
+            "PPPPPPPP",
+            "PPPPPPPP",
+            ".PP..PP.",
+            ".PP..PP."
+        };
 
-        private static readonly string[] Bee =
+        // frame A: wings up, frame B: wings folded — flap
+        private static readonly string[] BeeA =
         {
             "...WW.....",
             "..WWWW....",
+            ".YKYKYYK..",
+            "YYKYKYYYK.",
+            "YYKYKYYYK.",
+            ".YYYYYYY..",
+            "..Y..Y...."
+        };
+        private static readonly string[] BeeB =
+        {
+            "..........",
+            "...WW.....",
             ".YKYKYYK..",
             "YYKYKYYYK.",
             "YYKYKYYYK.",
@@ -64,36 +105,54 @@ namespace BlockifyLauncher.Core.Vibe
 
         public static void Start(Canvas canvas)
         {
-            AddMob(canvas, Creeper, scale: 3, durationSec: 46, delaySec: 0, bottom: 0, hop: true);
-            AddMob(canvas, Pig, scale: 3, durationSec: 70, delaySec: -32, bottom: 0, hop: true);
-            AddMob(canvas, Bee, scale: 3, durationSec: 34, delaySec: -12, bottom: 18, hop: false, flap: true);
+            AddMob(canvas, new[] { CreeperA, CreeperB }, scale: 3,
+                durationSec: 46, delaySec: 0, bottom: 0, stepSec: 0.32, hop: true);
+            AddMob(canvas, new[] { PigA, PigB }, scale: 3,
+                durationSec: 70, delaySec: -32, bottom: 0, stepSec: 0.28, hop: true);
+            AddMob(canvas, new[] { BeeA, BeeB }, scale: 3,
+                durationSec: 34, delaySec: -12, bottom: 18, stepSec: 0.14, hop: false, bob: true);
         }
 
-        private static void AddMob(Canvas canvas, string[] map, int scale,
-            double durationSec, double delaySec, double bottom, bool hop, bool flap = false)
+        private static void AddMob(Canvas canvas, string[][] frames, int scale,
+            double durationSec, double delaySec, double bottom, double stepSec,
+            bool hop, bool bob = false)
         {
+            var bitmaps = frames.Select(BuildSprite).ToArray();
+
             var image = new Image
             {
-                Source = BuildSprite(map),
-                Width = map[0].Length * scale,
-                Height = map.Length * scale,
+                Source = bitmaps[0],
+                Width = frames[0][0].Length * scale,
+                Height = frames[0].Length * scale,
                 IsHitTestVisible = false
             };
             RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.NearestNeighbor);
 
-            var bob = new TranslateTransform();
-            image.RenderTransform = bob;
+            var move = new TranslateTransform();
+            image.RenderTransform = move;
 
             Canvas.SetBottom(image, bottom);
             Canvas.SetLeft(image, -80);
             canvas.Children.Add(image);
 
+            // stroll across the window
             var walk = new DoubleAnimation(-80, 2400, TimeSpan.FromSeconds(durationSec))
             {
                 RepeatBehavior = RepeatBehavior.Forever,
                 BeginTime = TimeSpan.FromSeconds(delaySec)
             };
             image.BeginAnimation(Canvas.LeftProperty, walk);
+
+            // two-frame sprite cycle (walk / flap)
+            var sprite = new ObjectAnimationUsingKeyFrames
+            {
+                Duration = TimeSpan.FromSeconds(stepSec * bitmaps.Length),
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+            for (int i = 0; i < bitmaps.Length; i++)
+                sprite.KeyFrames.Add(new DiscreteObjectKeyFrame(bitmaps[i],
+                    KeyTime.FromTimeSpan(TimeSpan.FromSeconds(stepSec * i))));
+            image.BeginAnimation(Image.SourceProperty, sprite);
 
             if (hop)
             {
@@ -102,17 +161,17 @@ namespace BlockifyLauncher.Core.Vibe
                     RepeatBehavior = RepeatBehavior.Forever,
                     AutoReverse = true
                 };
-                bob.BeginAnimation(TranslateTransform.YProperty, hopAnim);
+                move.BeginAnimation(TranslateTransform.YProperty, hopAnim);
             }
-            else if (flap)
+            else if (bob)
             {
-                var flapAnim = new DoubleAnimation(0, -8, TimeSpan.FromSeconds(0.8))
+                var bobAnim = new DoubleAnimation(0, -8, TimeSpan.FromSeconds(0.8))
                 {
                     RepeatBehavior = RepeatBehavior.Forever,
                     AutoReverse = true,
-                    EasingFunction = new System.Windows.Media.Animation.SineEase()
+                    EasingFunction = new SineEase()
                 };
-                bob.BeginAnimation(TranslateTransform.YProperty, flapAnim);
+                move.BeginAnimation(TranslateTransform.YProperty, bobAnim);
             }
         }
 
