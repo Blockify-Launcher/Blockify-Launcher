@@ -51,23 +51,53 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             return newsItem;
         }
 
-        private void LoadingMainPage(object sender, RoutedEventArgs e)
+        private async void LoadingMainPage(object sender, RoutedEventArgs e)
         {
-            InitializeNews();
+            await InitializeNewsAsync();
         }
 
-        // Initialize news list.
-        private void InitializeNews()
+        // Live news: Mojang launcher feed + Blockify feed, with offline cache.
+        // Falls back to the bundled local file when nothing is available.
+        private async Task InitializeNewsAsync()
         {
-            var news = new News();
-            _news = news.getAllNews();
+            List<Core.News.NewsItem> items;
+            try
+            {
+                items = await Core.News.NewsService.GetAsync();
+            }
+            catch
+            {
+                items = new List<Core.News.NewsItem>();
+            }
 
             StackPanelNews.Children.Clear();
 
-            for (int i = 0; i < _news.Length; i++)
-                StackPanelNews.Children.Add(CreateNewsItem(_news[i]));
+            if (items.Count > 0)
+            {
+                foreach (var item in items)
+                    StackPanelNews.Children.Add(new NewsComponent(item) { Width = ItemWidth });
+            }
+            else
+            {
+                InitializeNewsFromLocalFile();
+            }
 
             UpdateStackPanelNews(); // Update visual element.
+        }
+
+        // Legacy bundled news file (offline last resort).
+        private void InitializeNewsFromLocalFile()
+        {
+            try
+            {
+                var news = new News();
+                _news = news.getAllNews();
+                if (_news == null) return;
+
+                for (int i = 0; i < _news.Length; i++)
+                    StackPanelNews.Children.Add(CreateNewsItem(_news[i]));
+            }
+            catch { /* no local news either — empty panel */ }
         }
 
         // Count visible panel element.

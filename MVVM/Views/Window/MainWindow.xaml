@@ -21,22 +21,9 @@
             <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="42"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Border Style="{StaticResource WindowBorderHeaderStyle}" MouseDown="HeaderMouse">
-            <Grid>
-                <Label x:Name="TitleCustomForm" Foreground="#5A5A5A" FontSize="12" Margin="0,-5"
-                       VerticalAlignment="Center" FontWeight="Regular"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Height="Auto" Width="25" Style="{StaticResource HeaderButton}" Content="─" FontSize="20"
-                            Click="MainWindowsMinimals"/>
-                    <Button Height="Auto" Width="40" Style="{StaticResource HeaderButton}" Content="⨉" FontSize="16" Name="Exit"
-                            Click="MainWindowsClose"/>
-                </StackPanel>
-            </Grid>
-        </Border>
 
         <Border Grid.Row="1" x:Name="WindowBlurContainer">
 
@@ -46,21 +33,23 @@
                     <RowDefinition Height="Auto" MaxHeight="128"/>
                 </Grid.RowDefinitions>
 
-                <Border Style="{StaticResource WindowBorderStyle}" Margin="-22,-20" Grid.RowSpan="10"
+                <Border Style="{StaticResource WindowBorderStyle}" Margin="-22,-62,-22,-20" Grid.RowSpan="10"
                         x:Name="InnerBlurContainer"/>
 
-                <Border Grid.Row="1" Style="{StaticResource PanelBorder}" Height="55" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Grid Margin="41,10,11,10">
+                <Border Grid.Row="1" Style="{StaticResource PanelBorder}" CornerRadius="16" Background="{StaticResource GlassPanel}"
+                        BorderBrush="{StaticResource GlassLine}" BorderThickness="1"
+                        Height="78" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid Margin="20,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Orientation="Horizontal" Margin="0,0,100,0" >
-                            <Label Content="{Binding [account], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
-                                   Margin="0,0,10,0"/>
-                            <ComboBox Width="190" Height="Auto" Style="{StaticResource CustomComboBox}" x:Name="MinecraftAccountComboBox">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,60,0" >
+                            <StackPanel Margin="0,0,20,0" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource DockCaption}" Text="{Binding [cap_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                            <ComboBox Width="190" Height="36" Style="{StaticResource CustomComboBox}" x:Name="MinecraftAccountComboBox">
                                 <Separator Style="{StaticResource MenuSeparatorStyle}"/>
                                 <Button Command="{Binding AccountCommand}" Cursor="Hand" Width="150px" Height="25px" Content="Account Setting"
                                             Background="Transparent" Foreground="White">
@@ -82,14 +71,15 @@
                                     </Button.Style>
                                 </Button>
                             </ComboBox>
-                            <!--<TextBox Width="190" Height="Auto" Style="{StaticResource CustomTextBox}" x:Name="UserName"
-                                     BorderBrush="#3F5A5A5A" BorderThickness="1" Tag="UserName" TextChanged="TextChangedUserName"/> -->
-                            <Label Content="{Binding [version], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="{StaticResource HeaderText}" FontSize="16" VerticalAlignment="Center" 
-                                   Margin="16,0,10,0"/>
-                            <ComboBox Width="190" Height="Auto" Style="{StaticResource CustomComboBox}" x:Name="MinecraftVerisonComboBox"/>
+                            </StackPanel>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Style="{StaticResource DockCaption}" Text="{Binding [cap_version], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                                <ComboBox Width="190" Height="36" Style="{StaticResource CustomComboBox}" x:Name="MinecraftVerisonComboBox"/>
+                            </StackPanel>
                         </StackPanel>
                         <Button HorizontalAlignment="Right" Content="{Binding [start_game], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Grid.Column="2" Name="Start"
-                                Width="190" Height="Auto" Style="{StaticResource CustomButton}" Click="ButtonClickStartGame"/>
+                                Width="190" Height="56" Style="{StaticResource EmeraldButton}" Click="ButtonClickStartGame"
+                                ToolTip="{Binding [start_game], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
                     </Grid>
                 </Border>
 
@@ -101,103 +91,19 @@
 
 
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="37.2*"/>
-                            <RowDefinition Height="160"/>
-                            <RowDefinition Height="37.2*"/>
-                        </Grid.RowDefinitions>
-
-                        <Border Width="75" CornerRadius="35" HorizontalAlignment="Left" Grid.Row="1">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background" Value="#121212"/>
-                                    <Setter Property="BorderBrush" Value="#505a5a5a"/>
-                                    <Setter Property="BorderThickness" Value="1"/>
-                                </Style>
-                            </Border.Style>
-
-                            <Grid Margin="11,12">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="40*"/>
-                                    <RowDefinition Height="20*"/>
-                                    <RowDefinition Height="40*"/>
-                                </Grid.RowDefinitions>
-
-                                <RadioButton Command="{Binding MainCommand}" Cursor="Hand"
-                                             x:Name="homeRadioButton">
-                                    <RadioButton.Style>
-                                        <Style TargetType="RadioButton">
-                                            <Setter Property="Background" Value="#242424"/>
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="RadioButton">
-                                                        <Border Background="{TemplateBinding Background}" CornerRadius="50">
-                                                            <Image Source="{StaticResource HomeDrawingImage}" Height="30"
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                                <Image.Effect>
-                                                                    <DropShadowEffect BlurRadius="25" Opacity="0.5" ShadowDepth="6"/>
-                                                                </Image.Effect>
-                                                            </Image>
-                                                        </Border>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="#FF484848"/>
-                                                </Trigger>
-                                                <Trigger Property="IsChecked" Value="True">
-                                                    <Setter Property="Background">
-                                                        <Setter.Value>
-                                                            <LinearGradientBrush StartPoint="0 0" EndPoint="1 0">
-                                                                <GradientStop Color="#009046" Offset="0.0"/>
-                                                                <GradientStop Color="#009006" Offset="1.0"/>
-                                                            </LinearGradientBrush>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </RadioButton.Style>
+                        <!-- Hotbar navigation rail: inventory slots, active = selector frame -->
+                        <Border Width="74" CornerRadius="18" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                Background="{StaticResource GlassPanel}" BorderBrush="{StaticResource GlassLine}" BorderThickness="1">
+                            <StackPanel Margin="10,12">
+                                <RadioButton Style="{StaticResource HotbarSlot}" Command="{Binding MainCommand}" x:Name="homeRadioButton"
+                                             ToolTip="{Binding [nav_home], Source={x:Static lang:ResxLocalizationProvider.Instance}}">
+                                    <Image Source="{StaticResource HomeDrawingImage}" Height="26"/>
                                 </RadioButton>
-
-                                <RadioButton Grid.Row="2" Command="{Binding SettingCommand}" Cursor="Hand">
-                                    <RadioButton.Style>
-                                        <Style TargetType="RadioButton">
-                                            <Setter Property="Background" Value="#242424"/>
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="RadioButton">
-                                                        <Border Background="{TemplateBinding Background}" CornerRadius="50">
-                                                            <Image Source="{StaticResource SettingDrawingImage}" Height="30"
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                                <Image.Effect>
-                                                                    <DropShadowEffect BlurRadius="25" Opacity="0.5" ShadowDepth="6"/>
-                                                                </Image.Effect>
-                                                            </Image>
-                                                        </Border>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="#FF484848"/>
-                                                </Trigger>
-                                                <Trigger Property="IsChecked" Value="True">
-                                                    <Setter Property="Background">
-                                                        <Setter.Value>
-                                                            <LinearGradientBrush StartPoint="0 0" EndPoint="1 0">
-                                                                <GradientStop Color="#009046" Offset="0.0"/>
-                                                                <GradientStop Color="#009006" Offset="1.0"/>
-                                                            </LinearGradientBrush>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </RadioButton.Style>
+                                <RadioButton Style="{StaticResource HotbarSlot}" Command="{Binding SettingCommand}" Margin="0,10,0,0"
+                                             ToolTip="{Binding [nav_settings], Source={x:Static lang:ResxLocalizationProvider.Instance}}">
+                                    <Image Source="{StaticResource SettingDrawingImage}" Height="26"/>
                                 </RadioButton>
-                            </Grid>
+                            </StackPanel>
                         </Border>
                     </Grid>
 
@@ -206,9 +112,46 @@
 
                 </Grid>
 
+                <!-- Mob parade strip: pixel mobs stroll above the dock -->
+                <Canvas x:Name="ParadeCanvas" Height="44" VerticalAlignment="Bottom" Margin="0,0,0,-14"
+                        IsHitTestVisible="False" ClipToBounds="False"/>
+
             </Grid>
 
         </Border>
+
+        <!-- Integrated title bar: brand cube + wordmark, translucent window controls -->
+        <Border Grid.Row="0" Background="Transparent" MouseDown="HeaderMouse">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="18,0,0,0">
+                    <Border Width="16" Height="16" CornerRadius="3">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#3ED160" Offset="0.5"/>
+                                <GradientStop Color="#1F8F3A" Offset="0.5"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="12" ShadowDepth="0" Color="#00B558" Opacity="0.55"/>
+                        </Border.Effect>
+                    </Border>
+                    <TextBlock Text="B L O C K I F Y" Foreground="#D9FFFFFF" FontSize="12" FontWeight="Bold"
+                               VerticalAlignment="Center" Margin="10,0,0,0">
+                        <TextBlock.Effect>
+                            <DropShadowEffect BlurRadius="0" ShadowDepth="2" Direction="315" Color="#000000" Opacity="0.45"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                    <Label x:Name="TitleCustomForm" Visibility="Collapsed"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,6,0">
+                    <Button Height="32" Width="42" Style="{StaticResource HeaderButton}" Content="─" FontSize="18"
+                            Click="MainWindowsMinimals"/>
+                    <Button Height="32" Width="42" Style="{StaticResource HeaderButton}" Content="⨉" FontSize="15" Name="Exit"
+                            Click="MainWindowsClose"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
         <Grid Grid.Row="1" Opacity="0.02">
             <Rectangle Height="4" Width="4" x:Name="WindowResizeBottomLeft" PreviewMouseDown="WindowResize_OnPreviewMouseDown"
                    Stroke="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW"/>

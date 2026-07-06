@@ -231,4 +231,16 @@
   <data name="error_empty_username" xml:space="preserve">
     <value>Спочатку введіть ім'я користувача.</value>
   </data>
+  <data name="cap_account" xml:space="preserve">
+    <value>АКАУНТ</value>
+  </data>
+  <data name="cap_version" xml:space="preserve">
+    <value>ВЕРСІЯ</value>
+  </data>
+  <data name="nav_home" xml:space="preserve">
+    <value>Головна</value>
+  </data>
+  <data name="nav_settings" xml:space="preserve">
+    <value>Налаштування</value>
+  </data>
 </root>

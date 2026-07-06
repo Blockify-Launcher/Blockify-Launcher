@@ -231,4 +231,16 @@
   <data name="error_empty_username" xml:space="preserve">
     <value>Enter a username first.</value>
   </data>
+  <data name="cap_account" xml:space="preserve">
+    <value>ACCOUNT</value>
+  </data>
+  <data name="cap_version" xml:space="preserve">
+    <value>VERSION</value>
+  </data>
+  <data name="nav_home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="nav_settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
 </root>

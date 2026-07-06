@@ -39,8 +39,8 @@ namespace BlockifyLauncher
 
         private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
-            // initialization component discord.
-            //_discordController = new DiscordController();
+            ApplyVibeBackground();
+            Core.Vibe.MobParade.Start(ParadeCanvas);
 
             this.ProgressBarLoad.Activ = "None";
             try
@@ -113,6 +113,26 @@ namespace BlockifyLauncher
             foreach (var versionItem in version)
                 MinecraftVerisonComboBox.Items.Add(versionItem.Name);
             MinecraftVerisonComboBox.SelectedIndex = 0;
+        }
+
+        // Pixel-art vibe background: auto-picked by time of day, rendered once.
+        private void ApplyVibeBackground()
+        {
+            try
+            {
+                var scene = Core.Vibe.VibeScene.Render(Core.Vibe.VibeScene.ForNow());
+                var brush = new System.Windows.Media.ImageBrush(scene)
+                {
+                    Stretch = System.Windows.Media.Stretch.UniformToFill
+                };
+                System.Windows.Media.RenderOptions.SetBitmapScalingMode(
+                    brush, System.Windows.Media.BitmapScalingMode.NearestNeighbor);
+                InnerBlurContainer.Background = brush;
+            }
+            catch
+            {
+                // keep the default wallpaper from WindowBorderStyle
+            }
         }
 
         // Error message box.
