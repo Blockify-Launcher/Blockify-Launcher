@@ -1,5 +1,5 @@
-﻿using BlockifyLauncher.MVVM.Views.Pages.Func.Setting;
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -7,58 +7,206 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 using Microsoft.Win32;
-using System.Collections.ObjectModel;
-using BlockifyLib.Launcher.Version;
-using System.Windows.Media;
 using BlockifyLauncher.Resources;
 using System.Globalization;
 
 namespace BlockifyLauncher.MVVM.Views.Pages
 {
     /// <summary>
-    /// Логика взаимодействия для SettingPage.xaml
+    /// Launcher settings: display, system (RAM/Java/game dir),
+    /// launcher behaviour and version-list filters. Everything applies live
+    /// except the game directory, which needs a restart.
     /// </summary>
     public partial class SettingPage : Page
     {
-        private int MinMemoryRam = 1024;
+        private const int MinMemoryRam = 1024;
         private MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
         private Properties.Settings setting = new Properties.Settings();
-
-        // element
-        public ObservableCollection<CheckBox> _version_list { get; set; }
-            = new ObservableCollection<CheckBox>();
+        private bool _loaded;
 
         public SettingPage()
         {
             InitializeComponent();
-            DataContext = this;
         }
 
         private void LoadingPages(object sender, RoutedEventArgs e)
         {
-            
-            this.JavaVersion.Items.Add("javaw.exe");
-
-            this.SliderRam.Value = setting.GetMemoryRAM();
             this.SliderRam.Minimum = MinMemoryRam;
-            this.SliderRam.Maximum = (int)getMaxRam();
-
-            
-            //MinecraftPath_TextBox.Text = setting.minecraftPath.ToString();
+            this.SliderRam.Maximum = (int)GetMaxRamMb();
+            this.SliderRam.Value = setting.GetMemoryRAM();
+            UpdateRamText();
 
             var display = setting.GetSettingDisplayGame();
             this.WidthScrean.Text = display.w.ToString();
             this.HeightScrean.Text = display.h.ToString();
 
             this.FullScreanCheckBox.IsChecked = setting.GetFullScrean();
-            this.JavaVersion.SelectedIndex = 0;
-
             this.ComboBoxDisplayForm.SelectedIndex = setting.GetHideLauncher();
 
-            // Generate element
-            GenarateElement_CheckBox();
+            string dir = setting.GetMinecraftDir();
+            this.MinecraftPath_TextBox.Text = string.IsNullOrEmpty(dir)
+                ? BlockifyLib.Launcher.Minecraft.MinecraftPath.GetOSDefaultPath()
+                : dir;
+
+            this.FavoriteServerTextBox.Text = setting.GetFavoriteServer();
+
+            this.SwitchSnapshots.IsChecked = setting.GetShowSnapshots();
+            this.SwitchBetas.IsChecked = setting.GetShowBetas();
+            this.SwitchAlphas.IsChecked = setting.GetShowAlphas();
+
+            FillJavaComboBox();
             FillLanguageComboBox();
             FillVibeComboBox();
+
+            _loaded = true;
+        }
+
+        #region display
+        private static readonly Regex onlyNumbers = new Regex("[^0-9.-]+");
+        private void NumsPreviewTextInput(object sender, TextCompositionEventArgs e) =>
+            e.Handled = onlyNumbers.IsMatch(e.Text);
+
+        private void ApplySettingScrean(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                setting.SetFullScrean(FullScreanCheckBox.IsChecked == true);
+                setting.SetSettingDisplayGame(new Properties.Display
+                {
+                    w = Convert.ToInt32(WidthScrean.Text),
+                    h = Convert.ToInt32(HeightScrean.Text)
+                });
+                Notify(ResxLocalizationProvider.Instance["saved"],
+                       $"{WidthScrean.Text} ⨉ {HeightScrean.Text}");
+            }
+            catch (Exception ex)
+            {
+                new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
+            }
+        }
+        #endregion
+
+        #region system
+        private void SliderRAMValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (!_loaded) return;
+            setting.SetMemoryRAM((int)((Slider)sender).Value);
+            UpdateRamText();
+        }
+
+        private void UpdateRamText() =>
+            RamValueText.Text = $"{(int)SliderRam.Value} {ResxLocalizationProvider.Instance["mb"]}";
+
+        // Detected Java installs: system default + common install roots.
+        private void FillJavaComboBox()
+        {
+            JavaVersion.Items.Clear();
+            JavaVersion.Items.Add("javaw.exe");
+
+            foreach (var path in FindJavaInstalls())
+                JavaVersion.Items.Add(path);
+
+            string saved = setting.GetJavaPath();
+            if (!JavaVersion.Items.Contains(saved))
+                JavaVersion.Items.Add(saved);
+            JavaVersion.SelectedItem = saved;
+        }
+
+        private static IEnumerable<string> FindJavaInstalls()
+        {
+            var found = new List<string>();
+
+            void Probe(string binDir)
+            {
+                string javaw = Path.Combine(binDir, "javaw.exe");
+                if (File.Exists(javaw) && !found.Contains(javaw))
+                    found.Add(javaw);
+            }
+
+            string? javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
+            if (!string.IsNullOrEmpty(javaHome))
+                Probe(Path.Combine(javaHome, "bin"));
+
+            foreach (var root in new[]
+            {
+                @"C:\Program Files\Java",
+                @"C:\Program Files\Eclipse Adoptium",
+                @"C:\Program Files\Microsoft",
+                @"C:\Program Files (x86)\Java",
+                @"C:\Program Files\Zulu"
+            })
+            {
+                try
+                {
+                    if (!Directory.Exists(root)) continue;
+                    foreach (var dir in Directory.GetDirectories(root))
+                        Probe(Path.Combine(dir, "bin"));
+                }
+                catch { /* no access — skip root */ }
+            }
+            return found;
+        }
+
+        private void JavaVersionSelect(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_loaded || JavaVersion.SelectedItem == null) return;
+            setting.SetJavaPath(JavaVersion.SelectedItem.ToString() ?? "javaw.exe");
+        }
+
+        private void PathMinecraft(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFolderDialog
+            {
+                InitialDirectory = MinecraftPath_TextBox.Text
+            };
+            if (dialog.ShowDialog() != true) return;
+
+            setting.SetMinecraftDir(dialog.FolderName);
+            MinecraftPath_TextBox.Text = dialog.FolderName;
+            Notify(ResxLocalizationProvider.Instance["saved"],
+                   ResxLocalizationProvider.Instance["restart_required"]);
+        }
+        #endregion
+
+        #region launcher
+        private void ComboBoxDisplayFormSelect(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_loaded) return;
+            setting.SetHideLauncher(((ComboBox)sender).SelectedIndex);
+        }
+
+        private void FillLanguageComboBox()
+        {
+            var availableCultures = new List<CultureInfo>
+            {
+                new CultureInfo("en-US"),
+                new CultureInfo("ru-RU"),
+                new CultureInfo("uk-UA")
+            };
+
+            ComboBoxLauncherLanguage.Items.Clear();
+            foreach (var culture in availableCultures)
+                ComboBoxLauncherLanguage.Items.Add(new ComboBoxItem
+                {
+                    Content = culture.NativeName,
+                    Tag = culture.Name
+                });
+
+            foreach (ComboBoxItem item in ComboBoxLauncherLanguage.Items)
+                if ((string)item.Tag == setting.GetLanguage())
+                {
+                    ComboBoxLauncherLanguage.SelectedItem = item;
+                    break;
+                }
+        }
+
+        private void ComboBoxLauncherLanguageSelect(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_loaded) return;
+            if (((ComboBox)sender).SelectedItem is not ComboBoxItem item) return;
+
+            ResxLocalizationProvider.Instance.ChangeLanguage((string)item.Tag);
+            setting.SetLauguage((string)item.Tag);
         }
 
         private static readonly string[] VibeKeys = { "auto", "ocean", "sunset", "nether", "cherry", "end" };
@@ -73,7 +221,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
                     Tag = key
                 });
 
-            string current = new Properties.Settings().GetVibe() ?? "auto";
+            string current = setting.GetVibe() ?? "auto";
             foreach (ComboBoxItem item in ComboBoxVibe.Items)
                 if ((string)item.Tag == current)
                 {
@@ -84,149 +232,52 @@ namespace BlockifyLauncher.MVVM.Views.Pages
 
         private void ComboBoxVibeSelect(object sender, SelectionChangedEventArgs e)
         {
+            if (!_loaded) return;
             if (((ComboBox)sender).SelectedItem is not ComboBoxItem item) return;
 
-            new Properties.Settings().SetVibe((string)item.Tag);
+            setting.SetVibe((string)item.Tag);
             mainWindow.ApplyVibeBackground();
         }
 
-        private static readonly Regex onlyNumbers = new Regex("[^0-9.-]+");
-        private static bool IsTextAllowed(string text)
+        private void FavoriteServerChanged(object sender, RoutedEventArgs e)
         {
-            return !onlyNumbers.IsMatch(text);
+            if (!_loaded) return;
+            string host = FavoriteServerTextBox.Text.Trim();
+            if (host == setting.GetFavoriteServer()) return;
+
+            setting.SetFavoriteServer(host);
+            Notify(ResxLocalizationProvider.Instance["saved"], host);
         }
+        #endregion
 
-        private void NumsPreviewTextInput(object sender, TextCompositionEventArgs e) =>
-            e.Handled = !IsTextAllowed(e.Text);
-
-        private void PathMinecraft(object sender, RoutedEventArgs e)
+        #region version filters
+        private async void VersionFilterChanged(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.InitialDirectory = MinecraftPath_TextBox.Text ?? @"C:\";
-            saveFileDialog.RestoreDirectory = true;
+            if (!_loaded) return;
 
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                new MessageBox(saveFileDialog.FileName, MessageBox.TypeMessage.Error).ShowDialog();
-            }
+            setting.SetShowSnapshots(SwitchSnapshots.IsChecked == true);
+            setting.SetShowBetas(SwitchBetas.IsChecked == true);
+            setting.SetShowAlphas(SwitchAlphas.IsChecked == true);
+
+            try { await mainWindow.InitializeVersionsAsync(); }
+            catch { /* offline — the filter still applies on next refresh */ }
         }
+        #endregion
 
-        private void ApplySettingScrean(object sender, RoutedEventArgs e)
-        {
-            if (setting.GetFullScrean() != FullScreanCheckBox.IsChecked)
-                setting.SetFullScrean(FullScreanCheckBox.IsChecked.Value);
+        private void Notify(string title, string description) =>
+            _ = mainWindow.NotificationElement.GetNotification(title, description);
 
-            var display = setting.GetSettingDisplayGame();
-            if (display.w.ToString() != WidthScrean.Text ||
-                display.h.ToString() != HeightScrean.Text)
-            {
-                display.w = Convert.ToInt32(WidthScrean.Text);
-                display.h = Convert.ToInt32(HeightScrean.Text);
-            }
-            setting.SetSettingDisplayGame(display);
-            SaveProperties("Save", "Changing screen settings.");
-        }
-
-        private void GenarateElement_CheckBox()
-        {
-            int i = 0;
-
-            foreach(var item in ProfileConverter.GetListVersion())
-            {
-                _version_list.Add(new CheckBox()
-                {
-                    Name = $"_version_checkBox_{i++}",
-                    Content = $"{ResxLocalizationProvider.Instance["show_versions_prefix"]} {ProfileConverter.ToString(item)}",
-                    Style = (System.Windows.Style)FindResource("CustomCheckBox"),
-                    Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255)),
-                    FontSize = 14
-                });
-            }
-        }
-
-        private void SliderRAMValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        #region max RAM (WinAPI)
+        private static ulong GetMaxRamMb()
         {
             try
             {
-                setting.SetMemoryRAM(Convert.ToInt32((sender as Slider).Value));
-            }
-            catch (Exception ex)
-            {
-                new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
-                return;
-            }
-        }
-
-        private static ulong getMaxRam()
-        {
-            ulong maxMemory = 0;
-            try
-            {
-                MEMORYSTATUSEX memoryStatus = new MEMORYSTATUSEX();
+                var memoryStatus = new MEMORYSTATUSEX();
                 if (GlobalMemoryStatusEx(memoryStatus))
-                    maxMemory = memoryStatus.ullTotalPhys;
+                    return memoryStatus.ullTotalPhys / (1024 * 1024);
             }
-            catch (Exception e)
-            {
-                new MessageBox("An error occurred while querying for WMI data: " + e.Message,
-                    MessageBox.TypeMessage.Error).ShowDialog();
-                return 0;
-            }
-            return maxMemory / (1024 * 1024);
-        }
-
-        private void SaveProperties(string Title = "Save", string Description = "\0") =>
-            _ = mainWindow.NotificationElement.GetNotification(Title, Description);
-
-        private void ComboBoxDisplayFormSelect(object sender, SelectionChangedEventArgs e)
-        {
-            new Properties.Settings().SetHideLauncher(
-                ((ComboBox)sender).SelectedIndex
-                );
-        }
-
-        private void FillLanguageComboBox()
-        {
-            // TODO Нужно будет переделать реализацию
-            var availableCultures = new List<CultureInfo>
-            {
-                new CultureInfo("en-US"),
-                new CultureInfo("ru-RU"),
-                new CultureInfo("uk-UA")
-            };
-
-            ComboBoxLauncherLanguage.Items.Clear();
-
-
-            foreach (var culture in availableCultures)
-            {
-                var comboBoxItem = new ComboBoxItem
-                {
-                    Content = culture.NativeName, 
-                    Tag = culture.Name 
-                };
-
-                ComboBoxLauncherLanguage.Items.Add(comboBoxItem);
-            }
-
-            foreach (ComboBoxItem item in ComboBoxLauncherLanguage.Items)
-                if (item.Tag.ToString() == new Properties.Settings().GetLanguage())
-                {
-                    ComboBoxLauncherLanguage.SelectedItem = item;
-                    break;
-                }
-        }
-
-        private void ComboBoxLauncherLanguageSelect(object sender, SelectionChangedEventArgs e)
-        {
-            var selectedItem = (ComboBoxItem)((ComboBox)sender).SelectedItem;
-            ResxLocalizationProvider.Instance.ChangeLanguage(
-                selectedItem.Tag.ToString()
-                );
-
-            new Properties.Settings().SetLauguage(
-                selectedItem.Tag.ToString()
-                );
+            catch { /* fall through */ }
+            return 8192;
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
@@ -249,6 +300,6 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         [return: MarshalAs(UnmanagedType.Bool)]
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool GlobalMemoryStatusEx([In, Out] MEMORYSTATUSEX lpBuffer);
-
+        #endregion
     }
 }

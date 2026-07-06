@@ -38,7 +38,10 @@ namespace BlockifyLauncher.Properties {
 
         public void SettingsInitialize()
         {
-            this.launcher = new BlockifyLibLauncher(new MinecraftPath()); // TODO : Добавить смену расположения.
+            this.minecraftPath = string.IsNullOrEmpty(this.MinecraftDir)
+                ? new MinecraftPath()
+                : new MinecraftPath(this.MinecraftDir);
+            this.launcher = new BlockifyLibLauncher(this.minecraftPath);
             this.accountSession = new Account();
         }
         
@@ -84,6 +87,23 @@ namespace BlockifyLauncher.Properties {
         public string GetLastPlayed() => this.LastPlayed;
         public int GetLaunchCount() => this.LaunchCount;
         public string GetFavoriteServer() => this.FavoriteServer;
+        public void SetFavoriteServer(string host) => this.FavoriteServer = host;
+
+        /* Тека Minecraft (порожньо = стандартна .minecraft) */
+        public void SetMinecraftDir(string dir) => this.MinecraftDir = dir;
+        public string GetMinecraftDir() => this.MinecraftDir;
+
+        /* Шлях до Java (javaw.exe = системна) */
+        public void SetJavaPath(string path) => this.JavaVersion = path;
+        public string GetJavaPath() => this.JavaVersion;
+
+        /* Фільтри списку версій */
+        public void SetShowSnapshots(bool v) => this.ShowSnapshots = v;
+        public bool GetShowSnapshots() => this.ShowSnapshots;
+        public void SetShowBetas(bool v) => this.ShowBetas = v;
+        public bool GetShowBetas() => this.ShowBetas;
+        public void SetShowAlphas(bool v) => this.ShowAlphas = v;
+        public bool GetShowAlphas() => this.ShowAlphas;
 
         /* Розміри екрану гри */
         public void SetSettingDisplayGame(Display display)

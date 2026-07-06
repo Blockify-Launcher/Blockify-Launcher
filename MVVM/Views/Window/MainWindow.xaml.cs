@@ -105,14 +105,32 @@ namespace BlockifyLauncher
             catch { return; }
         }
 
-        // Initializa version comboBox
-        private async Task InitializeVersionsAsync()
+        // Initializa version comboBox (filtered by version-type settings)
+        public async Task InitializeVersionsAsync()
         {
+            var filter = new Properties.Settings();
+            string selected = MinecraftVerisonComboBox.SelectedIndex >= 0
+                ? MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex]?.ToString() ?? ""
+                : "";
+
             MinecraftVerisonComboBox.Items.Clear();
             var version = await setting.launcher.GetAllVersionsAsync();
             foreach (var versionItem in version)
-                MinecraftVerisonComboBox.Items.Add(versionItem.Name);
-            MinecraftVerisonComboBox.SelectedIndex = 0;
+            {
+                bool show = (versionItem.Type ?? "release") switch
+                {
+                    "snapshot" => filter.GetShowSnapshots(),
+                    "old_beta" => filter.GetShowBetas(),
+                    "old_alpha" => filter.GetShowAlphas(),
+                    _ => true
+                };
+                if (show || versionItem.IsLocalVersion)
+                    MinecraftVerisonComboBox.Items.Add(versionItem.Name);
+            }
+
+            int index = string.IsNullOrEmpty(selected) ? 0 : Math.Max(0, MinecraftVerisonComboBox.Items.IndexOf(selected));
+            if (MinecraftVerisonComboBox.Items.Count > 0)
+                MinecraftVerisonComboBox.SelectedIndex = index;
         }
 
         // One-click relaunch of the last played version (quick-row "Continue").
@@ -202,12 +220,14 @@ namespace BlockifyLauncher
         {
             Display display = setting.GetSettingDisplayGame();
             Session session = await ResolveLaunchSession();
+            string javaPath = new Properties.Settings().GetJavaPath();
             return await setting.launcher
                 .CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(),
                 new LaunchOption
                 {
                     Session = session,
                     MaximumRamMb = setting.GetMemoryRAM(),
+                    JavaPath = javaPath != "javaw.exe" && System.IO.File.Exists(javaPath) ? javaPath : null,
 
                     VersionType = this.GameLauncherName,
                     GameLauncherName = this.GameLauncherName,

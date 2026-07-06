@@ -238,5 +238,53 @@ namespace BlockifyLauncher.Properties {
                 this["FavoriteServer"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MinecraftDir {
+            get {
+                return ((string)(this["MinecraftDir"]));
+            }
+            set {
+                this["MinecraftDir"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowSnapshots {
+            get {
+                return ((bool)(this["ShowSnapshots"]));
+            }
+            set {
+                this["ShowSnapshots"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowBetas {
+            get {
+                return ((bool)(this["ShowBetas"]));
+            }
+            set {
+                this["ShowBetas"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowAlphas {
+            get {
+                return ((bool)(this["ShowAlphas"]));
+            }
+            set {
+                this["ShowAlphas"] = value;
+            }
+        }
     }
 }

@@ -284,6 +284,38 @@
         </Style.Triggers>
     </Style>
 
+    <!-- Switch toggle (CheckBox): pill with sliding knob, green when on -->
+    <Style x:Key="SwitchToggle" TargetType="CheckBox">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="#D9E2E8"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <StackPanel Orientation="Horizontal">
+                        <Border x:Name="Pill" Width="40" Height="22" CornerRadius="11" Background="#26FFFFFF" VerticalAlignment="Center">
+                            <Border x:Name="Knob" Width="16" Height="16" CornerRadius="8" Background="#FFF"
+                                    HorizontalAlignment="Left" Margin="3,0,0,0"/>
+                        </Border>
+                        <ContentPresenter VerticalAlignment="Center" Margin="9,0,0,0"
+                                          TextBlock.Foreground="{TemplateBinding Foreground}"
+                                          TextBlock.FontSize="{TemplateBinding FontSize}"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Pill" Property="Background" Value="{StaticResource GreenAccent}"/>
+                            <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right"/>
+                            <Setter TargetName="Knob" Property="Margin" Value="0,0,3,0"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="#FFF"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Ghost button: quiet translucent, for secondary actions -->
     <Style x:Key="GhostButton" TargetType="Button">
         <Setter Property="Cursor" Value="Hand"/>

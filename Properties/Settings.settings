@@ -56,5 +56,17 @@
     <Setting Name="FavoriteServer" Type="System.String" Scope="User">
       <Value Profile="(Default)">mc.hypixel.net</Value>
     </Setting>
+    <Setting Name="MinecraftDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ShowSnapshots" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ShowBetas" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ShowAlphas" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
