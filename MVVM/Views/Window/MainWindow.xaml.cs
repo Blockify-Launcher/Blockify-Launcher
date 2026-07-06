@@ -115,6 +115,22 @@ namespace BlockifyLauncher
             MinecraftVerisonComboBox.SelectedIndex = 0;
         }
 
+        // One-click relaunch of the last played version (quick-row "Continue").
+        public void QuickLaunchLast()
+        {
+            string last = new Properties.Settings().GetLastVersion();
+            if (string.IsNullOrEmpty(last)) return;
+
+            for (int i = 0; i < MinecraftVerisonComboBox.Items.Count; i++)
+                if (MinecraftVerisonComboBox.Items[i]?.ToString() == last)
+                {
+                    MinecraftVerisonComboBox.SelectedIndex = i;
+                    break;
+                }
+
+            ButtonClickStartGame(Start, new RoutedEventArgs());
+        }
+
         // Pixel-art vibe background: from settings, "auto" = by time of day.
         public void ApplyVibeBackground()
         {
@@ -233,6 +249,9 @@ namespace BlockifyLauncher
                     throw new InvalidOperationException(lang["error_start_failed"]);
 
                 process.Start();
+
+                new Properties.Settings().RegisterLaunch(
+                    MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString() ?? "");
 
                 App._discordController?.UpdateDiscordActivity("play");
 

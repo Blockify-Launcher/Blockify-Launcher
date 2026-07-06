@@ -44,5 +44,17 @@
     <Setting Name="Vibe" Type="System.String" Scope="User">
       <Value Profile="(Default)">auto</Value>
     </Setting>
+    <Setting Name="LastVersion" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LastPlayed" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LaunchCount" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="FavoriteServer" Type="System.String" Scope="User">
+      <Value Profile="(Default)">mc.hypixel.net</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -190,5 +190,53 @@ namespace BlockifyLauncher.Properties {
                 this["Vibe"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastVersion {
+            get {
+                return ((string)(this["LastVersion"]));
+            }
+            set {
+                this["LastVersion"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastPlayed {
+            get {
+                return ((string)(this["LastPlayed"]));
+            }
+            set {
+                this["LastPlayed"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int LaunchCount {
+            get {
+                return ((int)(this["LaunchCount"]));
+            }
+            set {
+                this["LaunchCount"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("mc.hypixel.net")]
+        public string FavoriteServer {
+            get {
+                return ((string)(this["FavoriteServer"]));
+            }
+            set {
+                this["FavoriteServer"] = value;
+            }
+        }
     }
 }

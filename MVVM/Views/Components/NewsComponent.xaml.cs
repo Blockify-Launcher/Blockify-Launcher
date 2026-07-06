@@ -54,7 +54,14 @@ namespace BlockifyLauncher.MVVM.Views.Components
             DataContext = this;
 
             Title = item.Title;
-            Description = item.Subtitle;
+            Description = item.Date == default
+                ? item.Subtitle
+                : item.Date.ToString("d MMMM yyyy").ToUpper();
+
+            BadgeText.Text = item.IsOwn ? "BLOCKIFY" : "MOJANG";
+            BadgeBorder.Visibility = Visibility.Visible;
+            if (item.IsOwn)
+                BadgeBorder.Background = (System.Windows.Media.Brush)FindResource("GreenAccent");
 
             if (!string.IsNullOrEmpty(item.LocalImagePath) && File.Exists(item.LocalImagePath))
             {
@@ -72,6 +79,7 @@ namespace BlockifyLauncher.MVVM.Views.Components
             {
                 Cursor = System.Windows.Input.Cursors.Hand;
                 ToolTip = item.Link;
+                MoreArrow.Visibility = Visibility.Visible;
                 MouseLeftButtonUp += (_, _) =>
                 {
                     try

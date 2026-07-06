@@ -73,6 +73,18 @@ namespace BlockifyLauncher.Properties {
         public void SetVibe(string vibe) => this.Vibe = vibe;
         public string GetVibe() => this.Vibe;
 
+        /* Статистика запусків для quick-row на головній */
+        public void RegisterLaunch(string version)
+        {
+            this.LastVersion = version;
+            this.LastPlayed = DateTime.Now.ToString("yyyy-MM-dd");
+            this.LaunchCount = this.LaunchCount + 1;
+        }
+        public string GetLastVersion() => this.LastVersion;
+        public string GetLastPlayed() => this.LastPlayed;
+        public int GetLaunchCount() => this.LaunchCount;
+        public string GetFavoriteServer() => this.FavoriteServer;
+
         /* Розміри екрану гри */
         public void SetSettingDisplayGame(Display display)
         {

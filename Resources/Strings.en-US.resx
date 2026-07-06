@@ -276,4 +276,31 @@
   <data name="packs_offline" xml:space="preserve">
     <value>Modrinth is unavailable. Check your connection.</value>
   </data>
+  <data name="news_caption" xml:space="preserve">
+    <value>NEWS</value>
+  </data>
+  <data name="quick_continue" xml:space="preserve">
+    <value>CONTINUE</value>
+  </data>
+  <data name="quick_stats" xml:space="preserve">
+    <value>STATISTICS</value>
+  </data>
+  <data name="quick_server" xml:space="preserve">
+    <value>FAVORITE SERVER</value>
+  </data>
+  <data name="quick_launches" xml:space="preserve">
+    <value>launches</value>
+  </data>
+  <data name="quick_no_launches" xml:space="preserve">
+    <value>no launches yet</value>
+  </data>
+  <data name="quick_last" xml:space="preserve">
+    <value>last:</value>
+  </data>
+  <data name="server_online" xml:space="preserve">
+    <value>online · {0} ms</value>
+  </data>
+  <data name="server_offline" xml:space="preserve">
+    <value>offline</value>
+  </data>
 </root>

@@ -53,7 +53,70 @@ namespace BlockifyLauncher.MVVM.Views.Pages
 
         private async void LoadingMainPage(object sender, RoutedEventArgs e)
         {
-            await InitializeNewsAsync();
+            FillQuickRow();
+            var newsTask = InitializeNewsAsync();
+            var pingTask = PingFavoriteServerAsync();
+            await newsTask;
+            await pingTask;
+        }
+
+        // quick-row: continue / stats / favorite server
+        private void FillQuickRow()
+        {
+            var lang = BlockifyLauncher.Resources.ResxLocalizationProvider.Instance;
+            var setting = new Properties.Settings();
+
+            string lastVersion = setting.GetLastVersion();
+            if (string.IsNullOrEmpty(lastVersion))
+            {
+                ContinueTitle.Text = "Minecraft";
+                ContinueSub.Text = lang["quick_no_launches"];
+                ContinueSection.IsEnabled = false;
+                ContinueSection.Opacity = 0.55;
+            }
+            else
+            {
+                ContinueTitle.Text = "Minecraft " + lastVersion;
+                ContinueSub.Text = setting.GetLastPlayed();
+            }
+
+            StatCount.Text = setting.GetLaunchCount().ToString();
+            StatLabel.Text = lang["quick_launches"];
+            StatSub.Text = string.IsNullOrEmpty(setting.GetLastPlayed())
+                ? "" : lang["quick_last"] + " " + setting.GetLastPlayed();
+
+            ServerHost.Text = setting.GetFavoriteServer();
+        }
+
+        private void ContinueClick(object sender, RoutedEventArgs e) =>
+            ((MainWindow)Application.Current.MainWindow).QuickLaunchLast();
+
+        // simple TCP reachability + latency check (full SLP protocol later)
+        private async Task PingFavoriteServerAsync()
+        {
+            var lang = BlockifyLauncher.Resources.ResxLocalizationProvider.Instance;
+            string host = new Properties.Settings().GetFavoriteServer();
+            if (string.IsNullOrWhiteSpace(host)) return;
+
+            try
+            {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                using var client = new System.Net.Sockets.TcpClient();
+                var connect = client.ConnectAsync(host, 25565);
+                if (await Task.WhenAny(connect, Task.Delay(4000)) != connect || !client.Connected)
+                    throw new TimeoutException();
+                watch.Stop();
+
+                ServerDot.Fill = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x7D, 0xFF, 0x5F));
+                ServerStatus.Text = string.Format(lang["server_online"], watch.ElapsedMilliseconds);
+            }
+            catch
+            {
+                ServerDot.Fill = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0xC0, 0x39, 0x2B));
+                ServerStatus.Text = lang["server_offline"];
+            }
         }
 
         // Live news: Mojang launcher feed + Blockify feed, with offline cache.
