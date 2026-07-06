@@ -41,6 +41,7 @@ namespace BlockifyLauncher
         {
             ApplyVibeBackground();
             ApplyParadeSetting();
+            PlayDockAssembly();
 
             this.ProgressBarLoad.Activ = "None";
             try
@@ -147,6 +148,48 @@ namespace BlockifyLauncher
                 }
 
             ButtonClickStartGame(Start, new RoutedEventArgs());
+        }
+
+        // Dock "assembly" entrance: the panel rises, then account → version →
+        // Start drop onto it one by one, like items into a crafting grid.
+        private void PlayDockAssembly()
+        {
+            var ease = new System.Windows.Media.Animation.QuadraticEase
+            {
+                EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut
+            };
+
+            var dockMove = new System.Windows.Media.TranslateTransform();
+            DockBorder.RenderTransform = dockMove;
+            DockBorder.Opacity = 0;
+            DockBorder.BeginAnimation(OpacityProperty,
+                new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.3)));
+            dockMove.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty,
+                new System.Windows.Media.Animation.DoubleAnimation(40, 0, TimeSpan.FromSeconds(0.3)) { EasingFunction = ease });
+
+            void DropPart(FrameworkElement part, double delaySec)
+            {
+                var move = new System.Windows.Media.TranslateTransform();
+                part.RenderTransform = move;
+                part.Opacity = 0;
+
+                var begin = TimeSpan.FromSeconds(delaySec);
+                part.BeginAnimation(OpacityProperty,
+                    new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.16)) { BeginTime = begin });
+
+                var y = new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames { BeginTime = begin };
+                y.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(-26,
+                    System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.Zero)));
+                y.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(4,
+                    System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0.2)), ease));
+                y.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(0,
+                    System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0.32)), ease));
+                move.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty, y);
+            }
+
+            DropPart(AccountField, 0.22);
+            DropPart(VersionField, 0.34);
+            DropPart(Start, 0.48);
         }
 
         // Mob parade on/off from settings, applied live.

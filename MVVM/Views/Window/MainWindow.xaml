@@ -36,7 +36,7 @@
                 <Border Style="{StaticResource WindowBorderStyle}" Margin="-22,-62,-22,-20" Grid.RowSpan="10"
                         x:Name="InnerBlurContainer"/>
 
-                <Border Grid.Row="1" Style="{StaticResource PanelBorder}" CornerRadius="16" Background="#EB0D1013"
+                <Border Grid.Row="1" x:Name="DockBorder" Style="{StaticResource PanelBorder}" CornerRadius="16" Background="#EB0D1013"
                         BorderBrush="{StaticResource GlassLine}" BorderThickness="1"
                         Height="78" HorizontalAlignment="Stretch" Margin="100,0,2,0" VerticalAlignment="Center">
                     <Grid Margin="20,10">
@@ -47,7 +47,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,60,0" >
-                            <StackPanel Margin="0,0,20,0" VerticalAlignment="Center">
+                            <StackPanel x:Name="AccountField" Margin="0,0,20,0" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource DockCaption}" Text="{Binding [cap_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
                             <ComboBox Width="190" Height="36" Style="{StaticResource CustomComboBox}" x:Name="MinecraftAccountComboBox">
                                 <Separator Style="{StaticResource MenuSeparatorStyle}"/>
@@ -72,7 +72,7 @@
                                 </Button>
                             </ComboBox>
                             </StackPanel>
-                            <StackPanel VerticalAlignment="Center">
+                            <StackPanel x:Name="VersionField" VerticalAlignment="Center">
                                 <TextBlock Style="{StaticResource DockCaption}" Text="{Binding [cap_version], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
                                 <ComboBox Width="190" Height="36" Style="{StaticResource CustomComboBox}" x:Name="MinecraftVerisonComboBox"/>
                             </StackPanel>
