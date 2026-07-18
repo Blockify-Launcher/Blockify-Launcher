@@ -11,6 +11,8 @@ namespace BlockifyLauncher.MVVM.ViewModel
         public RelayCommand SettingCommand { get; set; }
         public RelayCommand AccountCommand { get; set; }
         public RelayCommand PacksCommand { get; set; }
+        public RelayCommand VersionsCommand { get; set; }
+        public RelayCommand BuilderCommand { get; set; }
         public RelayCommand LastPageCommand { get; set; }
         #endregion
 
@@ -19,6 +21,8 @@ namespace BlockifyLauncher.MVVM.ViewModel
         public SettingModel SettingVM { get; set; }
         public AccountModel AccountVM { get; set; }
         public PacksModel PacksVM { get; set; }
+        public VersionsModel VersionsVM { get; set; }
+        public BuilderModel BuilderVM { get; set; }
         #endregion
 
         #region lastPage.
@@ -56,6 +60,8 @@ namespace BlockifyLauncher.MVVM.ViewModel
             SettingVM = new SettingModel();
             AccountVM = new AccountModel();
             PacksVM = new PacksModel();
+            VersionsVM = new VersionsModel();
+            BuilderVM = new BuilderModel();
         }
 
         private void GoLastPage()
@@ -73,6 +79,8 @@ namespace BlockifyLauncher.MVVM.ViewModel
             MainCommand = new RelayCommand(o => { CurrentView = MainVM; });
             SettingCommand = new RelayCommand(o => { CurrentView = SettingVM; });
             PacksCommand = new RelayCommand(o => { CurrentView = PacksVM; });
+            VersionsCommand = new RelayCommand(o => { CurrentView = VersionsVM; });
+            BuilderCommand = new RelayCommand(o => { LastView = CurrentView; CurrentView = BuilderVM; });
 
             AccountCommand = new RelayCommand(o => {
                 LastView = CurrentView;

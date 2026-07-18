@@ -14,6 +14,7 @@
                 <ResourceDictionary Source="MVVM/Views/Style/ApplicationStyle.xaml"/>
                 <ResourceDictionary Source="MVVM/Views/Style/CustomElement.xaml"/>
                 <ResourceDictionary Source="MVVM/Views/Style/BlockifyTheme.xaml"/>
+                <ResourceDictionary Source="MVVM/Views/Style/GlassTheme.xaml"/>
                 <ResourceDictionary Source="MVVM/Views/Style/Effect/Generic/Generic.xaml"/>
                 
                 <ResourceDictionary Source="Image/MessageBox/ImagePack.xaml"/>
@@ -32,6 +33,12 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewModel_Pages:PacksModel}">
                 <view_Pages:PacksPage/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModel_Pages:VersionsModel}">
+                <view_Pages:VersionsPage/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModel_Pages:BuilderModel}">
+                <view_Pages:BuilderPage/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewModel_Pages:AccountModel}">
                 <view_Pages:AccountPages/>

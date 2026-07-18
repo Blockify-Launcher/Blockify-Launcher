@@ -6,218 +6,156 @@
       xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
       xmlns:lang="clr-namespace:BlockifyLauncher.Resources"
       mc:Ignorable="d"
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="620" d:DesignWidth="900"
       Title="MainPage" Loaded="LoadingMainPage">
 
-    <Page.Resources>
-        <DrawingBrush x:Key="PixelRule" TileMode="Tile" Viewport="0,0,12,4" ViewportUnits="Absolute" Stretch="None">
-            <DrawingBrush.Drawing>
-                <GeometryDrawing Brush="#B300B558">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,8,4"/>
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingBrush.Drawing>
-        </DrawingBrush>
-        <Style x:Key="QuickCap" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#9FB2C0"/>
-            <Setter Property="FontSize" Value="10"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Margin" Value="0,0,0,5"/>
-        </Style>
-        <Style x:Key="QuickCard" TargetType="Border">
-            <Setter Property="Background" Value="#C90E1114"/>
-            <Setter Property="BorderBrush" Value="#17FFFFFF"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="16"/>
-            <Setter Property="Padding" Value="16,10"/>
-        </Style>
-        <Style x:Key="NewsCard" TargetType="Border">
-            <Setter Property="Background" Value="#C90E1114"/>
-            <Setter Property="BorderBrush" Value="#17FFFFFF"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="14"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="#7300B558"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <Style x:Key="NewsBadge" TargetType="Border">
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="Margin" Value="10,10,0,0"/>
-            <Setter Property="CornerRadius" Value="5"/>
-            <Setter Property="Padding" Value="7,2"/>
-            <Setter Property="Background" Value="#C00A0C0E"/>
-            <Setter Property="BorderBrush" Value="#40FFFFFF"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-    </Page.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="26,4,30,30">
+        <StackPanel>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="14"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
-        <!-- section header -->
-        <StackPanel Margin="8,0,0,10" HorizontalAlignment="Left">
-            <TextBlock Text="{Binding [news_caption], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
-                       Foreground="#D5E2EA" FontSize="12" FontWeight="Bold" Margin="0,0,0,5">
-                <TextBlock.Effect>
-                    <DropShadowEffect BlurRadius="0" ShadowDepth="2" Direction="315" Color="#000000" Opacity="0.5"/>
-                </TextBlock.Effect>
-            </TextBlock>
-            <Rectangle Height="4" Fill="{StaticResource PixelRule}"/>
-        </StackPanel>
-
-        <!-- magazine layout: featured story + two side stories -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.7*"/>
-                <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- featured -->
-            <Border x:Name="FeaturedCard" Style="{StaticResource NewsCard}" MouseLeftButtonUp="NewsCardClick" Tag="0">
+            <!-- ═══ hero ═══ -->
+            <Border CornerRadius="18" MinHeight="250" ClipToBounds="True" BorderBrush="{StaticResource G.Line}" BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40" ShadowDepth="16" Direction="270" Color="#000000" Opacity="0.4"/>
+                </Border.Effect>
+                <!-- base texture: vertical pixel stripes 26px (#243b17 / #2c4a1d / #1f3413) -->
+                <Border.Background>
+                    <DrawingBrush TileMode="Tile" Viewport="0,0,78,20" ViewportUnits="Absolute" Stretch="None">
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <GeometryDrawing Brush="#243B17"><GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,26,20"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                <GeometryDrawing Brush="#2C4A1D"><GeometryDrawing.Geometry><RectangleGeometry Rect="26,0,26,20"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                <GeometryDrawing Brush="#1F3413"><GeometryDrawing.Geometry><RectangleGeometry Rect="52,0,26,20"/></GeometryDrawing.Geometry></GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Border.Background>
                 <Grid>
-                    <Border x:Name="FeaturedBg" CornerRadius="13" Background="#FF12253A"/>
-                    <Border CornerRadius="13">
-                        <Border.Background>
+                    <!-- darkening overlay: rgba(11,14,16,.1) -> .82 at 78% -->
+                    <Rectangle>
+                        <Rectangle.Fill>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Color="#22000000" Offset="0.25"/>
-                                <GradientStop Color="#F00A0D10" Offset="1"/>
+                                <GradientStop Color="#400B0E10" Offset="0"/>
+                                <GradientStop Color="#8A0B0E10" Offset="0.4"/>
+                                <GradientStop Color="#E00B0E10" Offset="0.82"/>
                             </LinearGradientBrush>
-                        </Border.Background>
-                    </Border>
-                    <Border x:Name="FeaturedBadge" Style="{StaticResource NewsBadge}">
-                        <TextBlock x:Name="FeaturedBadgeText" FontSize="9" FontWeight="Bold" Foreground="#FFF"/>
-                    </Border>
-                    <StackPanel VerticalAlignment="Bottom" Margin="16,0,16,13">
-                        <TextBlock x:Name="FeaturedTitle" Foreground="#FFF" FontSize="17" FontWeight="Bold"
-                                   TextWrapping="Wrap" MaxHeight="46" TextTrimming="CharacterEllipsis">
-                            <TextBlock.Effect>
-                                <DropShadowEffect BlurRadius="0" ShadowDepth="2" Direction="315" Color="#000000" Opacity="0.55"/>
-                            </TextBlock.Effect>
-                        </TextBlock>
-                        <TextBlock x:Name="FeaturedDesc" Foreground="#B5C4CF" FontSize="11" LineHeight="15" Margin="0,4,60,0"
-                                   TextWrapping="Wrap" MaxHeight="31" TextTrimming="CharacterEllipsis"/>
-                        <TextBlock x:Name="FeaturedDate" Foreground="#8A9BA8" FontSize="9.5" Margin="0,7,0,0"/>
+                        </Rectangle.Fill>
+                    </Rectangle>
+
+                    <!-- pixel grass strip on top -->
+                    <Rectangle VerticalAlignment="Top" Height="10">
+                        <Rectangle.Fill>
+                            <DrawingBrush TileMode="Tile" Viewport="0,0,30,10" ViewportUnits="Absolute" Stretch="None">
+                                <DrawingBrush.Drawing>
+                                    <DrawingGroup>
+                                        <GeometryDrawing Brush="#6BBF3B"><GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,10,10"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                        <GeometryDrawing Brush="#4E9427"><GeometryDrawing.Geometry><RectangleGeometry Rect="10,0,10,10"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                        <GeometryDrawing Brush="#7CCF49"><GeometryDrawing.Geometry><RectangleGeometry Rect="20,0,10,10"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                    </DrawingGroup>
+                                </DrawingBrush.Drawing>
+                            </DrawingBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+
+                    <StackPanel VerticalAlignment="Bottom" Margin="26,0,26,26">
+                        <TextBlock x:Name="HeroTitle" FontFamily="{StaticResource G.Display}" FontWeight="Black" FontSize="26"
+                                   Foreground="{StaticResource G.Text}" Margin="0,0,0,6"/>
+                        <TextBlock x:Name="HeroSub" Foreground="#C9D3C4" FontSize="13" TextWrapping="Wrap" MaxWidth="480" Margin="0,0,0,18"/>
+                        <Grid HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="PlayButton" Style="{StaticResource PlayButton}" Content="▶  ИГРАТЬ" Click="PlayClick"/>
+                            <ComboBox Grid.Column="2" x:Name="VersionCombo" Style="{StaticResource HeroVersionCombo}"
+                                      VerticalAlignment="Stretch" MinWidth="180" SelectionChanged="VersionChanged"/>
+                        </Grid>
                     </StackPanel>
                 </Grid>
             </Border>
 
-            <!-- side stories -->
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="12"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+            <!-- ═══ news ═══ -->
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="320"/>
+                </Grid.ColumnDefinitions>
 
-                <Border x:Name="Small1Card" Style="{StaticResource NewsCard}" MouseLeftButtonUp="NewsCardClick" Tag="1">
-                    <Grid>
-                        <Border x:Name="Small1Bg" CornerRadius="13" Background="#FF1A2F52"/>
-                        <Border CornerRadius="13">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                    <GradientStop Color="#22000000" Offset="0.2"/>
-                                    <GradientStop Color="#F00A0D10" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Border.Background>
-                        </Border>
-                        <Border x:Name="Small1Badge" Style="{StaticResource NewsBadge}">
-                            <TextBlock x:Name="Small1BadgeText" FontSize="8.5" FontWeight="Bold" Foreground="#FFF"/>
-                        </Border>
-                        <StackPanel VerticalAlignment="Bottom" Margin="12,0,12,9">
-                            <TextBlock x:Name="Small1Title" Foreground="#FFF" FontSize="12" FontWeight="SemiBold"
-                                       TextTrimming="CharacterEllipsis"/>
-                            <TextBlock x:Name="Small1Date" Foreground="#8A9BA8" FontSize="9" Margin="0,3,0,0"/>
-                        </StackPanel>
-                    </Grid>
+                <!-- news list -->
+                <Border Style="{StaticResource GlassPanel2}" Padding="18">
+                    <StackPanel>
+                        <TextBlock Text="{Binding [news_caption], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                   FontWeight="ExtraBold" FontSize="15" Foreground="{StaticResource G.Text}" Margin="0,0,0,12"/>
+                        <StackPanel x:Name="NewsList"/>
+                    </StackPanel>
                 </Border>
 
-                <Border x:Name="Small2Card" Grid.Row="2" Style="{StaticResource NewsCard}" MouseLeftButtonUp="NewsCardClick" Tag="2">
+                <!-- ad slot #1 · 300×250 · partner server (fictional placeholder) -->
+                <Border Grid.Column="2" Style="{StaticResource GlassPanel2}" ClipToBounds="True">
                     <Grid>
-                        <Border x:Name="Small2Bg" CornerRadius="13" Background="#FF16324A"/>
-                        <Border CornerRadius="13">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                    <GradientStop Color="#22000000" Offset="0.2"/>
-                                    <GradientStop Color="#F00A0D10" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Border.Background>
-                        </Border>
-                        <Border x:Name="Small2Badge" Style="{StaticResource NewsBadge}">
-                            <TextBlock x:Name="Small2BadgeText" FontSize="8.5" FontWeight="Bold" Foreground="#FFF"/>
-                        </Border>
-                        <StackPanel VerticalAlignment="Bottom" Margin="12,0,12,9">
-                            <TextBlock x:Name="Small2Title" Foreground="#FFF" FontSize="12" FontWeight="SemiBold"
-                                       TextTrimming="CharacterEllipsis"/>
-                            <TextBlock x:Name="Small2Date" Foreground="#8A9BA8" FontSize="9" Margin="0,3,0,0"/>
+                        <StackPanel>
+                            <!-- art: teal stripes + gold glow + pickaxe -->
+                            <Border Height="120" ClipToBounds="True">
+                                <Grid>
+                                    <Rectangle>
+                                        <Rectangle.Fill>
+                                            <DrawingBrush TileMode="Tile" Viewport="0,0,44,20" ViewportUnits="Absolute" Stretch="None">
+                                                <DrawingBrush.Drawing>
+                                                    <DrawingGroup>
+                                                        <GeometryDrawing Brush="#1D3B46"><GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,22,20"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                                        <GeometryDrawing Brush="#234A57"><GeometryDrawing.Geometry><RectangleGeometry Rect="22,0,22,20"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                                    </DrawingGroup>
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Rectangle>
+                                        <Rectangle.Fill>
+                                            <RadialGradientBrush Center="0.7,0.2" GradientOrigin="0.7,0.2" RadiusX="0.6" RadiusY="0.8">
+                                                <GradientStop Color="#59F2C14E" Offset="0"/>
+                                                <GradientStop Color="#00F2C14E" Offset="1"/>
+                                            </RadialGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <TextBlock Text="⛏" FontSize="34" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="18,0,0,8"/>
+                                </Grid>
+                            </Border>
+                            <StackPanel Margin="14">
+                                <TextBlock Text="GIGACRAFT" FontFamily="{StaticResource G.Display}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource G.Text}"/>
+                                <TextBlock Text="Сервер выживания 1.21.4 · без вайпов · кланы и ивенты каждую неделю"
+                                           Foreground="{StaticResource G.Muted}" FontSize="11.5" TextWrapping="Wrap" Margin="0,6,0,8"/>
+                                <TextBlock Text="● онлайн: 1 247 игроков" Foreground="{StaticResource G.Primary}" FontFamily="{StaticResource G.Mono}" FontSize="10.5" Margin="0,0,0,10"/>
+                                <Button Style="{StaticResource AdCta}" Content="Играть → mc.gigacraft.ua"/>
+                            </StackPanel>
                         </StackPanel>
+                        <Border Style="{StaticResource AdMark}">
+                            <TextBlock Text="РЕКЛАМА" FontFamily="{StaticResource G.Mono}" FontSize="8.5" Foreground="#A6FFFFFF"/>
+                        </Border>
                     </Grid>
                 </Border>
             </Grid>
-        </Grid>
 
-        <!-- quick row -->
-        <Grid Grid.Row="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.6*"/>
-                <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Border Style="{StaticResource QuickCard}">
-                <Grid x:Name="ContinueSection">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Style="{StaticResource QuickCap}"
-                                   Text="{Binding [quick_continue], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                        <TextBlock x:Name="ContinueTitle" Foreground="#FFF" FontSize="15" FontWeight="SemiBold"
-                                   TextTrimming="CharacterEllipsis"/>
-                        <TextBlock x:Name="ContinueSub" Foreground="#5F7280" FontSize="10.5" Margin="0,3,0,0"/>
+            <!-- ad slot #2 · 728×90 · hosting banner (fictional placeholder) -->
+            <Border Style="{StaticResource GlassPanel2}" Margin="0,16,0,0" Padding="20,16">
+                <Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="52" Height="52" CornerRadius="13" Background="#FF203C4B">
+                            <TextBlock Text="🖥" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Margin="18,0,0,0">
+                            <TextBlock Text="MineHost — свой сервер за 5 минут" Foreground="{StaticResource G.Text}" FontSize="14.5" FontWeight="Bold"/>
+                            <TextBlock Foreground="{StaticResource G.Muted}" FontSize="12" Margin="0,2,0,0">
+                                <Run Text="NVMe-диски · защита от DDoS · панель на русском · от "/><Run Text="99 ₴/мес" Foreground="{StaticResource G.Gold}" FontFamily="{StaticResource G.Mono}"/>
+                            </TextBlock>
+                        </StackPanel>
+                        <Button Style="{StaticResource AdCta}" Content="Создать сервер" VerticalAlignment="Center" Margin="24,0,0,0"/>
                     </StackPanel>
-                    <Button Grid.Column="1" Content="▶" Width="46" Height="46" FontSize="14" Margin="12,0,0,0"
-                            Style="{StaticResource EmeraldButton}" Click="ContinueClick"
-                            ToolTip="{Binding [quick_continue], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                    <Border Style="{StaticResource AdMark}">
+                        <TextBlock Text="РЕКЛАМА" FontFamily="{StaticResource G.Mono}" FontSize="8.5" Foreground="#A6FFFFFF"/>
+                    </Border>
                 </Grid>
             </Border>
-
-            <Border Grid.Column="2" Style="{StaticResource QuickCard}">
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Style="{StaticResource QuickCap}"
-                               Text="{Binding [quick_stats], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="StatCount" Foreground="#FFF" FontSize="19" FontWeight="Bold"/>
-                        <TextBlock x:Name="StatLabel" Foreground="#9FB2C0" FontSize="11" VerticalAlignment="Bottom" Margin="7,0,0,3"/>
-                    </StackPanel>
-                    <TextBlock x:Name="StatSub" Foreground="#5F7280" FontSize="10.5" Margin="0,2,0,0"/>
-                </StackPanel>
-            </Border>
-
-            <Border Grid.Column="4" Style="{StaticResource QuickCard}">
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Style="{StaticResource QuickCap}"
-                               Text="{Binding [quick_server], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse x:Name="ServerDot" Width="8" Height="8" Fill="#5F7280" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="ServerHost" Foreground="#FFF" FontSize="13.5" FontWeight="SemiBold" Margin="7,0,0,0"/>
-                    </StackPanel>
-                    <TextBlock x:Name="ServerStatus" Foreground="#5F7280" FontSize="10.5" Margin="15,3,0,0"/>
-                </StackPanel>
-            </Border>
-        </Grid>
-    </Grid>
+        </StackPanel>
+    </ScrollViewer>
 </Page>

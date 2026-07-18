@@ -1,0 +1,585 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ══════════ Blockify · Liquid Glass · brandbook tokens ══════════ -->
+    <!-- Embedded brand fonts (static weights, SIL OFL). Weight is picked via
+         FontWeight thanks to the typographic family names in the .ttf tables. -->
+    <FontFamily x:Key="G.Display">pack://application:,,,/Resources/Fonts/#Unbounded</FontFamily>
+    <FontFamily x:Key="G.Body">pack://application:,,,/Resources/Fonts/#Manrope</FontFamily>
+    <FontFamily x:Key="G.Mono">pack://application:,,,/Resources/Fonts/#JetBrains Mono</FontFamily>
+
+    <!-- app-wide default: body text is Manrope (mockup body{font-family:'Manrope'}) -->
+    <Style TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource G.Body}"/>
+    </Style>
+
+    <!-- exact brandbook v1.0 tokens (dark theme, WPF ARGB) -->
+    <SolidColorBrush x:Key="G.Bg"        Color="#FF0B0E10"/>
+    <SolidColorBrush x:Key="G.Surface"   Color="#FF161C1A"/>
+    <SolidColorBrush x:Key="G.Glass"     Color="#85161C1A"/>
+    <SolidColorBrush x:Key="G.Glass2"    Color="#731E2622"/>
+    <SolidColorBrush x:Key="G.Line"      Color="#17FFFFFF"/>
+    <SolidColorBrush x:Key="G.LineStr"   Color="#2BFFFFFF"/>
+    <SolidColorBrush x:Key="G.Hi"        Color="#24FFFFFF"/>
+    <SolidColorBrush x:Key="G.Primary"   Color="#FF6BBF3B"/>
+    <SolidColorBrush x:Key="G.PrimaryDk" Color="#FF4E9427"/>
+    <SolidColorBrush x:Key="G.Gold"      Color="#FFF2C14E"/>
+    <SolidColorBrush x:Key="G.Danger"    Color="#FFE0564A"/>
+    <SolidColorBrush x:Key="G.Info"      Color="#FF5EB8E6"/>
+    <SolidColorBrush x:Key="G.Text"      Color="#FFEAEFE8"/>
+    <SolidColorBrush x:Key="G.Muted"     Color="#FF93A096"/>
+    <SolidColorBrush x:Key="G.Disabled"  Color="#FF5A645D"/>
+
+    <!-- mockup .btn-play base: linear-gradient(180deg,#83d94f,grass 55%,grass-dark) -->
+    <LinearGradientBrush x:Key="G.PlayGrad" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FF83D94F" Offset="0"/>
+        <GradientStop Color="#FF6BBF3B" Offset="0.55"/>
+        <GradientStop Color="#FF4E9427" Offset="1"/>
+    </LinearGradientBrush>
+    <!-- white sheen overlay: rgba(255,255,255,.28) -> transparent at 45% -->
+    <LinearGradientBrush x:Key="G.PlaySheen" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#47FFFFFF" Offset="0"/>
+        <GradientStop Color="#00FFFFFF" Offset="0.45"/>
+    </LinearGradientBrush>
+    <!-- .btn.primary base (versions/packs): rgba(107,191,59,.9) + top sheen .2 -->
+    <LinearGradientBrush x:Key="G.PrimaryGrad" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#33FFFFFF" Offset="0"/>
+        <GradientStop Color="#00FFFFFF" Offset="0.5"/>
+    </LinearGradientBrush>
+
+    <!-- glass panel: translucent surface over the blurred blobs, lit top edge.
+         mockup: border-radius 14px; box-shadow 0 12px 32px rgba(0,0,0,.35), inset 0 1px 0 hi -->
+    <Style x:Key="GlassPanel" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource G.Glass}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="BorderBrush">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#24FFFFFF" Offset="0"/>
+                    <GradientStop Color="#17FFFFFF" Offset="0.22"/>
+                    <GradientStop Color="#17FFFFFF" Offset="1"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="32" ShadowDepth="12" Direction="270" Color="#000000" Opacity="0.35"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="GlassPanel2" TargetType="Border" BasedOn="{StaticResource GlassPanel}">
+        <Setter Property="Background" Value="{StaticResource G.Glass2}"/>
+        <Setter Property="Effect" Value="{x:Null}"/>
+    </Style>
+
+    <!-- sidebar nav item -->
+    <Style x:Key="SidebarNav" TargetType="RadioButton">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{StaticResource G.Muted}"/>
+        <Setter Property="FontFamily" Value="{StaticResource G.Body}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="Bg" CornerRadius="11" Padding="13,11" Margin="0,2" Background="Transparent"
+                            BorderBrush="Transparent" BorderThickness="1">
+                        <StackPanel Orientation="Horizontal">
+                            <ContentPresenter x:Name="Icon" ContentSource="Tag" VerticalAlignment="Center" Width="18" Height="18"/>
+                            <TextBlock Text="{TemplateBinding Content}" Margin="11,0,0,0" VerticalAlignment="Center"
+                                       Foreground="{TemplateBinding Foreground}"/>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#0DFFFFFF"/>
+                            <Setter Property="Foreground" Value="{StaticResource G.Text}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#216BBF3B"/>
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="#406BBF3B"/>
+                            <Setter Property="Foreground" Value="{StaticResource G.Text}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- account mini-card in the sidebar footer -->
+    <Style x:Key="AccountCard" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="12" Padding="11,10" Background="#0DFFFFFF"
+                            BorderBrush="{StaticResource G.Line}" BorderThickness="1">
+                        <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#17FFFFFF"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- big Play button (hero) -->
+    <Style x:Key="PlayButton" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="#0C1506"/>
+        <Setter Property="FontFamily" Value="{StaticResource G.Display}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="12" Background="{StaticResource G.PlayGrad}"
+                            BorderBrush="#40FFFFFF" BorderThickness="1">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="24" ShadowDepth="8" Direction="270" Color="#6BBF3B" Opacity="0.4"/>
+                        </Border.Effect>
+                        <Border CornerRadius="12" Background="{StaticResource G.PlaySheen}">
+                            <!-- inset 0 1px 0 rgba(255,255,255,.5): bright top gloss edge -->
+                            <Border CornerRadius="11" Padding="40,14" BorderBrush="#80FFFFFF" BorderThickness="0,1,0,0">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Border>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Effect">
+                                <Setter.Value><DropShadowEffect BlurRadius="30" ShadowDepth="10" Direction="270" Color="#6BBF3B" Opacity="0.5"/></Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource G.PrimaryDk}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- secondary glass button — mockup .btn: pad 8/16, radius 10, bg .06, hover .11 -->
+    <Style x:Key="GlassButton" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{StaticResource G.Text}"/>
+        <Setter Property="FontFamily" Value="{StaticResource G.Body}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="10" Padding="16,8" Background="#0FFFFFFF"
+                            BorderBrush="{StaticResource G.Line}" BorderThickness="1">
+                        <Border BorderBrush="{StaticResource G.Hi}" BorderThickness="0,1,0,0" CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#1CFFFFFF"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- primary variant — mockup .btn.primary: rgba(107,191,59,.9) + top sheen, dark text -->
+    <Style x:Key="GlassButtonPrimary" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="#0C1506"/>
+        <Setter Property="FontFamily" Value="{StaticResource G.Body}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="10" Background="#E66BBF3B" BorderThickness="0">
+                        <Border CornerRadius="10" Padding="16,8" Background="{StaticResource G.PrimaryGrad}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#FF6BBF3B"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource G.PrimaryDk}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- danger variant — mockup .btn.danger: red text, red-tint border, hover red .12 -->
+    <Style x:Key="GlassButtonDanger" TargetType="Button" BasedOn="{StaticResource GlassButton}">
+        <Setter Property="Foreground" Value="{StaticResource G.Danger}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="10" Padding="16,8" Background="Transparent"
+                            BorderBrush="#59E0564A" BorderThickness="1">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#1FE0564A"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- window control (min / close) -->
+    <Style x:Key="GlassWinBtn" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{StaticResource G.Muted}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="8" Width="32" Height="28" Background="Transparent">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#14FFFFFF"/>
+                            <Setter Property="Foreground" Value="{StaticResource G.Text}"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                                <Condition Property="Tag" Value="close"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bg" Property="Background" Value="#E0564A"/>
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- glass combo box (version selector) -->
+    <Style x:Key="GlassCombo" TargetType="ComboBox">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{StaticResource G.Text}"/>
+        <Setter Property="FontFamily" Value="{StaticResource G.Mono}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Height" Value="44"/>
+        <Setter Property="ItemContainerStyle" Value="{DynamicResource GlassComboItem}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <ToggleButton Focusable="False" ClickMode="Press"
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border x:Name="Bg" CornerRadius="12" Background="#99141A18"
+                                            BorderBrush="{StaticResource G.Line}" BorderThickness="1" Padding="16,0">
+                                        <Grid>
+                                            <ContentPresenter Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                              VerticalAlignment="Center" Margin="0,0,24,0"/>
+                                            <Path Data="M0,0 L8,8 L16,0" Stroke="{StaticResource G.Muted}" StrokeThickness="1.6"
+                                                  HorizontalAlignment="Right" VerticalAlignment="Center" Width="12" Height="7" Stretch="Fill"/>
+                                        </Grid>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="BorderBrush" Value="#736BBF3B"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True"
+                               Focusable="False" PopupAnimation="Slide" MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+                            <Border Background="#F5141A18" BorderBrush="{StaticResource G.LineStr}" BorderThickness="1"
+                                    CornerRadius="12" Margin="0,4,0,0" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="18" ShadowDepth="4" Color="#000000" Opacity="0.5"/>
+                                </Border.Effect>
+                                <ScrollViewer Margin="4">
+                                    <ItemsPresenter/>
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- hero version selector — mockup .ver-select: "Версия: <gold value> ▾" inline glass box -->
+    <Style x:Key="HeroVersionCombo" TargetType="ComboBox">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{StaticResource G.Gold}"/>
+        <Setter Property="FontFamily" Value="{StaticResource G.Mono}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="ItemContainerStyle" Value="{DynamicResource GlassComboItem}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <ToggleButton Focusable="False" ClickMode="Press"
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border x:Name="Bg" CornerRadius="12" Background="#99141A18"
+                                            BorderBrush="{StaticResource G.Line}" BorderThickness="1" Padding="16,0">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="Версия:" Foreground="{StaticResource G.Muted}" VerticalAlignment="Center"/>
+                                            <ContentPresenter Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                              TextBlock.Foreground="{StaticResource G.Gold}" TextBlock.FontWeight="Bold"
+                                                              VerticalAlignment="Center" Margin="7,0,0,0"/>
+                                            <Path Data="M0,0 L8,8 L16,0" Stroke="{StaticResource G.Muted}" StrokeThickness="1.6"
+                                                  VerticalAlignment="Center" Width="11" Height="6" Stretch="Fill" Margin="10,1,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="BorderBrush" Value="#736BBF3B"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True"
+                               Focusable="False" PopupAnimation="Slide" MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+                            <Border Background="#F5141A18" BorderBrush="{StaticResource G.LineStr}" BorderThickness="1"
+                                    CornerRadius="12" Margin="0,4,0,0" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="18" ShadowDepth="4" Color="#000000" Opacity="0.5"/>
+                                </Border.Effect>
+                                <ScrollViewer Margin="4"><ItemsPresenter/></ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- glass chip (filter) -->
+    <Style x:Key="GlassChip" TargetType="RadioButton">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{StaticResource G.Muted}"/>
+        <Setter Property="FontFamily" Value="{StaticResource G.Body}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Margin" Value="0,0,8,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="Bg" CornerRadius="12" Padding="15,7" Background="#0DFFFFFF"
+                            BorderBrush="{StaticResource G.Line}" BorderThickness="1">
+                        <ContentPresenter TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource G.Text}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#D96BBF3B"/>
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="Transparent"/>
+                            <Setter Property="Foreground" Value="#0C1506"/>
+                            <Setter TargetName="Bg" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="14" ShadowDepth="4" Direction="270" Color="#6BBF3B" Opacity="0.35"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- toggle switch — mockup .sw: 40×22 track, sliding knob, on = grass .85 -->
+    <Style x:Key="GlassSwitch" TargetType="CheckBox">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Border x:Name="Track" Width="40" Height="22" CornerRadius="11" Background="#14FFFFFF"
+                            BorderBrush="{StaticResource G.Line}" BorderThickness="1">
+                        <Border x:Name="Knob" Width="16" Height="16" CornerRadius="8" HorizontalAlignment="Left"
+                                Margin="2,0,0,0">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#FFCFD8D0" Offset="0"/>
+                                    <GradientStop Color="#FF9AA69C" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="3" ShadowDepth="1" Direction="270" Color="#000000" Opacity="0.4"/>
+                            </Border.Effect>
+                        </Border>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Track" Property="Background" Value="#D96BBF3B"/>
+                            <Setter TargetName="Track" Property="BorderBrush" Value="Transparent"/>
+                            <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right"/>
+                            <Setter TargetName="Knob" Property="Margin" Value="0,0,2,0"/>
+                            <Setter TargetName="Knob" Property="Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#FFFFFFFF" Offset="0"/>
+                                        <GradientStop Color="#FFDFE9DB" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- form text field — mockup .field input: radius 10, bg rgba(0,0,0,.25), mono, focus green -->
+    <Style x:Key="GlassField" TargetType="TextBox">
+        <Setter Property="Foreground" Value="{StaticResource G.Text}"/>
+        <Setter Property="CaretBrush" Value="{StaticResource G.Primary}"/>
+        <Setter Property="FontFamily" Value="{StaticResource G.Mono}"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="Bd" CornerRadius="10" Padding="12,9" Background="#40000000"
+                            BorderBrush="{StaticResource G.Line}" BorderThickness="1">
+                        <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#806BBF3B"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- compact form combo — same skin as GlassField, drop-down list -->
+    <Style x:Key="GlassFieldCombo" TargetType="ComboBox" BasedOn="{StaticResource GlassCombo}">
+        <Setter Property="Height" Value="38"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <ToggleButton Focusable="False" ClickMode="Press"
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border x:Name="Bg" CornerRadius="10" Background="#40000000"
+                                            BorderBrush="{StaticResource G.Line}" BorderThickness="1" Padding="12,0">
+                                        <Grid>
+                                            <ContentPresenter Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                              VerticalAlignment="Center" Margin="0,0,22,0"/>
+                                            <Path Data="M0,0 L8,8 L16,0" Stroke="{StaticResource G.Muted}" StrokeThickness="1.6"
+                                                  HorizontalAlignment="Right" VerticalAlignment="Center" Width="11" Height="6" Stretch="Fill"/>
+                                        </Grid>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="BorderBrush" Value="#806BBF3B"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True"
+                               Focusable="False" PopupAnimation="Slide" MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+                            <Border Background="#F5141A18" BorderBrush="{StaticResource G.LineStr}" BorderThickness="1"
+                                    CornerRadius="10" Margin="0,4,0,0" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="18" ShadowDepth="4" Color="#000000" Opacity="0.5"/>
+                                </Border.Effect>
+                                <ScrollViewer Margin="4"><ItemsPresenter/></ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ad CTA — mockup .ad-cta: gold-tinted button -->
+    <Style x:Key="AdCta" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{StaticResource G.Gold}"/>
+        <Setter Property="FontFamily" Value="{StaticResource G.Body}"/>
+        <Setter Property="FontWeight" Value="ExtraBold"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="10" Padding="14,9" Background="#29F2C14E"
+                            BorderBrush="#80F2C14E" BorderThickness="1">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#47F2C14E"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- "Реклама" corner marker -->
+    <Style x:Key="AdMark" TargetType="Border">
+        <Setter Property="Background" Value="#73000000"/>
+        <Setter Property="CornerRadius" Value="5"/>
+        <Setter Property="Padding" Value="7,2"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Margin" Value="0,8,8,0"/>
+    </Style>
+
+    <!-- combo item — used by GlassCombo / GlassFieldCombo popups -->
+    <Style x:Key="GlassComboItem" TargetType="ComboBoxItem">
+        <Setter Property="Foreground" Value="{StaticResource G.Text}"/>
+        <Setter Property="Padding" Value="10,7"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border x:Name="Bd" CornerRadius="7" Padding="{TemplateBinding Padding}" Background="Transparent">
+                        <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#226BBF3B"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

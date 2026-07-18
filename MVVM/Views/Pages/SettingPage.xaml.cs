@@ -68,16 +68,6 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             _loaded = true;
         }
 
-        private void SectionChecked(object sender, RoutedEventArgs e)
-        {
-            if (PaneGame == null) return; // fires during InitializeComponent
-            string tag = (string)((RadioButton)sender).Tag;
-            PaneGame.Visibility = tag == "game" ? Visibility.Visible : Visibility.Collapsed;
-            PaneJava.Visibility = tag == "java" ? Visibility.Visible : Visibility.Collapsed;
-            PaneLauncher.Visibility = tag == "launcher" ? Visibility.Visible : Visibility.Collapsed;
-            PaneVersions.Visibility = tag == "versions" ? Visibility.Visible : Visibility.Collapsed;
-            PaneData.Visibility = tag == "data" ? Visibility.Visible : Visibility.Collapsed;
-        }
 
         #region game
         private static readonly Regex onlyNumbers = new Regex("[^0-9.-]+");
@@ -111,7 +101,7 @@ namespace BlockifyLauncher.MVVM.Views.Pages
         }
 
         private void UpdateRamText() =>
-            RamValueText.Text = $"{(int)SliderRam.Value} {ResxLocalizationProvider.Instance["mb"]}";
+            RamRun.Text = $"{(int)SliderRam.Value} {ResxLocalizationProvider.Instance["mb"]}";
 
         private void AikarChanged(object sender, RoutedEventArgs e)
         {
@@ -259,14 +249,14 @@ namespace BlockifyLauncher.MVVM.Views.Pages
             if (((ComboBox)sender).SelectedItem is not ComboBoxItem item) return;
 
             setting.SetVibe((string)item.Tag);
-            mainWindow.ApplyVibeBackground();
+            // vibe background replaced by Liquid Glass blobs — no live apply
         }
 
         private void ParadeChanged(object sender, RoutedEventArgs e)
         {
             if (!_loaded) return;
             setting.SetShowParade(SwitchParade.IsChecked == true);
-            mainWindow.ApplyParadeSetting();
+            // mob parade removed in the glass redesign
         }
 
         private void DiscordChanged(object sender, RoutedEventArgs e)

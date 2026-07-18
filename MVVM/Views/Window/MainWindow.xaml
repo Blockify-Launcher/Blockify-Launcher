@@ -1,193 +1,33 @@
-﻿<Window x:Class="BlockifyLauncher.MainWindow"
+<Window x:Class="BlockifyLauncher.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel"
-        xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
         xmlns:local="clr-namespace:BlockifyLauncher"
-        xmlns:lang="clr-namespace:BlockifyLauncher.Resources"
         xmlns:component="clr-namespace:BlockifyLauncher.MVVM.Views.Components"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d" WindowStyle="None" Loaded="LoadingMainWindow"
-        Width="1280" Height="720" Title="Blockify Launcher" AllowsTransparency="True"
-        MinHeight="540" MinWidth="1010" DataContext="{StaticResource currentViewModel}"
-        SourceInitialized="Window_OnSourceInitialized" SizeChanged="Window_OnSizeChanged"
-        PreviewMouseMove="Window_OnPreviewMouseMove">
+        Width="1280" Height="720" Title="Blockify" Background="#0B0E10"
+        MinHeight="600" MinWidth="1024"
+        SourceInitialized="Window_OnSourceInitialized" SizeChanged="Window_OnSizeChanged">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0"/>
+    </WindowChrome.WindowChrome>
 
     <Grid>
-        <!-- Діленння макету -->
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="0*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="42"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <!-- the entire UI lives in the web view -->
+        <wv2:WebView2 x:Name="Web"/>
 
-        <Border Grid.Row="1" x:Name="WindowBlurContainer">
+        <!-- hidden state that drives launch / auth (populated in code) -->
+        <ComboBox x:Name="MinecraftAccountComboBox" Visibility="Collapsed"/>
+        <ComboBox x:Name="MinecraftVerisonComboBox" Visibility="Collapsed"/>
 
-            <Grid Margin="22,20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto" MaxHeight="128"/>
-                </Grid.RowDefinitions>
-
-                <Border Style="{StaticResource WindowBorderStyle}" Margin="-22,-62,-22,-20" Grid.RowSpan="10"
-                        x:Name="InnerBlurContainer"/>
-
-                <Border Grid.Row="1" x:Name="DockBorder" Style="{StaticResource PanelBorder}" CornerRadius="16" Background="#EB0D1013"
-                        BorderBrush="{StaticResource GlassLine}" BorderThickness="1"
-                        Height="78" HorizontalAlignment="Stretch" Margin="100,0,2,0" VerticalAlignment="Center"
-                        SizeChanged="DockSizeChanged">
-                    <Grid>
-                    <!-- baked diorama art + particle layer, behind the controls -->
-                    <Image x:Name="DockDecorImage" Margin="0,-27,0,-1" Stretch="None"
-                           HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
-                    <Canvas x:Name="DockFxCanvas" Margin="0,-27,0,-1" IsHitTestVisible="False" ClipToBounds="False"/>
-                    <Grid Margin="20,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Orientation="Horizontal" Margin="0,0,60,0" >
-                            <StackPanel x:Name="AccountField" Margin="0,0,20,0" VerticalAlignment="Center">
-                            <TextBlock Style="{StaticResource DockCaption}" Text="{Binding [cap_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                            <ComboBox Width="190" Height="36" Style="{StaticResource CustomComboBox}" x:Name="MinecraftAccountComboBox">
-                                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
-                                <Button Command="{Binding AccountCommand}" Cursor="Hand" Width="150px" Height="25px" Content="Account Setting"
-                                            Background="Transparent" Foreground="White">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Grid>
-                                                            <Border Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" Background="{TemplateBinding Background}">
-                                                                <Label VerticalAlignment="Center" HorizontalAlignment="Center" Content="{TemplateBinding Content}"
-                                                                           Foreground="{TemplateBinding Foreground}"/>
-                                                            </Border>
-                                                        </Grid>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
-                            </ComboBox>
-                            </StackPanel>
-                            <StackPanel x:Name="VersionField" VerticalAlignment="Center">
-                                <TextBlock Style="{StaticResource DockCaption}" Text="{Binding [cap_version], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                                <ComboBox Width="190" Height="36" Style="{StaticResource CustomComboBox}" x:Name="MinecraftVerisonComboBox"/>
-                            </StackPanel>
-                        </StackPanel>
-                        <Button HorizontalAlignment="Right" Content="{Binding [start_game], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Grid.Column="2" Name="Start"
-                                Width="190" Height="56" Style="{StaticResource EmeraldButton}" Click="ButtonClickStartGame"
-                                ToolTip="{Binding [start_game], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
-                    </Grid>
-                    </Grid>
-                </Border>
-
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-
-
-                    <Grid>
-                        <!-- Hotbar navigation rail: inventory slots, active = selector frame -->
-                        <Border Width="74" CornerRadius="18" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                Background="#EB0D1013" BorderBrush="{StaticResource GlassLine}" BorderThickness="1">
-                            <StackPanel Margin="10,12">
-                                <RadioButton Style="{StaticResource HotbarSlot}" Command="{Binding MainCommand}" x:Name="homeRadioButton"
-                                             ToolTip="{Binding [nav_home], Source={x:Static lang:ResxLocalizationProvider.Instance}}">
-                                    <Image Source="{StaticResource HomeDrawingImage}" Height="26"/>
-                                </RadioButton>
-                                <RadioButton Style="{StaticResource HotbarSlot}" Command="{Binding PacksCommand}" Margin="0,10,0,0"
-                                             ToolTip="{Binding [nav_packs], Source={x:Static lang:ResxLocalizationProvider.Instance}}">
-                                    <Image Source="{StaticResource CategoryDrawingImage}" Height="24"/>
-                                </RadioButton>
-                                <RadioButton Style="{StaticResource HotbarSlot}" Command="{Binding SettingCommand}" Margin="0,10,0,0"
-                                             ToolTip="{Binding [nav_settings], Source={x:Static lang:ResxLocalizationProvider.Instance}}">
-                                    <Image Source="{StaticResource SettingDrawingImage}" Height="26"/>
-                                </RadioButton>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-
-                    <Frame Content="{Binding CurrentView}" Grid.Column="1" NavigationUIVisibility="Hidden"
-                           Margin="0,0,0,50"/>
-
-                </Grid>
-
-                <!-- Mob parade strip: pixel mobs stroll above the dock -->
-                <Canvas x:Name="ParadeCanvas" Height="44" VerticalAlignment="Bottom" Margin="0,0,0,2"
-                        IsHitTestVisible="False" ClipToBounds="False"/>
-
-            </Grid>
-
-        </Border>
-
-        <!-- Integrated title bar: brand cube + wordmark, translucent window controls -->
-        <Border Grid.Row="0" Background="Transparent" MouseDown="HeaderMouse">
-            <Grid>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="18,0,0,0">
-                    <Border Width="16" Height="16" CornerRadius="3">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#3ED160" Offset="0.5"/>
-                                <GradientStop Color="#1F8F3A" Offset="0.5"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Border.Effect>
-                            <DropShadowEffect BlurRadius="12" ShadowDepth="0" Color="#00B558" Opacity="0.55"/>
-                        </Border.Effect>
-                    </Border>
-                    <TextBlock Text="B L O C K I F Y" Foreground="#D9FFFFFF" FontSize="12" FontWeight="Bold"
-                               VerticalAlignment="Center" Margin="10,0,0,0">
-                        <TextBlock.Effect>
-                            <DropShadowEffect BlurRadius="0" ShadowDepth="2" Direction="315" Color="#000000" Opacity="0.45"/>
-                        </TextBlock.Effect>
-                    </TextBlock>
-                    <Label x:Name="TitleCustomForm" Visibility="Collapsed"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0">
-                    <Button Height="30" Width="40" Style="{StaticResource WinControl}" Content="─" FontSize="15"
-                            Click="MainWindowsMinimals"/>
-                    <Button Height="30" Width="40" Style="{StaticResource WinControl}" Content="✕" FontSize="13" Tag="close"
-                            Click="MainWindowsClose"/>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <Grid Grid.Row="1" Opacity="0.02">
-            <Rectangle Height="4" Width="4" x:Name="WindowResizeBottomLeft" PreviewMouseDown="WindowResize_OnPreviewMouseDown"
-                   Stroke="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW"/>
-            <Rectangle Height="4" Width="4" x:Name="WindowResizeBottomRight" PreviewMouseDown="WindowResize_OnPreviewMouseDown"
-                   Stroke="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE"/>
-
-            <Rectangle Width="2" x:Name="WindowResizeLeft" PreviewMouseDown="WindowResize_OnPreviewMouseDown" Fill="#FFF"
-                   Stroke="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE"/>
-            <Rectangle Width="2" x:Name="WindowResizeRight" PreviewMouseDown="WindowResize_OnPreviewMouseDown" Fill="#FFF"
-                   Stroke="{x:Null}" HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE"/>
-            <Rectangle Height="2" x:Name="WindowResizeBottom" PreviewMouseDown="WindowResize_OnPreviewMouseDown" Fill="#FFF"
-                   Stroke="{x:Null}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS"/>
-            
-            <!--<Thumb Name="BottomLeftThumb" DragDelta="Thumb_DragDelta"  Height="4" Width="4" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW"/>
-            <Thumb Name="BottomRightThumb" DragDelta="Thumb_DragDelta" Height="4" Width="4" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE"/>
-
-            <Thumb Name="LeftThumb" DragDelta="Thumb_DragDelta" Width="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE"/>
-            <Thumb Name="RightThumb" DragDelta="Thumb_DragDelta" Width="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE"/>
-            <Thumb Name="BottomThumb" DragDelta="Thumb_DragDelta" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS"/>-->
-        </Grid>
-
-        <component:LoaderComponent Title="Title" Description="Minecraft.jar" Grid.Row="1" VerticalAlignment="Bottom"
-                           Margin="80,0,80,80" x:Name="ProgressBarLoad"/>
-
-        <component:NotificationElement Title="Title" Description="Description" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center"
-                                       x:Name="NotificationElement" x:FieldModifier="public" Margin="0,20,0,0"/>
+        <!-- download progress toast (kept; will be surfaced into the web UI later) -->
+        <component:LoaderComponent Title="Title" Description="Minecraft.jar" VerticalAlignment="Bottom"
+                                   HorizontalAlignment="Center" Margin="0,0,0,26" x:Name="ProgressBarLoad"/>
+        <component:NotificationElement Title="Title" Description="Description" VerticalAlignment="Top"
+                                       HorizontalAlignment="Center" x:Name="NotificationElement"
+                                       x:FieldModifier="public" Margin="0,20,0,0"/>
     </Grid>
 </Window>

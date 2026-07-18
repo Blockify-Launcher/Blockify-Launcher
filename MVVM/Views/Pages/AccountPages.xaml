@@ -1,101 +1,78 @@
-﻿<Page x:Class="BlockifyLauncher.MVVM.Views.Pages.AccountPages"
+<Page x:Class="BlockifyLauncher.MVVM.Views.Pages.AccountPages"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
-      xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel"
       xmlns:lang="clr-namespace:BlockifyLauncher.Resources"
-      xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="AccountPages" Margin="0, 0, 60, 0" DataContext="{StaticResource currentViewModel}">
+      mc:Ignorable="d"
+      d:DesignHeight="620" d:DesignWidth="900"
+      Title="AccountPages">
 
-    <Grid>
-        <controls:WindowBlur BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur" Width="540" Height="330">
-            <Border CornerRadius="16" Background="#EE111417" BorderBrush="#2BFFFFFF" BorderThickness="1">
-                <Grid Margin="15,10,15,15">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="50"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="47"/>
-                    </Grid.RowDefinitions>
+    <Page.Resources>
+        <Style x:Key="GInput" TargetType="TextBox">
+            <Setter Property="Foreground" Value="{StaticResource G.Text}"/>
+            <Setter Property="CaretBrush" Value="{StaticResource G.Primary}"/>
+            <Setter Property="FontFamily" Value="{StaticResource G.Mono}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="B" CornerRadius="10" Background="#40000000" BorderBrush="{StaticResource G.Line}" BorderThickness="1" Padding="12,10">
+                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="B" Property="BorderBrush" Value="{StaticResource G.Primary}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
 
-                    <Grid VerticalAlignment="Center">
-                        <Button x:Name="LastPageButton" Cursor="Hand" HorizontalAlignment="Left" Margin="10,0">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border Height="20" Width="Auto" Background="Transparent">
-                                                    <Image Source="{StaticResource Arrow___LeftDrawingImage}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Opacity" Value="0.7"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Label Content="{Binding [account_setting], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="White" FontWeight="Bold" FontSize="18" HorizontalAlignment="Center"/>
-                    </Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="26,4,30,20">
+        <StackPanel>
+            <TextBlock Text="{Binding [sec_data], Source={x:Static lang:ResxLocalizationProvider.Instance}, FallbackValue=Аккаунты}"
+                       FontFamily="{StaticResource G.Display}" FontWeight="Bold" FontSize="21" Foreground="{StaticResource G.Text}"/>
+            <TextBlock Text="Профили для входа. Активный используется при запуске — переключение в один клик."
+                       Foreground="{StaticResource G.Muted}" FontSize="13" Margin="0,5,0,18"/>
 
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="21"/>
-                            <ColumnDefinition Width="210"/>
-                        </Grid.ColumnDefinitions>
+            <!-- account list -->
+            <StackPanel x:Name="AccountList"/>
 
-                        <ListBox x:Name="AccountList" Style="{StaticResource ListBoxAccount}"
-                                 ItemContainerStyle="{StaticResource ListBoxAccount_Item}">
-                        </ListBox>
+            <!-- add cards -->
+            <Grid Margin="0,12,0,0" MaxWidth="760" HorizontalAlignment="Left">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                        <Rectangle Grid.Column="1" Fill="#665A5A5A" Width="1" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+                <Border Style="{StaticResource GlassPanel2}" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="{Binding [login_microsoft], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                   FontSize="14.5" FontWeight="ExtraBold" Foreground="{StaticResource G.Text}"/>
+                        <TextBlock Text="Официальные сервера, скины и плащи из профиля, доступ к Realms. Пароль в лаунчер не вводится — только токен от Microsoft."
+                                   Foreground="{StaticResource G.Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,10,0,14"/>
+                        <Button x:Name="MsLoginBtn" Style="{StaticResource PlayButton}" FontSize="13" HorizontalAlignment="Left"
+                                Content="{Binding [login_microsoft], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Click="MicrosoftLogin"/>
+                    </StackPanel>
+                </Border>
 
-                        <StackPanel Grid.Column="2" Margin="5,0,0,0">
-                            <Label Content="{Binding [username], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Foreground="White" Padding="2,0,0,3"/>
-                            <TextBox x:Name="UserNameTextBox" Height="30" BorderBrush="#3F5A5A5A"
-                                     IsEnabled="{Binding IsChecked, ElementName=LoginNotPassword}">
-                                <TextBox.Style>
-                                    <Style TargetType="TextBox" BasedOn="{StaticResource CustomTextBox}">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsEnabled" Value="False">
-                                                <Setter Property="Opacity" Value="0.4"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBox.Style>
-                            </TextBox>
-                            <RadioButton Style="{StaticResource CustomRadioButton}" Content="{Binding [login_without_password], Source={x:Static lang:ResxLocalizationProvider.Instance}}" x:Name="LoginNotPassword" IsChecked="True" Margin="0,14,0,0"/>
-                            <RadioButton Style="{StaticResource CustomRadioButton}" Content="{Binding [login_microsoft], Source={x:Static lang:ResxLocalizationProvider.Instance}}" x:Name="LoginMicrosoft" Margin="0,8,0,0"/>
-                            <!--
-                            <RadioButton Style="{StaticResource CustomRadioButton}" Content="Login through Mojang" x:Name="LoginMojang"/>
-                            -->
-                        </StackPanel>
-                    </Grid>
-
-                    <Grid Grid.Row="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="21"/>
-                            <ColumnDefinition Width="210"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Button x:Name="SaveAccountButton" Content="{Binding [save_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Height="38" VerticalAlignment="Bottom" Margin="2,0"
-                                FontSize="13" Style="{StaticResource GhostButton}" Click="SaveUserAccount" IsEnabled="False"/>
-
-                        <Button Grid.Column="2" Content="{Binding [add_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}" Height="42" VerticalAlignment="Bottom" Margin="5,0,2,0"
-                                FontSize="13" Style="{StaticResource EmeraldButton}"
-                                Click="ButtonClickAddNewAccount"/>
-                    </Grid>
-                </Grid>
-            </Border>
-        </controls:WindowBlur>
-    </Grid>
+                <Border Grid.Column="2" Style="{StaticResource GlassPanel2}" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="{Binding [login_without_password], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                   FontSize="14.5" FontWeight="ExtraBold" Foreground="{StaticResource G.Text}"/>
+                        <TextBlock Text="Локальный профиль по нику — для одиночной игры и серверов без проверки лицензии."
+                                   Foreground="{StaticResource G.Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,10,0,12"/>
+                        <TextBox x:Name="OffNick" Style="{StaticResource GInput}" MaxLength="16" Margin="0,0,0,10"/>
+                        <Button Style="{StaticResource GlassButton}" HorizontalAlignment="Left" Click="AddOffline"
+                                Content="{Binding [add_account], Source={x:Static lang:ResxLocalizationProvider.Instance}}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
 </Page>

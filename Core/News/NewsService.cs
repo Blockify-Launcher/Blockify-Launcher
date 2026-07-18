@@ -44,6 +44,19 @@ namespace BlockifyLauncher.Core.News
 
         private static string FeedCachePath => Path.Combine(CacheDir, "feed.json");
 
+        /// <summary>Last cached feed, read from disk instantly (no network). Empty on first run.</summary>
+        public static List<NewsItem> GetCached(int max = 6)
+        {
+            try
+            {
+                if (File.Exists(FeedCachePath))
+                    return (JsonConvert.DeserializeObject<List<NewsItem>>(File.ReadAllText(FeedCachePath))
+                            ?? new List<NewsItem>()).Take(max).ToList();
+            }
+            catch { /* corrupt / missing cache */ }
+            return new List<NewsItem>();
+        }
+
         public static async Task<List<NewsItem>> GetAsync(int max = 6)
         {
             Directory.CreateDirectory(CacheDir);

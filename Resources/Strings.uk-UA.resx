@@ -432,4 +432,10 @@
   <data name="no_releases" xml:space="preserve">
     <value>Релізів поки не опубліковано</value>
   </data>
+  <data name="hero_ready" xml:space="preserve">
+    <value>Готовий до запуску</value>
+  </data>
+  <data name="quick_continue_btn" xml:space="preserve">
+    <value>Продовжити</value>
+  </data>
 </root>

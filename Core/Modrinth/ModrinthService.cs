@@ -1,8 +1,21 @@
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
+using System.Text;
 
 namespace BlockifyLauncher.Core.Modrinth
 {
+    /// <summary>Update status of a single installed mod jar (matched on Modrinth by file hash).</summary>
+    public class ModUpdateInfo
+    {
+        public string Hash = "";
+        public string? Title;
+        public string? CurrentVersion;
+        public string? LatestVersion;
+        public bool HasUpdate;
+        public string? DownloadUrl;
+        public string? DownloadFileName;
+    }
+
     public class ModpackInfo
     {
         public string Title { get; set; } = "";
@@ -94,6 +107,102 @@ namespace BlockifyLauncher.Core.Modrinth
                 });
             }
             return result;
+        }
+
+        // ── mod update checks (installed jars matched by sha1) ──
+
+        /// <summary>
+        /// Look installed mod hashes up on Modrinth and report which have a newer version.
+        /// Two calls: /version_files (current) and /version_files/update (latest for the
+        /// given loaders/game versions). Project titles are resolved in a batch.
+        /// </summary>
+        public static async Task<Dictionary<string, ModUpdateInfo>> CheckModUpdatesAsync(
+            List<string> hashes, List<string> loaders, List<string> gameVersions)
+        {
+            var result = new Dictionary<string, ModUpdateInfo>();
+            if (hashes == null || hashes.Count == 0) return result;
+
+            // 1. current version for each hash
+            JObject current;
+            try
+            {
+                current = await PostJsonAsync("https://api.modrinth.com/v2/version_files",
+                    new JObject { ["hashes"] = new JArray(hashes), ["algorithm"] = "sha1" });
+            }
+            catch { current = new JObject(); }
+
+            // 2. project titles (batch)
+            var projIds = new HashSet<string>();
+            foreach (var p in current.Properties())
+                if (p.Value.Value<string>("project_id") is string pid && pid.Length > 0) projIds.Add(pid);
+
+            var titles = new Dictionary<string, string>();
+            if (projIds.Count > 0)
+            {
+                try
+                {
+                    string idsParam = "[" + string.Join(",", projIds.Select(i => "\"" + i + "\"")) + "]";
+                    var projJson = JArray.Parse(await Http.GetStringAsync(
+                        "https://api.modrinth.com/v2/projects?ids=" + Uri.EscapeDataString(idsParam)));
+                    foreach (var pr in projJson)
+                        titles[pr.Value<string>("id") ?? ""] = pr.Value<string>("title") ?? "";
+                }
+                catch { }
+            }
+
+            // 3. latest matching version for each hash
+            JObject latest;
+            try
+            {
+                latest = await PostJsonAsync("https://api.modrinth.com/v2/version_files/update",
+                    new JObject
+                    {
+                        ["hashes"] = new JArray(hashes),
+                        ["algorithm"] = "sha1",
+                        ["loaders"] = new JArray(loaders ?? new List<string>()),
+                        ["game_versions"] = new JArray(gameVersions ?? new List<string>())
+                    });
+            }
+            catch { latest = new JObject(); }
+
+            foreach (var hash in hashes)
+            {
+                var info = new ModUpdateInfo { Hash = hash };
+                var cur = current[hash];
+                if (cur != null)
+                {
+                    info.CurrentVersion = cur.Value<string>("version_number");
+                    string pid = cur.Value<string>("project_id") ?? "";
+                    if (titles.TryGetValue(pid, out var t) && t.Length > 0) info.Title = t;
+                }
+                var lat = latest[hash];
+                if (lat != null && cur != null)
+                {
+                    string curId = cur.Value<string>("id") ?? "";
+                    string latId = lat.Value<string>("id") ?? "";
+                    info.LatestVersion = lat.Value<string>("version_number");
+                    if (latId.Length > 0 && latId != curId)
+                    {
+                        info.HasUpdate = true;
+                        var files = (JArray?)lat["files"];
+                        var primary = files?.FirstOrDefault(f => f.Value<bool?>("primary") == true) ?? files?.FirstOrDefault();
+                        info.DownloadUrl = primary?.Value<string>("url");
+                        info.DownloadFileName = primary?.Value<string>("filename");
+                    }
+                }
+                result[hash] = info;
+            }
+            return result;
+        }
+
+        public static Task<byte[]> DownloadAsync(string url) => Http.GetByteArrayAsync(url);
+
+        private static async Task<JObject> PostJsonAsync(string url, JObject body)
+        {
+            using var content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
+            var resp = await Http.PostAsync(url, content);
+            resp.EnsureSuccessStatusCode();
+            return JObject.Parse(await resp.Content.ReadAsStringAsync());
         }
     }
 }

@@ -76,6 +76,7 @@
       <TreatAsUsed>true</TreatAsUsed>
     </PackageReference>
     <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.68.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4078.44" />
     <PackageReference Include="NETStandard.Library" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
@@ -88,6 +89,18 @@
 
   <ItemGroup>
     <Resource Include="Image\wallpaper.jpg" />
+  </ItemGroup>
+
+  <!-- embedded brand fonts (Unbounded / Manrope / JetBrains Mono, SIL OFL) -->
+  <ItemGroup>
+    <Resource Include="Resources\Fonts\*.ttf" />
+  </ItemGroup>
+
+  <!-- WebView2 UI assets (html/css/js/fonts) shipped next to the exe -->
+  <ItemGroup>
+    <Content Include="WebUI\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

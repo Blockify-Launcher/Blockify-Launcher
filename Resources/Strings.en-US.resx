@@ -432,4 +432,10 @@
   <data name="no_releases" xml:space="preserve">
     <value>No releases published yet</value>
   </data>
+  <data name="hero_ready" xml:space="preserve">
+    <value>Ready to launch</value>
+  </data>
+  <data name="quick_continue_btn" xml:space="preserve">
+    <value>Continue</value>
+  </data>
 </root>

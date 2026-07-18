@@ -96,16 +96,20 @@ namespace BlockifyLauncher.Core.DiscordActivy
 
         public void UpdateDiscordActivity(string key, string val = null)
         {
-            if (key == "play")
-            {
-                // econom resourse pc.
-                _delayUpdate = 1000;
+            if (key != "play") return;
 
-                _activity = _UpdateDiscordActivity(_discordStr.DiscordStruct[key]);
-                UpdateActivity();
+            // Discord RPC is optional: if it never initialized (Discord not running,
+            // no token, config missing) just skip — a launch must never fail on this.
+            if (_discordStr.DiscordStruct == null || !_discordStr.DiscordStruct.ContainsKey(key))
+                return;
 
-                _play = true; 
-            }
+            // econom resourse pc.
+            _delayUpdate = 1000;
+
+            _activity = _UpdateDiscordActivity(_discordStr.DiscordStruct[key]);
+            UpdateActivity();
+
+            _play = true;
         }
 
         public DiscordController() : base()
@@ -158,6 +162,7 @@ namespace BlockifyLauncher.Core.DiscordActivy
         private void UpdateActivity()
         {
             var activity = _discord?.GetActivityManager();
+            if (activity == null) return;
             activity.UpdateActivity(_activity, (result) => {
                 //Debug.WriteLine($"debug discord update activity. Code : {result}");
             });

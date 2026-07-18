@@ -19,19 +19,16 @@ namespace BlockifyLauncher
     {
         //private DiscordController _discordController;
 
-        public Border MainBorder { get; set; }
-
         private Settings setting = new Settings();
         private Account? account;
+
+        // Raised after accounts + versions finish loading — the home page
+        // fills its version selector from this.
+        public event Action? ShellReady;
 
         public MainWindow()
         {
             InitializeComponent();
-            this.Resources.Add("WindowTitle", this.Title);
-
-            this.homeRadioButton.IsChecked = true;
-
-            this.MainBorder = InnerBlurContainer;
 
             this.Width = Settings.Default.WidthProgram;
             this.Height = Settings.Default.HeightProgram;
@@ -39,21 +36,23 @@ namespace BlockifyLauncher
 
         private async void LoadingMainWindow(object sender, RoutedEventArgs e)
         {
-            ApplyVibeBackground();
-            ApplyParadeSetting();
-            PlayDockAssembly();
-
             this.ProgressBarLoad.Activ = "None";
             try
             {
+                await InitWebAsync();
+
                 await InitializeAccountsAsync();
                 await InitializeVersionsAsync();
 
                 MinecraftAccountComboBox.SelectionChanged += MinecraftAccountSelectionChanged;
                 setting.launcher.FileChanged += LauncherFileChanged;
+
+                ShellReady?.Invoke();
+                MarkDataReady();
             }
             catch (Exception ex)
             {
+                try { System.IO.File.WriteAllText(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "blockify_err.txt"), ex.ToString()); } catch { }
                 HandleException(ex);
             }
         }
@@ -76,23 +75,15 @@ namespace BlockifyLauncher
 
             if (MinecraftAccountComboBox.Items.Count > 0)
                 MinecraftAccountComboBox.SelectedIndex = index;
-            else
-                MinecraftAccountComboBox.Text = ResxLocalizationProvider.Instance["none_account"];
 
-            MinecraftAccountComboBox.Items.Add(new Separator()
-            {
-                Style = (Style)Application.Current.FindResource("MenuSeparatorStyle")
-            });
-
-            var navButton_account = new Button()
-            {
-                Style = (Style)Application.Current.FindResource("ButtonComboBoxAccount"),
-                Content = ResxLocalizationProvider.Instance["account_setting"]
-            };
-            navButton_account.SetBinding(Button.CommandProperty, new Binding("AccountCommand"));
-
-            MinecraftAccountComboBox.Items.Add(navButton_account);
+            RefreshAccountCard();
         }
+
+        // Push the active account (and the full list) into the web UI.
+        public void RefreshAccountCard() => PushAccounts();
+
+        public string ActiveAccountName =>
+            MinecraftAccountComboBox.SelectedItem as string ?? "";
 
         // Set information for last user.
         private void MinecraftAccountSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -102,6 +93,7 @@ namespace BlockifyLauncher
                 ComboBox senderBox = (ComboBox)sender;
                 SessionStruct sessionUsed = (account.GetAllUserArray())[senderBox.SelectedIndex];
                 setting.SetLastUser(sessionUsed.Id);
+                RefreshAccountCard();
             }
             catch { return; }
         }
@@ -134,164 +126,26 @@ namespace BlockifyLauncher
                 MinecraftVerisonComboBox.SelectedIndex = index;
         }
 
-        // One-click relaunch of the last played version (quick-row "Continue").
-        public void QuickLaunchLast()
+        // ── version selector data for the home page ──
+        public IReadOnlyList<string> GetVersionNames()
         {
-            string last = new Properties.Settings().GetLastVersion();
-            if (string.IsNullOrEmpty(last)) return;
+            var list = new List<string>();
+            foreach (var item in MinecraftVerisonComboBox.Items)
+                if (item is string s) list.Add(s);
+            return list;
+        }
 
+        public int SelectedVersionIndex
+        {
+            get => MinecraftVerisonComboBox.SelectedIndex;
+            set { if (value >= 0 && value < MinecraftVerisonComboBox.Items.Count) MinecraftVerisonComboBox.SelectedIndex = value; }
+        }
+
+        public void SelectVersion(string name)
+        {
             for (int i = 0; i < MinecraftVerisonComboBox.Items.Count; i++)
-                if (MinecraftVerisonComboBox.Items[i]?.ToString() == last)
-                {
-                    MinecraftVerisonComboBox.SelectedIndex = i;
-                    break;
-                }
-
-            ButtonClickStartGame(Start, new RoutedEventArgs());
-        }
-
-        // Diorama on the dock: baked pixel art + four kinds of living particles.
-        private void DockSizeChanged(object sender, SizeChangedEventArgs e) => RebuildDockDiorama();
-
-        private void RebuildDockDiorama()
-        {
-            int w = (int)DockBorder.ActualWidth;
-            if (w < 200) return;
-
-            var art = Core.Vibe.DockDiorama.Render(w);
-            DockDecorImage.Source = art.Bitmap;
-            System.Windows.Media.RenderOptions.SetBitmapScalingMode(
-                DockDecorImage, System.Windows.Media.BitmapScalingMode.NearestNeighbor);
-
-            var fx = DockFxCanvas;
-            fx.Children.Clear();
-            var rnd = new Random(42);
-
-            System.Windows.Shapes.Ellipse Dot(double size, System.Windows.Media.Color color, double glow)
-            {
-                var el = new System.Windows.Shapes.Ellipse
-                {
-                    Width = size, Height = size,
-                    Fill = new System.Windows.Media.SolidColorBrush(color),
-                    Effect = new System.Windows.Media.Effects.DropShadowEffect
-                    { BlurRadius = glow, ShadowDepth = 0, Color = color, Opacity = 0.85 }
-                };
-                return el;
-            }
-
-            void Twinkle(System.Windows.Shapes.Ellipse el, double x, double y, double durSec)
-            {
-                Canvas.SetLeft(el, x); Canvas.SetTop(el, y);
-                fx.Children.Add(el);
-                el.BeginAnimation(OpacityProperty,
-                    new System.Windows.Media.Animation.DoubleAnimation(0.06, 0.95, TimeSpan.FromSeconds(durSec))
-                    {
-                        RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever,
-                        AutoReverse = true,
-                        BeginTime = TimeSpan.FromSeconds(-rnd.NextDouble() * 4)
-                    });
-            }
-
-            // sculk souls (left zone)
-            for (int i = 0; i < 5; i++)
-                Twinkle(Dot(3, System.Windows.Media.Color.FromRgb(0x3D, 0xE8, 0xFF), 6),
-                    w * (0.01 + rnd.NextDouble() * 0.24), 38 + rnd.NextDouble() * 52, 2.4 + rnd.NextDouble() * 2);
-
-            // amethyst glints
-            for (int i = 0; i < 3; i++)
-                Twinkle(Dot(3, System.Windows.Media.Color.FromRgb(0xE3, 0xD0, 0xFF), 7),
-                    w * (0.315 + rnd.NextDouble() * 0.09), 32 + rnd.NextDouble() * 58, 3.5 + rnd.NextDouble() * 3);
-
-            // glow berry pulse at vine tips
-            foreach (var tip in art.BerryTips)
-                Twinkle(Dot(4, System.Windows.Media.Color.FromRgb(0xFF, 0xB0, 0x2E), 8),
-                    tip.X - 1, tip.Y, 2 + rnd.NextDouble() * 2);
-
-            // spore blossom particles drifting down
-            for (int i = 0; i < 8; i++)
-            {
-                var spore = Dot(3, rnd.NextDouble() < 0.7
-                    ? System.Windows.Media.Color.FromRgb(0xF2, 0xA1, 0xC0)
-                    : System.Windows.Media.Color.FromRgb(0xCD, 0xEA, 0x7A), 3);
-                double sx = art.SporeOrigin.X - 10 + rnd.NextDouble() * 26;
-                Canvas.SetLeft(spore, sx); Canvas.SetTop(spore, art.SporeOrigin.Y);
-                fx.Children.Add(spore);
-
-                var move = new System.Windows.Media.TranslateTransform();
-                spore.RenderTransform = move;
-                double dur = 5 + rnd.NextDouble() * 4;
-                var begin = TimeSpan.FromSeconds(-rnd.NextDouble() * 8);
-                var forever = System.Windows.Media.Animation.RepeatBehavior.Forever;
-
-                move.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty,
-                    new System.Windows.Media.Animation.DoubleAnimation(0, 72, TimeSpan.FromSeconds(dur))
-                    { RepeatBehavior = forever, BeginTime = begin });
-                move.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty,
-                    new System.Windows.Media.Animation.DoubleAnimation(0, 14, TimeSpan.FromSeconds(dur))
-                    { RepeatBehavior = forever, BeginTime = begin });
-
-                var fade = new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames
-                { Duration = TimeSpan.FromSeconds(dur), RepeatBehavior = forever, BeginTime = begin };
-                fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(0,
-                    System.Windows.Media.Animation.KeyTime.FromPercent(0)));
-                fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(0.9,
-                    System.Windows.Media.Animation.KeyTime.FromPercent(0.1)));
-                fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(0.7,
-                    System.Windows.Media.Animation.KeyTime.FromPercent(0.85)));
-                fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(0,
-                    System.Windows.Media.Animation.KeyTime.FromPercent(1)));
-                spore.BeginAnimation(OpacityProperty, fade);
-            }
-        }
-
-        // Dock "assembly" entrance: the panel rises, then account → version →
-        // Start drop onto it one by one, like items into a crafting grid.
-        private void PlayDockAssembly()
-        {
-            var ease = new System.Windows.Media.Animation.QuadraticEase
-            {
-                EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut
-            };
-
-            var dockMove = new System.Windows.Media.TranslateTransform();
-            DockBorder.RenderTransform = dockMove;
-            DockBorder.Opacity = 0;
-            DockBorder.BeginAnimation(OpacityProperty,
-                new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.3)));
-            dockMove.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty,
-                new System.Windows.Media.Animation.DoubleAnimation(40, 0, TimeSpan.FromSeconds(0.3)) { EasingFunction = ease });
-
-            void DropPart(FrameworkElement part, double delaySec)
-            {
-                var move = new System.Windows.Media.TranslateTransform();
-                part.RenderTransform = move;
-                part.Opacity = 0;
-
-                var begin = TimeSpan.FromSeconds(delaySec);
-                part.BeginAnimation(OpacityProperty,
-                    new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.16)) { BeginTime = begin });
-
-                var y = new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames { BeginTime = begin };
-                y.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(-26,
-                    System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.Zero)));
-                y.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(4,
-                    System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0.2)), ease));
-                y.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(0,
-                    System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0.32)), ease));
-                move.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty, y);
-            }
-
-            DropPart(AccountField, 0.22);
-            DropPart(VersionField, 0.34);
-            DropPart(Start, 0.48);
-        }
-
-        // Mob parade on/off from settings, applied live.
-        public void ApplyParadeSetting()
-        {
-            ParadeCanvas.Children.Clear();
-            if (new Properties.Settings().GetShowParade())
-                Core.Vibe.MobParade.Start(ParadeCanvas);
+                if (MinecraftVerisonComboBox.Items[i]?.ToString() == name)
+                { MinecraftVerisonComboBox.SelectedIndex = i; return; }
         }
 
         // Aikar GC flags: community-standard JVM tuning for smooth Minecraft.
@@ -306,38 +160,35 @@ namespace BlockifyLauncher
             "-XX:+PerfDisableSharedMem", "-XX:MaxTenuringThreshold=1"
         };
 
-        // Pixel-art vibe background: from settings, "auto" = by time of day.
-        public void ApplyVibeBackground()
+        // Error message box — routed into the web UI's glass dialog when it's ready
+        // so all popups share the launcher's style; native box only as a fallback.
+        private void HandleException(Exception ex)
+        {
+            LogDiag("EXCEPTION " + ex);
+            try
+            {
+                if (_webReady && Web?.CoreWebView2 != null)
+                {
+                    if (Dispatcher.CheckAccess()) Post(new { type = "error", message = ex.Message });
+                    else Dispatcher.Invoke(() => Post(new { type = "error", message = ex.Message }));
+                    return;
+                }
+            }
+            catch { }
+            new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
+        }
+
+        // append a diagnostic line to %TEMP%/blockify_err.txt (for debugging launch issues)
+        private static void LogDiag(string msg)
         {
             try
             {
-                var kind = new Properties.Settings().GetVibe()?.ToLowerInvariant() switch
-                {
-                    "ocean" => Core.Vibe.VibeKind.Ocean,
-                    "sunset" => Core.Vibe.VibeKind.Sunset,
-                    "nether" => Core.Vibe.VibeKind.Nether,
-                    "cherry" => Core.Vibe.VibeKind.Cherry,
-                    "end" => Core.Vibe.VibeKind.End,
-                    _ => Core.Vibe.VibeScene.ForNow()
-                };
-                var scene = Core.Vibe.VibeScene.Render(kind);
-                var brush = new System.Windows.Media.ImageBrush(scene)
-                {
-                    Stretch = System.Windows.Media.Stretch.UniformToFill
-                };
-                System.Windows.Media.RenderOptions.SetBitmapScalingMode(
-                    brush, System.Windows.Media.BitmapScalingMode.NearestNeighbor);
-                InnerBlurContainer.Background = brush;
+                System.IO.File.AppendAllText(
+                    System.IO.Path.Combine(System.IO.Path.GetTempPath(), "blockify_err.txt"),
+                    DateTime.Now.ToString("HH:mm:ss") + " " + msg + "\n");
             }
-            catch
-            {
-                // keep the default wallpaper from WindowBorderStyle
-            }
+            catch { }
         }
-
-        // Error message box.
-        private void HandleException(Exception ex) =>
-            new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
 
         private string GameLauncherName = "BlockifyLauncher";
         private string GameLauncherVersion = "1";
@@ -375,6 +226,11 @@ namespace BlockifyLauncher
 
         private async Task<Process?> StartGame()
         {
+            string vnDiag = MinecraftVerisonComboBox.SelectedIndex >= 0
+                ? MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex]?.ToString() ?? "?"
+                : "(none)";
+            LogDiag($"LAUNCH version='{vnDiag}' selIdx={MinecraftVerisonComboBox.SelectedIndex} gameDir='{_packGameDir ?? "(base)"}'");
+
             Display display = setting.GetSettingDisplayGame();
             Session session = await ResolveLaunchSession();
             string javaPath = new Properties.Settings().GetJavaPath();
@@ -386,6 +242,7 @@ namespace BlockifyLauncher
                     MaximumRamMb = setting.GetMemoryRAM(),
                     JavaPath = javaPath != "javaw.exe" && System.IO.File.Exists(javaPath) ? javaPath : null,
                     JVMArguments = new Properties.Settings().GetJvmAikar() ? AikarFlags : null,
+                    GameDirectory = _packGameDir,   // isolated instance when launching a modpack
 
                     VersionType = this.GameLauncherName,
                     GameLauncherName = this.GameLauncherName,
@@ -397,8 +254,13 @@ namespace BlockifyLauncher
                 });
         }
 
-        private async void ButtonClickStartGame(object sender, RoutedEventArgs e)
+        private bool _launching;
+        public event Action<bool>? LaunchStateChanged;
+
+        // Launch the selected version. Called by the home page Play button.
+        public async void LaunchSelected()
         {
+            if (_launching) return;
             var lang = ResxLocalizationProvider.Instance;
 
             if (MinecraftVerisonComboBox.SelectedIndex < 0)
@@ -417,8 +279,14 @@ namespace BlockifyLauncher
             /* This code would increase download speed. */
             System.Net.ServicePointManager.DefaultConnectionLimit = 256;
 
-            Start.IsEnabled = false;
+            _launching = true;
+            LaunchStateChanged?.Invoke(true);
             ProgressBarLoad.Activ = "Use";
+
+            // surface file download for a normal launch in the web download panel too
+            string launchVer = MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex]?.ToString() ?? "—";
+            _activeJob = ("launch", "Запуск " + launchVer);
+            PostJob("launch", "Запуск " + launchVer, "Проверка файлов…", 0, 0);
 
             try
             {
@@ -427,11 +295,14 @@ namespace BlockifyLauncher
                     throw new InvalidOperationException(lang["error_start_failed"]);
 
                 process.Start();
+                Post(new { type = "installDone", id = "launch", ok = true });
 
                 new Properties.Settings().RegisterLaunch(
                     MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString() ?? "");
 
-                App._discordController?.UpdateDiscordActivity("play");
+                // Discord Rich Presence is optional — never let it break a launch
+                if (new Properties.Settings().GetDiscordRpc())
+                    try { App._discordController?.UpdateDiscordActivity("play"); } catch { }
 
                 /*Closing the Launcher after launching minecraft.*/
                 if (new Properties.Settings().GetHideLauncher() == 0)
@@ -439,12 +310,16 @@ namespace BlockifyLauncher
             }
             catch (Exception ex)
             {
+                Post(new { type = "installDone", id = "launch", ok = false, error = ex.Message });
                 HandleException(ex);
             }
             finally
             {
                 ProgressBarLoad.Activ = "Сlose";
-                Start.IsEnabled = true;
+                _launching = false;
+                _packGameDir = null;   // clear instance override after a launch attempt
+                _activeJob = null;
+                LaunchStateChanged?.Invoke(false);
             }
         }
 
@@ -456,6 +331,10 @@ namespace BlockifyLauncher
                 ProgressBarLoad.Title = e.FileKind.ToString();
                 ProgressBarLoad.Maximum = e.TotalFileCount;
                 ProgressBarLoad.Value = e.ProgressedFileCount;
+
+                // mirror into the web download panel while a background job is running
+                if (_activeJob is { } job)
+                    PostJob(job.id, job.title, e.FileKind.ToString(), e.ProgressedFileCount, e.TotalFileCount);
             });
         }
 

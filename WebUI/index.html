@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blockify — лаунчер</title>
+<style>
+/* ── embedded brand fonts (local .ttf, SIL OFL) ── */
+@font-face{font-family:'Unbounded';src:url('fonts/Unbounded-Medium.ttf');font-weight:500}
+@font-face{font-family:'Unbounded';src:url('fonts/Unbounded-Bold.ttf');font-weight:700}
+@font-face{font-family:'Unbounded';src:url('fonts/Unbounded-Black.ttf');font-weight:900}
+@font-face{font-family:'Manrope';src:url('fonts/Manrope-Regular.ttf');font-weight:400}
+@font-face{font-family:'Manrope';src:url('fonts/Manrope-Medium.ttf');font-weight:500}
+@font-face{font-family:'Manrope';src:url('fonts/Manrope-SemiBold.ttf');font-weight:600}
+@font-face{font-family:'Manrope';src:url('fonts/Manrope-Bold.ttf');font-weight:700}
+@font-face{font-family:'Manrope';src:url('fonts/Manrope-ExtraBold.ttf');font-weight:800}
+@font-face{font-family:'JetBrains Mono';src:url('fonts/JetBrainsMono-Regular.ttf');font-weight:400}
+@font-face{font-family:'JetBrains Mono';src:url('fonts/JetBrainsMono-SemiBold.ttf');font-weight:600}
+
+:root{
+  --bg:#0B0E10;
+  --glass:rgba(22,28,26,.52);
+  --glass2:rgba(30,38,34,.45);
+  --glass-line:rgba(255,255,255,.09);
+  --glass-hi:rgba(255,255,255,.14);
+  --grass:#6BBF3B; --grass-dark:#4E9427;
+  --gold:#F2C14E; --red:#E0564A;
+  --text:#EAEFE8; --muted:#93A096;
+  --mono:'JetBrains Mono',monospace;
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;font-size:15px}
+
+.bgfx{position:fixed;inset:0;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:drift 26s ease-in-out infinite alternate}
+.b1{width:560px;height:560px;left:-140px;top:-160px;background:#2f5c17}
+.b2{width:480px;height:480px;right:-120px;top:18%;background:#14424f;animation-delay:-8s}
+.b3{width:520px;height:520px;left:32%;bottom:-240px;background:#5a4514;animation-delay:-16s}
+@keyframes drift{to{transform:translate(60px,40px) scale(1.12)}}
+@media (prefers-reduced-motion:reduce){.blob{animation:none}}
+
+.glass{
+  background:var(--glass);
+  backdrop-filter:blur(24px) saturate(1.5);
+  -webkit-backdrop-filter:blur(24px) saturate(1.5);
+  border:1px solid var(--glass-line);
+  border-radius:var(--r);
+  box-shadow:0 12px 32px rgba(0,0,0,.35), inset 0 1px 0 var(--glass-hi);
+  position:relative;
+}
+.glass::before{
+  content:'';position:absolute;inset:0 0 auto 0;height:46%;border-radius:var(--r) var(--r) 40% 40%;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),transparent);
+  pointer-events:none;
+}
+
+/* ── window title bar ── */
+.titlebar{position:relative;z-index:55;height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 20px;flex-shrink:0}
+.tb-brand{display:flex;align-items:center;gap:9px;font-family:'Unbounded';font-weight:700;font-size:12.5px;color:var(--muted);pointer-events:none}
+.tb-brand .tb-cube{width:16px;height:16px;border-radius:4px;image-rendering:pixelated;
+  background:linear-gradient(180deg,var(--grass) 0 34%,#8a6a3f 34% 58%,#6e4f2c 58% 100%)}
+.tb-brand b{color:var(--text);font-weight:700}
+.tb-brand b span{color:var(--grass)}
+.tb-btns{display:flex;gap:4px}
+.wb{width:34px;height:28px;border:0;border-radius:8px;background:rgba(255,255,255,.05);color:var(--text);cursor:pointer;display:grid;place-items:center;transition:.15s}
+.wb svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.wb:hover{background:rgba(255,255,255,.13)}
+.wb-close:hover{background:var(--red);color:#fff}
+
+/* ── native-resize grips (WebView covers WPF's own) ── */
+.rsz{position:fixed;z-index:70}
+.rsz-t{top:0;left:8px;right:8px;height:5px;cursor:ns-resize}
+.rsz-b{bottom:0;left:8px;right:8px;height:5px;cursor:ns-resize}
+.rsz-l{top:8px;bottom:8px;left:0;width:5px;cursor:ew-resize}
+.rsz-r{top:8px;bottom:8px;right:0;width:5px;cursor:ew-resize}
+.rsz-tl{top:0;left:0;width:9px;height:9px;cursor:nwse-resize;z-index:71}
+.rsz-tr{top:0;right:0;width:9px;height:9px;cursor:nesw-resize;z-index:71}
+.rsz-bl{bottom:0;left:0;width:9px;height:9px;cursor:nesw-resize;z-index:71}
+.rsz-br{bottom:0;right:0;width:9px;height:9px;cursor:nwse-resize;z-index:71}
+
+/* ── HOME fits the window (no page scroll; news scrolls internally if long) ── */
+#s-home.active{display:flex;flex-direction:column;overflow:hidden;padding-bottom:26px}
+#s-home .hero{flex-shrink:0}
+#s-home .grid-2{flex:1;min-height:0;margin-top:16px;grid-template-columns:minmax(0,1fr) 300px}
+#s-home #newsCard{min-width:0;overflow:hidden;display:flex;flex-direction:column}
+#s-home #newsList{overflow-y:auto;flex:1;margin-right:-6px;padding-right:6px}
+#s-home .ad-server{min-height:0;overflow:hidden}
+#s-home .ad-banner{flex-shrink:0;margin-top:16px}
+.news-item>div{min-width:0}
+.news-item b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.window{display:flex;height:calc(100vh - 42px);position:relative;z-index:1;padding:0 14px 14px;gap:14px}
+
+.sidebar{width:224px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden}
+.logo{padding:20px 18px 16px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--glass-line)}
+.logo-cube{width:34px;height:34px;flex-shrink:0;image-rendering:pixelated;border-radius:8px;
+  background:linear-gradient(180deg,var(--grass) 0 32%,#8a6a3f 32% 55%,#6e4f2c 55% 100%);
+  box-shadow:0 4px 12px rgba(107,191,59,.35), inset 0 1px 0 rgba(255,255,255,.35)}
+.logo b{font-family:'Unbounded';font-weight:900;font-size:15px;white-space:nowrap;line-height:1.15}
+.logo b span{color:var(--grass)}
+#verTag{display:block;font-size:10px;color:var(--muted);font-family:var(--mono);white-space:nowrap}
+.nav{padding:14px 10px;display:flex;flex-direction:column;gap:4px}
+.nav button{
+  display:flex;align-items:center;gap:11px;width:100%;padding:11px 13px;border:0;border-radius:11px;cursor:pointer;
+  background:transparent;color:var(--muted);font:700 14px 'Manrope';text-align:left;transition:.18s;
+}
+.nav button:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.nav button.active{
+  background:rgba(107,191,59,.13);color:var(--text);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1), 0 0 0 1px rgba(107,191,59,.25);
+}
+.nav svg{width:18px;height:18px;flex-shrink:0}
+.spacer{flex:1}
+.account{
+  margin:10px;padding:11px 12px;border-radius:12px;display:flex;align-items:center;gap:10px;cursor:pointer;
+  background:rgba(255,255,255,.05);border:1px solid var(--glass-line);transition:.15s;
+}
+.account:hover{background:rgba(255,255,255,.09)}
+.skin{width:32px;height:32px;image-rendering:pixelated;border-radius:8px;position:relative;flex-shrink:0;
+  background:conic-gradient(from 90deg at 50% 40%,#8d6b4f 0 25%,#7a5a40 0 50%,#8d6b4f 0 75%,#6f5138 0)}
+.skin::after{content:'';position:absolute;left:7px;top:12px;width:5px;height:5px;background:#2b2118;box-shadow:13px 0 0 #2b2118}
+.skin.alt{background:conic-gradient(from 90deg at 50% 40%,#5f7a8d 0 25%,#48606f 0 50%,#5f7a8d 0 75%,#3a4e5a 0)}
+.skin.alt::after{background:#16222b;box-shadow:13px 0 0 #16222b}
+.account b{font-size:13px;display:block}
+.account span{font-size:10.5px;color:var(--muted);font-family:var(--mono)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--grass);margin-left:auto;box-shadow:0 0 8px var(--grass)}
+
+.main{flex:1;overflow:hidden;border-radius:var(--r);display:flex;flex-direction:column}
+.screen{display:none;padding:26px 30px 40px;animation:fade .22s}
+.screen.active{display:block;flex:1;min-height:0;overflow-y:auto}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+h1{font-family:'Unbounded';font-weight:700;font-size:22px}
+.sub{color:var(--muted);font-size:13px;margin:5px 0 22px}
+
+.hero{
+  border-radius:18px;overflow:hidden;position:relative;min-height:250px;
+  display:flex;flex-direction:column;justify-content:flex-end;padding:26px;
+  background:
+    linear-gradient(180deg,rgba(11,14,16,.1),rgba(11,14,16,.82) 78%),
+    repeating-linear-gradient(90deg,#243b17 0 26px,#2c4a1d 26px 52px,#1f3413 52px 78px),#1f3413;
+  border:1px solid var(--glass-line);
+  box-shadow:0 16px 40px rgba(0,0,0,.4), inset 0 1px 0 var(--glass-hi);
+}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:10px;image-rendering:pixelated;
+  background:repeating-linear-gradient(90deg,var(--grass) 0 10px,var(--grass-dark) 10px 20px,#7ccf49 20px 30px)}
+.hero h2{font-family:'Unbounded';font-weight:900;font-size:26px;margin-bottom:6px}
+.hero p{color:#c9d3c4;font-size:13px;max-width:470px;margin-bottom:18px}
+.launch-row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch}
+.btn-play{
+  font-family:'Unbounded';font-weight:700;font-size:16px;letter-spacing:.5px;
+  padding:14px 40px;border:1px solid rgba(255,255,255,.25);border-radius:12px;cursor:pointer;color:#0c1506;
+  background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 45%),linear-gradient(180deg,#83d94f,var(--grass) 55%,var(--grass-dark));
+  box-shadow:0 8px 24px rgba(107,191,59,.4), inset 0 1px 0 rgba(255,255,255,.5);transition:.12s;
+}
+.btn-play:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(107,191,59,.5), inset 0 1px 0 rgba(255,255,255,.5)}
+.btn-play:active{transform:translateY(1px)}
+.ver-select{
+  display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:12px;cursor:pointer;
+  background:rgba(20,26,24,.6);backdrop-filter:blur(14px);border:1px solid var(--glass-line);
+  font-family:var(--mono);font-size:13px;box-shadow:inset 0 1px 0 var(--glass-hi);
+}
+.ver-select b{color:var(--gold)}
+
+.grid-2{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-top:18px}
+.card{padding:18px}
+.card h3{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tag{font-family:var(--mono);font-size:10px;color:var(--grass);border:1px solid rgba(107,191,59,.4);border-radius:5px;padding:1px 6px}
+.news-item{display:flex;gap:12px;padding:11px 0;border-top:1px solid var(--glass-line);cursor:pointer}
+.news-item:first-of-type{border-top:0;padding-top:0}
+.news-thumb{width:64px;height:44px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,#2c4a1d,#141a17);box-shadow:inset 0 1px 0 var(--glass-hi);background-size:cover;background-position:center}
+.news-item b{font-size:13px;display:block;margin-bottom:2px}
+.news-item span{font-size:12px;color:var(--muted)}
+
+.ad-mark{position:absolute;top:8px;right:8px;z-index:2;font-family:var(--mono);font-size:8.5px;
+  letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.65);
+  background:rgba(0,0,0,.45);backdrop-filter:blur(6px);padding:2px 7px;border-radius:5px}
+.ad-server{overflow:hidden;display:flex;flex-direction:column;min-height:250px}
+.ad-server .art{height:120px;position:relative;
+  background:radial-gradient(circle at 70% 20%,rgba(242,193,78,.35),transparent 55%),
+    repeating-linear-gradient(90deg,#1d3b46 0 22px,#234a57 22px 44px),#1d3b46}
+.ad-server .art::after{content:'⛏';position:absolute;left:18px;bottom:10px;font-size:34px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))}
+.ad-server .body{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.ad-server b{font-family:'Unbounded';font-size:14px}
+.ad-server p{font-size:11.5px;color:var(--muted);flex:1}
+.ad-server .online{font-family:var(--mono);font-size:10.5px;color:var(--grass)}
+.ad-cta{padding:9px 14px;border-radius:10px;border:1px solid rgba(242,193,78,.5);cursor:pointer;text-align:center;
+  background:linear-gradient(180deg,rgba(255,255,255,.15),transparent),rgba(242,193,78,.16);
+  color:var(--gold);font:800 12px 'Manrope';transition:.15s}
+.ad-cta:hover{background:rgba(242,193,78,.28)}
+.ad-banner{margin-top:16px;min-height:90px;display:flex;align-items:center;gap:18px;padding:16px 20px;overflow:hidden}
+.ad-banner .hicon{width:52px;height:52px;border-radius:13px;flex-shrink:0;display:grid;place-items:center;font-size:24px;
+  background:linear-gradient(135deg,#2a4b5c,#16303c);box-shadow:inset 0 1px 0 var(--glass-hi)}
+.ad-banner .btxt{flex:1}
+.ad-banner .btxt b{font-size:14.5px;display:block}
+.ad-banner .btxt span{font-size:12px;color:var(--muted)}
+.price{font-family:var(--mono);color:var(--gold)}
+.ad-line{margin-top:22px;max-width:880px;display:flex;align-items:center;gap:14px;padding:13px 18px}
+.ad-line .ic{font-size:20px}
+.ad-line b{font-size:13px;display:block}
+.ad-line span{font-size:11.5px;color:var(--muted)}
+.ad-line .ad-cta{margin-left:auto;flex-shrink:0}
+
+.toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.chip{padding:7px 15px;border-radius:20px;border:1px solid var(--glass-line);cursor:pointer;
+  background:rgba(255,255,255,.05);color:var(--muted);font:700 12px 'Manrope';backdrop-filter:blur(10px);transition:.15s}
+.chip:hover{color:var(--text)}
+.chip.on{background:rgba(107,191,59,.85);border-color:transparent;color:#0c1506;box-shadow:0 4px 14px rgba(107,191,59,.35)}
+.vrow{display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:10px}
+.vicon{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:grid;place-items:center;font-family:var(--mono);font-size:10px;font-weight:600;box-shadow:inset 0 1px 0 var(--glass-hi)}
+.vic-rel{background:rgba(107,191,59,.16);color:var(--grass)}
+.vic-forge{background:rgba(242,193,78,.14);color:var(--gold)}
+.vic-fab{background:rgba(151,113,235,.16);color:#b58cf2}
+.vic-snap{background:rgba(94,184,230,.14);color:#5eb8e6}
+.vrow b{font-size:14px;font-family:var(--mono)}
+.vrow small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.grow{flex:1}
+.badge{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:6px;background:rgba(107,191,59,.16);color:var(--grass)}
+.b-update{background:rgba(242,193,78,.14);color:var(--gold)}
+.btn{padding:8px 16px;border-radius:10px;border:1px solid var(--glass-line);cursor:pointer;
+  background:rgba(255,255,255,.06);color:var(--text);font:700 12.5px 'Manrope';
+  box-shadow:inset 0 1px 0 var(--glass-hi);transition:.15s}
+.btn:hover{background:rgba(255,255,255,.11)}
+.btn.primary{background:linear-gradient(180deg,rgba(255,255,255,.2),transparent),rgba(107,191,59,.9);border-color:transparent;color:#0c1506}
+.btn.danger{color:var(--red);border-color:rgba(224,86,74,.35)}
+.btn.danger:hover{background:rgba(224,86,74,.12)}
+
+.packs{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.pack{overflow:hidden;display:flex;flex-direction:column;transition:.18s}
+.pack:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(0,0,0,.45), inset 0 1px 0 var(--glass-hi)}
+.pack-img{height:110px;position:relative;background-size:cover;background-position:center}
+.pack-img .tag{position:absolute;top:10px;left:10px;background:rgba(11,14,16,.65);backdrop-filter:blur(6px);color:var(--text);border-color:var(--glass-line)}
+.pack-body{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pack-body b{font-size:14px}
+.pack-body p{font-size:12px;color:var(--muted);flex:1;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pack-meta{display:flex;gap:10px;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.pack .btn{margin:0 14px 14px}
+
+.acc-row{display:flex;align-items:center;gap:14px;padding:15px 18px;margin-bottom:10px}
+.acc-row .skin{width:42px;height:42px;border-radius:10px}
+.acc-row b{font-size:15px;display:block}
+.acc-row small{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
+.acc-badge{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:6px}
+.lic{background:rgba(107,191,59,.16);color:var(--grass)}
+.off{background:rgba(242,193,78,.14);color:var(--gold)}
+.acc-active{font-size:11px;color:var(--grass);font-weight:800;display:flex;align-items:center;gap:6px}
+.acc-active::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--grass);box-shadow:0 0 8px var(--grass)}
+.add-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px;max-width:760px}
+.add-card{padding:20px;display:flex;flex-direction:column;gap:10px}
+.add-card h3{font-size:14.5px;font-weight:800}
+.add-card p{font-size:12px;color:var(--muted);flex:1;line-height:1.55}
+.add-card input{padding:10px 12px;border-radius:10px;border:1px solid var(--glass-line);
+  background:rgba(0,0,0,.25);color:var(--text);font:13px var(--mono);outline:none}
+.add-card input:focus{border-color:rgba(107,191,59,.5)}
+.hint{font-size:10.5px;color:#6d7a70;line-height:1.5}
+
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:880px}
+.set-card{padding:18px}
+.set-card h3{font-size:14px;font-weight:800;margin-bottom:14px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.field input[type=text],.field select{width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--glass-line);
+  background:rgba(0,0,0,.25);color:var(--text);font:12.5px var(--mono);outline:none}
+.field input:focus,.field select:focus{border-color:rgba(107,191,59,.5)}
+.field select option{background:#161c1a}
+input[type=range]{width:100%;accent-color:var(--grass)}
+.ram-val{font-family:var(--mono);color:var(--gold);font-size:13px}
+.switch-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-top:1px solid var(--glass-line);font-size:13px}
+.switch-row:first-of-type{border-top:0}
+.sw{position:relative;width:40px;height:22px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.sw i{position:absolute;inset:0;background:rgba(255,255,255,.08);border:1px solid var(--glass-line);border-radius:20px;cursor:pointer;transition:.18s;box-shadow:inset 0 1px 2px rgba(0,0,0,.3)}
+.sw i::before{content:'';position:absolute;width:16px;height:16px;border-radius:50%;top:2px;left:2px;transition:.18s;
+  background:linear-gradient(180deg,#cfd8d0,#9aa69c);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.sw input:checked + i{background:rgba(107,191,59,.85);border-color:transparent}
+.sw input:checked + i::before{background:linear-gradient(180deg,#fff,#dfe9db);transform:translateX(18px)}
+.footnote{margin-top:26px;font-size:11px;color:#57635a;font-family:var(--mono)}
+.empty{padding:40px 8px;text-align:center;color:var(--muted);font-size:12.5px;font-family:var(--mono)}
+
+/* ── custom glass dropdown (replaces native <select>) ── */
+.gdd{position:relative;user-select:none}
+.gdd .caret{margin-left:auto;color:var(--muted);font-size:11px;transition:transform .15s}
+.gdd.open .caret{transform:rotate(180deg)}
+.gdd-menu{
+  position:absolute;top:calc(100% + 6px);left:0;min-width:100%;z-index:50;
+  max-height:280px;overflow-y:auto;display:none;padding:6px;
+  background:rgba(16,22,20,.97);backdrop-filter:blur(28px) saturate(1.4);
+  border:1px solid var(--glass-hi);border-radius:12px;
+  box-shadow:0 20px 46px rgba(0,0,0,.55), inset 0 1px 0 var(--glass-hi);
+  animation:ddin .14s ease;
+}
+@keyframes ddin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.gdd.open .gdd-menu{display:block}
+.gdd-portal{position:fixed;display:block}
+.gdd-menu div{padding:8px 12px;border-radius:8px;cursor:pointer;font-family:var(--mono);
+  font-size:12.5px;color:var(--text);white-space:nowrap;transition:.1s}
+.gdd-menu div:hover{background:rgba(107,191,59,.18)}
+.gdd-menu div.sel{color:var(--gold);background:rgba(242,193,78,.1)}
+/* field-style trigger for settings selects */
+.gdd-field{width:100%}
+.gdd-trigger{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;
+  border:1px solid var(--glass-line);background:rgba(0,0,0,.25);color:var(--text);
+  font:12.5px var(--mono);cursor:pointer;transition:.15s}
+.gdd-field:hover .gdd-trigger,.gdd-field.open .gdd-trigger{border-color:rgba(107,191,59,.5)}
+.gdd-trigger .gdd-val{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── themed scrollbars ── */
+*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:6px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:rgba(107,191,59,.5);background-clip:content-box}
+
+/* ── feature: mod updates (folded into Packs) ── */
+.mods-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.mods-head h3{font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px}
+.mods-actions{display:flex;gap:8px;flex-shrink:0}
+.cat-head{font-size:15px;font-weight:800;margin:28px 0 14px}
+.mrow{display:flex;align-items:center;gap:14px;padding:13px 16px;margin-bottom:9px}
+.mrow .micon{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:grid;place-items:center;font-size:17px;
+  background:rgba(151,113,235,.16);box-shadow:inset 0 1px 0 var(--glass-hi)}
+.mrow b{font-size:14px;display:block}
+.mrow small{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
+
+/* ── packs: catalog search + installed management ── */
+.pack-search{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.pack-search input{flex:1;min-width:180px;padding:10px 14px;border-radius:11px;border:1px solid var(--glass-line);
+  background:rgba(0,0,0,.25);color:var(--text);font:13px 'Manrope';outline:none}
+.pack-search input:focus{border-color:rgba(107,191,59,.5)}
+.pack-search .pack-mc{flex:0 0 150px;min-width:120px;font-family:var(--mono);font-size:12.5px}
+.pack-search .gdd-field{flex:0 0 180px}
+.mp-row{display:flex;align-items:center;gap:13px;padding:12px 14px;margin-bottom:9px}
+.mp-ico{width:44px;height:44px;border-radius:10px;flex-shrink:0;background:#0b0e10 center/cover no-repeat;
+  box-shadow:inset 0 1px 0 var(--glass-hi)}
+.mp-row .grow b{font-size:14px;display:block}
+.mp-row .grow small{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.mp-badge{font-family:var(--mono);font-size:9.5px;padding:2px 7px;border-radius:5px;background:rgba(151,113,235,.16);color:#b58cf2}
+.mp-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.mp-actions .btn{padding:7px 11px;font-size:11.5px}
+
+/* ── feature: skins (folded into Accounts) ── */
+.skin-grid{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:start;margin-top:8px}
+.skin-preview{padding:22px;display:flex;flex-direction:column;align-items:center;gap:14px;border-radius:var(--r)}
+.skin-face{width:96px;height:96px;image-rendering:pixelated;border-radius:12px;flex-shrink:0;
+  box-shadow:inset 0 1px 0 var(--glass-hi),0 8px 18px rgba(0,0,0,.45);
+  background:conic-gradient(from 90deg at 50% 42%,#8d6b4f 0 25%,#7a5a40 0 50%,#8d6b4f 0 75%,#6f5138 0)}
+.skin-lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:12px}
+.skin-card{padding:14px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;transition:.15s;
+  border-radius:12px;border:1px solid var(--glass-line);background:var(--glass2)}
+.skin-card:hover{transform:translateY(-2px)}
+.skin-card.cur{box-shadow:0 0 0 1.5px var(--grass), inset 0 1px 0 var(--glass-hi)}
+.skin-card .mini{width:46px;height:46px;image-rendering:pixelated;border-radius:8px}
+.skin-card b{font-size:11.5px;word-break:break-all;text-align:center;line-height:1.3}
+.skin-card.upload{justify-content:center;color:var(--muted);font-size:12px;min-height:112px;border-style:dashed;text-align:center}
+
+/* ── feature: worlds & backups ── */
+.wrow{display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:10px}
+.wicon{width:42px;height:42px;border-radius:10px;flex-shrink:0;box-shadow:inset 0 1px 0 var(--glass-hi);
+  background:linear-gradient(135deg,#2c4a1d,#5a4514)}
+.wrow b{font-size:14px;display:block}
+.wrow small{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
+.wbackups{padding:6px 14px;margin:-4px 0 12px 56px;border-radius:12px}
+.tl-item{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--glass-line);font-size:12.5px}
+.tl-item:first-child{border-top:0}
+.tl-dot{width:9px;height:9px;border-radius:50%;background:var(--grass);flex-shrink:0}
+.tl-item small{color:var(--muted);font-family:var(--mono);font-size:10.5px}
+.tl-item .btn{margin-left:auto;padding:5px 12px;font-size:11px}
+
+/* ── feature: screenshots ── */
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.shot{border-radius:12px;overflow:hidden;position:relative;height:132px;cursor:pointer;
+  border:1px solid var(--glass-line);transition:.15s;background:#141a17 center/cover no-repeat}
+.shot:hover{transform:scale(1.02);box-shadow:0 12px 26px rgba(0,0,0,.45)}
+.shot .meta{position:absolute;inset:auto 0 0 0;padding:8px 11px;
+  background:linear-gradient(transparent,rgba(0,0,0,.8));font-family:var(--mono);font-size:10px;color:#cfd8d0}
+
+/* ── HOME: when packs are shown, let the page flow/scroll instead of hard-fitting ── */
+#s-home.has-packs{overflow-y:auto;padding-right:6px}
+#s-home.has-packs .grid-2{flex:0 0 auto;min-height:300px}
+#s-home.has-packs #newsList{overflow-y:auto;max-height:360px}
+#s-home.has-packs .ad-server{min-height:300px}
+
+/* ── HOME: installed modpacks strip ── */
+.home-packs{flex-shrink:0;margin-top:16px}
+.hp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hp-head h3{font-size:15px;font-weight:800}
+.hp-row{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px}
+.hp-card{flex-shrink:0;width:200px;border-radius:13px;overflow:hidden;border:1px solid var(--glass-line);
+  background:var(--glass2);box-shadow:inset 0 1px 0 var(--glass-hi);display:flex;flex-direction:column}
+.hp-top{height:66px;display:flex;align-items:center;gap:10px;padding:0 12px;
+  background:linear-gradient(135deg,#243b17,#141a17);background-size:cover;background-position:center}
+.hp-ico{width:40px;height:40px;border-radius:9px;flex-shrink:0;background:#0b0e10 center/cover no-repeat;
+  box-shadow:0 2px 8px rgba(0,0,0,.5),inset 0 1px 0 var(--glass-hi)}
+.hp-body{padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.hp-body b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hp-body small{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.hp-actions{display:flex;gap:6px;margin-top:8px}
+.hp-actions .btn{padding:6px 10px;font-size:11.5px;flex:1}
+
+/* version "install" button state */
+.vrow .btn.installing{opacity:.7;pointer-events:none}
+
+/* ── modpack install modal ── */
+.pmodal{position:fixed;inset:0;z-index:210;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:rgba(6,9,8,.78);backdrop-filter:blur(12px)}
+.pmodal[hidden]{display:none}
+.pm-card{width:min(560px,100%);max-height:82vh;display:flex;flex-direction:column;padding:20px;border-radius:16px}
+.pm-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pm-head b{font-family:'Unbounded';font-size:16px}
+.pm-sub{font-size:12px;color:var(--muted);margin:6px 0 14px}
+.pm-body{overflow-y:auto;display:flex;flex-direction:column;gap:9px;min-height:0}
+.pv-row{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:11px;
+  border:1px solid var(--glass-line);background:rgba(255,255,255,.04)}
+.pv-row.pv-pick{cursor:pointer;transition:.13s}
+.pv-row.pv-pick:hover{background:rgba(107,191,59,.12);border-color:rgba(107,191,59,.35)}
+.pv-row b{font-size:13px;display:block}
+.pv-row small{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.pv-badge{font-family:var(--mono);font-size:9.5px;padding:2px 7px;border-radius:5px;
+  background:rgba(151,113,235,.16);color:#b58cf2}
+.pv-soon{font-size:10.5px;color:var(--gold);font-family:var(--mono)}
+
+/* ── unified glass dialog (confirm / alert) ── */
+.dlg{position:fixed;inset:0;z-index:240;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:rgba(6,9,8,.62);backdrop-filter:blur(10px)}
+.dlg[hidden]{display:none}
+.dlg-card{width:min(420px,100%);padding:22px;border-radius:16px;animation:ddin .16s ease}
+.dlg-title{font-family:'Unbounded';font-size:15px;display:block;margin-bottom:8px}
+.dlg-msg{font-size:13.5px;color:var(--text);line-height:1.55;white-space:pre-wrap;margin-bottom:18px}
+.dlg-actions{display:flex;gap:10px;justify-content:flex-end}
+.dlg-actions .btn{min-width:92px;padding:10px 16px}
+
+/* ── background download / install panel (bottom-right) ── */
+.dlpanel{position:fixed;right:16px;bottom:16px;z-index:150;width:320px;max-width:calc(100vw - 32px);
+  border-radius:14px;overflow:hidden;border:1px solid var(--glass-hi);
+  background:rgba(16,22,20,.96);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:0 18px 46px rgba(0,0,0,.55),inset 0 1px 0 var(--glass-hi)}
+.dlpanel[hidden]{display:none}
+.dl-head{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;
+  font:800 12.5px 'Manrope';border-bottom:1px solid var(--glass-line)}
+.dl-min{width:24px;height:22px;border:0;border-radius:6px;background:rgba(255,255,255,.06);color:var(--text);cursor:pointer}
+.dl-min:hover{background:rgba(255,255,255,.14)}
+.dlpanel.min .dl-list{display:none}
+.dlpanel.min .dl-min{transform:rotate(180deg)}
+.dl-list{max-height:260px;overflow-y:auto;padding:10px 13px;display:flex;flex-direction:column;gap:12px}
+.dl-job b{font-size:12.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl-job small{font-family:var(--mono);font-size:10.5px;color:var(--muted);display:block;margin:2px 0 6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl-bar{height:7px;border-radius:5px;background:rgba(255,255,255,.09);overflow:hidden}
+.dl-fill{height:100%;width:0;border-radius:5px;transition:width .2s;
+  background:linear-gradient(90deg,var(--grass-dark),var(--grass))}
+.dl-fill.indet{width:35%;animation:dlslide 1.1s ease-in-out infinite}
+@keyframes dlslide{0%{margin-left:-35%}100%{margin-left:100%}}
+.dl-job.ok .dl-fill{background:var(--grass);width:100%!important}
+.dl-job.err .dl-fill{background:var(--red);width:100%!important}
+.dl-job.ok small{color:var(--grass)}
+.dl-job.err small{color:var(--red)}
+
+/* ── in-app screenshot viewer + editor ── */
+.viewer{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;
+  background:rgba(6,9,8,.86);backdrop-filter:blur(16px)}
+.viewer[hidden]{display:none}
+.vw-bar{display:flex;align-items:center;gap:12px;padding:10px 14px;flex-shrink:0;
+  background:rgba(16,22,20,.9);border-bottom:1px solid var(--glass-line)}
+.vw-name{font-family:var(--mono);font-size:12px;color:var(--muted);max-width:260px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.vw-tools{display:flex;align-items:center;gap:5px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+.vw-b{height:30px;min-width:30px;padding:0 9px;border:1px solid var(--glass-line);border-radius:8px;cursor:pointer;
+  background:rgba(255,255,255,.05);color:var(--text);font:700 13px 'Manrope';display:grid;place-items:center;transition:.13s}
+.vw-b:hover{background:rgba(255,255,255,.13)}
+.vw-b.active{background:rgba(107,191,59,.85);color:#0c1506;border-color:transparent}
+.vw-b.primary{background:linear-gradient(180deg,rgba(255,255,255,.2),transparent),rgba(107,191,59,.9);color:#0c1506;border-color:transparent}
+.vw-b.danger{color:var(--red);border-color:rgba(224,86,74,.35)}
+.vw-b.danger:hover{background:rgba(224,86,74,.16)}
+.vw-b.vw-close:hover{background:var(--red);color:#fff}
+.vw-sep{width:1px;height:20px;background:var(--glass-line);margin:0 3px}
+.vw-zoom{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:42px;text-align:center}
+#vwColor{width:30px;height:30px;padding:0;border:1px solid var(--glass-line);border-radius:8px;background:none;cursor:pointer}
+.vw-stage{flex:1;min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center;padding:24px}
+.vw-wrap{position:relative;margin:auto;flex-shrink:0;line-height:0;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);background:
+   repeating-conic-gradient(#2a302e 0 25%,#232927 0 50%) 0 0/24px 24px}
+#vwCanvas{display:block;image-rendering:auto}
+.vw-wrap.crop #vwCanvas,.vw-wrap.crop{cursor:crosshair}
+.vw-wrap.pen #vwCanvas{cursor:crosshair}
+.vw-cropbox{position:absolute;border:1.5px dashed var(--grass);background:rgba(107,191,59,.14);
+  box-shadow:0 0 0 9999px rgba(0,0,0,.45);pointer-events:none}
+.vw-cropbox[hidden]{display:none}
+.vw-hint{flex-shrink:0;text-align:center;padding:7px;font-family:var(--mono);font-size:11px;color:var(--muted);
+  background:rgba(16,22,20,.9);border-top:1px solid var(--glass-line)}
+</style>
+</head>
+<body>
+<div class="bgfx"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+
+<!-- window chrome -->
+<div class="titlebar" id="titlebar">
+  <span class="tb-brand"><span class="tb-cube"></span>Block<b><span>ify</span></b> Launcher</span>
+  <div class="tb-btns">
+    <button class="wb" id="winMin" title="Свернуть">&#9472;</button>
+    <button class="wb" id="winMax" title="Развернуть">&#9633;</button>
+    <button class="wb wb-close" id="winClose" title="Закрыть">&#10005;</button>
+  </div>
+</div>
+<div class="rsz rsz-t" data-d="top"></div>
+<div class="rsz rsz-b" data-d="bottom"></div>
+<div class="rsz rsz-l" data-d="left"></div>
+<div class="rsz rsz-r" data-d="right"></div>
+<div class="rsz rsz-tl" data-d="top-left"></div>
+<div class="rsz rsz-tr" data-d="top-right"></div>
+<div class="rsz rsz-bl" data-d="bottom-left"></div>
+<div class="rsz rsz-br" data-d="bottom-right"></div>
+
+<div class="window">
+  <aside class="sidebar glass">
+    <div class="logo" id="logoDrag">
+      <div class="logo-cube"></div>
+      <div><b>Block<span style="color:var(--grass)">ify</span></b><span id="verTag">v1.0.0 · glass</span></div>
+    </div>
+    <nav class="nav">
+      <button class="active" data-s="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg><span>Главная</span></button>
+      <button data-s="versions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8V21H3V8M1 3h22v5H1zM10 12h4"/></svg><span>Версии</span></button>
+      <button data-s="packs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span>Сборки</span></button>
+      <button data-s="worlds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.6 3.8 9S14.5 18.5 12 21C9.5 18.5 8.2 15.4 8.2 12S9.5 5.5 12 3z"/></svg><span>Миры</span></button>
+      <button data-s="screens"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 18 5-5 3 3 3-3 3 3"/></svg><span>Скриншоты</span></button>
+      <button data-s="accounts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Аккаунты</span></button>
+      <button data-s="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9c.3.6.9 1 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Настройки</span></button>
+    </nav>
+    <div class="spacer"></div>
+    <div class="account" id="accountCard">
+      <div class="skin" id="accSkin"></div>
+      <div><b id="curName">—</b><span id="curType">оффлайн</span></div>
+      <div class="dot"></div>
+    </div>
+  </aside>
+
+  <main class="main glass">
+    <!-- HOME -->
+    <section class="screen active" id="s-home">
+      <div class="hero">
+        <h2 id="heroTitle">Готов к запуску</h2>
+        <p id="heroSub">Выбери версию и нажми «Играть».</p>
+        <div class="launch-row">
+          <button class="btn-play" id="playBtn">▶&nbsp; ИГРАТЬ</button>
+          <div class="ver-select gdd" id="verSelect" tabindex="0">
+            <span>Версия:</span><b id="verValue">—</b><span class="caret">▾</span>
+            <div class="gdd-menu" id="verMenu"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="home-packs" id="homePacks" hidden>
+        <div class="hp-head"><h3>Мои сборки</h3><button class="btn" id="hpAll">Все сборки →</button></div>
+        <div class="hp-row" id="hpRow"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card glass" id="newsCard" style="background:var(--glass2)">
+          <h3>Новости <span class="tag">RU/UA</span></h3>
+          <div id="newsList"><div class="empty">Загрузка новостей…</div></div>
+        </div>
+
+        <div class="ad-server glass" style="background:var(--glass2)">
+          <span class="ad-mark">Реклама</span>
+          <div class="art"></div>
+          <div class="body">
+            <b>GIGACRAFT</b>
+            <p>Сервер выживания 1.21.4 · без вайпов · кланы и ивенты каждую неделю</p>
+            <div class="online">● онлайн: 1 247 игроков</div>
+            <button class="ad-cta">Играть → mc.gigacraft.ua</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ad-banner glass" style="background:var(--glass2)">
+        <span class="ad-mark">Реклама</span>
+        <div class="hicon">🖥</div>
+        <div class="btxt">
+          <b>MineHost — свой сервер за 5 минут</b>
+          <span>NVMe-диски · защита от DDoS · панель на русском · от <span class="price">99 ₴/мес</span></span>
+        </div>
+        <button class="ad-cta">Создать сервер</button>
+      </div>
+    </section>
+
+    <!-- VERSIONS -->
+    <section class="screen" id="s-versions">
+      <h1>Управление версиями</h1>
+      <div class="sub">Установленные версии и загрузчики — локальные и из Mojang</div>
+      <div class="toolbar" id="verFilters">
+        <button class="chip on" data-f="all">Все</button>
+        <button class="chip" data-f="release">Релизы</button>
+        <button class="chip" data-f="snapshot">Снапшоты</button>
+        <button class="chip" data-f="old">Старые</button>
+      </div>
+      <div id="versionsList"><div class="empty">Загрузка версий…</div></div>
+    </section>
+
+    <!-- PACKS -->
+    <section class="screen" id="s-packs">
+      <h1>Сборки</h1>
+      <div class="sub">Твои сборки, установленные моды и каталог модпаков Modrinth</div>
+
+      <!-- installed modpacks management -->
+      <h3 class="cat-head" style="margin-top:6px">Установленные сборки <span class="tag" id="myPacksCount"></span></h3>
+      <div id="myPacksList"><div class="empty">Пока нет установленных сборок — выбери в каталоге ниже</div></div>
+
+      <!-- installed mod updates (real: <mc>/mods matched on Modrinth by hash) -->
+      <div class="mods-head">
+        <h3>Обновления модов <span class="tag" id="modsCount">—</span></h3>
+        <div class="mods-actions">
+          <button class="btn" id="modsRefresh">Проверить</button>
+          <button class="btn" id="modsFolder">Папка модов</button>
+        </div>
+      </div>
+      <div id="modsList"><div class="empty">Открой раздел — проверю моды в папке mods…</div></div>
+
+      <h3 class="cat-head">Каталог модпаков</h3>
+      <div class="pack-search">
+        <input id="packQuery" placeholder="Поиск сборок…" autocomplete="off">
+        <input id="packMc" class="pack-mc" placeholder="MC, напр. 1.20.1" autocomplete="off">
+        <select id="packSort">
+          <option value="relevance">Релевантность</option>
+          <option value="downloads">Загрузки</option>
+          <option value="follows">Подписки</option>
+          <option value="updated">Обновление</option>
+          <option value="newest">Новизна</option>
+        </select>
+      </div>
+      <div class="toolbar" id="packFilters">
+        <button class="chip on" data-f="">Все</button>
+        <button class="chip" data-f="fabric">Fabric</button>
+        <button class="chip" data-f="forge">Forge</button>
+        <button class="chip" data-f="neoforge">NeoForge</button>
+        <button class="chip" data-f="quilt">Quilt</button>
+      </div>
+      <div class="packs" id="packsList"><div class="empty">Загрузка сборок…</div></div>
+    </section>
+
+    <!-- ACCOUNTS -->
+    <section class="screen" id="s-accounts">
+      <h1>Аккаунты</h1>
+      <div class="sub">Профили для входа. Активный используется при запуске.</div>
+      <div id="accList"></div>
+      <div class="add-grid">
+        <div class="add-card glass" style="background:var(--glass2)">
+          <h3>Лицензионный аккаунт</h3>
+          <p>Вход через Microsoft: официальные сервера, скины и Realms. Пароль в лаунчер не вводится.</p>
+          <button class="btn primary" id="msLogin" style="align-self:flex-start">Войти через Microsoft</button>
+          <div class="hint">Откроется окно авторизации Microsoft.</div>
+        </div>
+        <div class="add-card glass" style="background:var(--glass2)">
+          <h3>Оффлайн-профиль</h3>
+          <p>Локальный профиль по нику — для одиночной игры и серверов без проверки лицензии.</p>
+          <input type="text" id="offNick" placeholder="Никнейм (3–16 символов)" maxlength="16">
+          <button class="btn" id="addOffline" style="align-self:flex-start">Добавить профиль</button>
+        </div>
+      </div>
+
+      <!-- skins for offline profiles (real: local PNG library, stored per account) -->
+      <h3 class="cat-head">Скины оффлайн-профилей</h3>
+      <div class="sub">Для лицензии скин берётся из профиля Microsoft. Для оффлайн-профилей — локальная библиотека PNG 64×64. Выбери профиль, затем скин из библиотеки.</div>
+      <div class="skin-grid">
+        <div class="skin-preview glass" style="background:var(--glass2)">
+          <div class="skin-face" id="skinFace"></div>
+          <div style="text-align:center"><b id="skinAccName">—</b><br><small id="skinAccHint" style="color:var(--muted);font-family:var(--mono);font-size:10.5px">выбери оффлайн-профиль</small></div>
+          <select id="skinAccSel" style="width:100%"></select>
+        </div>
+        <div>
+          <div class="skin-lib" id="skinLib"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORLDS & BACKUPS -->
+    <section class="screen" id="s-worlds">
+      <h1>Миры и бэкапы</h1>
+      <div class="sub">Миры из папки saves. Бэкап пакует мир в zip; перед восстановлением текущий мир сохраняется автоматически.</div>
+      <div style="display:flex;gap:10px;margin-bottom:16px">
+        <button class="btn" id="worldsRefresh">Обновить</button>
+        <button class="btn" id="savesFolder">Папка saves</button>
+      </div>
+      <div id="worldsList"><div class="empty">Загрузка миров…</div></div>
+    </section>
+
+    <!-- SCREENSHOTS -->
+    <section class="screen" id="s-screens">
+      <h1>Скриншоты</h1>
+      <div class="sub">Всё, что снято по F2, из папки screenshots. Клик — открыть в просмотрщике.</div>
+      <div style="display:flex;gap:10px;margin-bottom:16px">
+        <button class="btn" id="screensRefresh">Обновить</button>
+        <button class="btn" id="screensFolder">Открыть папку</button>
+      </div>
+      <div class="shots" id="shotsList"><div class="empty">Загрузка скриншотов…</div></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="screen" id="s-settings">
+      <h1>Настройки</h1>
+      <div class="sub">Параметры игры и лаунчера</div>
+      <div class="set-grid">
+        <div class="set-card glass" style="background:var(--glass2)">
+          <h3>Игра</h3>
+          <div class="field"><label>Оперативная память — <span class="ram-val" id="ramVal">6 ГБ</span></label>
+            <input type="range" id="ramRange" min="2" max="16" value="6"></div>
+          <div class="field"><label>Версия Java</label><select id="javaSel"></select></div>
+          <div class="field"><label>Папка Minecraft</label><input type="text" id="mcDir"></div>
+        </div>
+        <div class="set-card glass" style="background:var(--glass2)">
+          <h3>Лаунчер</h3>
+          <div class="field"><label>Язык</label><select id="langSel"><option>Русский</option><option>Українська</option><option>English</option></select></div>
+          <div class="field"><label>Любимый сервер</label><input type="text" id="favServer" placeholder="mc.example.net"></div>
+          <div class="switch-row">Закрывать лаунчер после запуска игры <label class="sw"><input type="checkbox" id="swClose"><i></i></label></div>
+          <div class="switch-row">Оптимизированные JVM-флаги <label class="sw"><input type="checkbox" id="swJvm"><i></i></label></div>
+          <div class="switch-row">Discord-статус <label class="sw"><input type="checkbox" id="swDiscord"><i></i></label></div>
+          <div class="switch-row">Показывать снапшоты <label class="sw"><input type="checkbox" id="swSnap"><i></i></label></div>
+        </div>
+      </div>
+      <div class="footnote" id="footVer">// Blockify</div>
+    </section>
+  </main>
+</div>
+
+<!-- in-app screenshot viewer + editor -->
+<div class="viewer" id="viewer" hidden>
+  <div class="vw-bar">
+    <span class="vw-name" id="vwName">—</span>
+    <div class="vw-tools">
+      <button class="vw-b" data-t="prev" title="Предыдущий (←)">‹</button>
+      <button class="vw-b" data-t="next" title="Следующий (→)">›</button>
+      <span class="vw-sep"></span>
+      <button class="vw-b" data-t="zoomout" title="Уменьшить">－</button>
+      <span class="vw-zoom" id="vwZoom">100%</span>
+      <button class="vw-b" data-t="zoomin" title="Увеличить">＋</button>
+      <button class="vw-b" data-t="fit" title="Вписать">⤢</button>
+      <span class="vw-sep"></span>
+      <button class="vw-b" data-t="rotl" title="Влево 90°">⟲</button>
+      <button class="vw-b" data-t="rotr" title="Вправо 90°">⟳</button>
+      <button class="vw-b" data-t="crop" title="Обрезать">⛶</button>
+      <button class="vw-b" data-t="pen" title="Рисовать">✎</button>
+      <input type="color" id="vwColor" value="#ff4d4d" title="Цвет кисти">
+      <button class="vw-b" data-t="undo" title="Отменить">↶</button>
+      <button class="vw-b" data-t="reset" title="Сбросить всё">Сброс</button>
+      <span class="vw-sep"></span>
+      <button class="vw-b primary" data-t="save" title="Перезаписать">Сохранить</button>
+      <button class="vw-b" data-t="copy" title="Сохранить копию">Копия</button>
+      <button class="vw-b danger" data-t="del" title="В корзину">Удалить</button>
+      <button class="vw-b" data-t="ext" title="Открыть системно">↗</button>
+      <button class="vw-b vw-close" data-t="close" title="Закрыть (Esc)">✕</button>
+    </div>
+  </div>
+  <div class="vw-stage" id="vwStage">
+    <div class="vw-wrap" id="vwWrap">
+      <canvas id="vwCanvas"></canvas>
+      <div class="vw-cropbox" id="vwCropBox" hidden></div>
+    </div>
+  </div>
+  <div class="vw-hint" id="vwHint">Загрузка…</div>
+</div>
+
+<!-- unified glass dialog (confirm / alert) -->
+<div class="dlg" id="dlg" hidden>
+  <div class="dlg-card glass">
+    <b class="dlg-title" id="dlgTitle">Blockify</b>
+    <p class="dlg-msg" id="dlgMsg"></p>
+    <div class="dlg-actions">
+      <button class="btn" id="dlgCancel">Отмена</button>
+      <button class="btn primary" id="dlgOk">ОК</button>
+    </div>
+  </div>
+</div>
+
+<!-- background download / install panel -->
+<div class="dlpanel" id="dlPanel" hidden>
+  <div class="dl-head"><span>Загрузки</span><button class="dl-min" id="dlMin" title="Свернуть">▾</button></div>
+  <div class="dl-list" id="dlList"></div>
+</div>
+
+<!-- modpack install (pick a pack version) -->
+<div class="pmodal" id="packModal" hidden>
+  <div class="pm-card glass">
+    <div class="pm-head">
+      <b id="pmTitle">Сборка</b>
+      <button class="vw-b vw-close" id="pmClose" title="Закрыть">✕</button>
+    </div>
+    <div class="pm-sub">Выбери версию сборки — установится в отдельный инстанс, не трогая основную игру.</div>
+    <div class="pm-body" id="pmBody"><div class="empty">Загрузка версий…</div></div>
+  </div>
+</div>
+
+<script>
+  // load app.js with the same cache-bust version as this page
+  (function(){ var v = new URLSearchParams(location.search).get('v') || '';
+    var s = document.createElement('script'); s.src = 'app.js?v=' + v; document.body.appendChild(s); })();
+</script>
+</body>
+</html>
