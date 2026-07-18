@@ -1,0 +1,441 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="account" xml:space="preserve">
+    <value>Account :</value>
+  </data>
+  <data name="apply_button" xml:space="preserve">
+    <value>Apply </value>
+  </data>
+  <data name="display_height" xml:space="preserve">
+    <value>height</value>
+  </data>
+  <data name="display_width" xml:space="preserve">
+    <value>width</value>
+  </data>
+  <data name="start_game" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="version" xml:space="preserve">
+    <value>Minecraft version : </value>
+  </data>
+  <data name="account_setting" xml:space="preserve">
+    <value>Account Setting</value>
+  </data>
+  <data name="none_account" xml:space="preserve">
+    <value>None...</value>
+  </data>
+  <data name="error_no_version" xml:space="preserve">
+    <value>Select a Minecraft version first.</value>
+  </data>
+  <data name="error_no_account" xml:space="preserve">
+    <value>Select an account first.</value>
+  </data>
+  <data name="error_start_failed" xml:space="preserve">
+    <value>Failed to create the game process.</value>
+  </data>
+  <data name="display_section" xml:space="preserve">
+    <value>Display</value>
+  </data>
+  <data name="fullscreen" xml:space="preserve">
+    <value>Fullscreen</value>
+  </data>
+  <data name="system_section" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="ram_utilization" xml:space="preserve">
+    <value>RAM utilization</value>
+  </data>
+  <data name="minecraft_path" xml:space="preserve">
+    <value>Minecraft path</value>
+  </data>
+  <data name="path_button" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="java_version" xml:space="preserve">
+    <value>Java version</value>
+  </data>
+  <data name="edit_button" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="launcher_setting_section" xml:space="preserve">
+    <value>Launcher settings</value>
+  </data>
+  <data name="hide_launcher" xml:space="preserve">
+    <value>Hide the launcher</value>
+  </data>
+  <data name="hide" xml:space="preserve">
+    <value>hide</value>
+  </data>
+  <data name="show" xml:space="preserve">
+    <value>show</value>
+  </data>
+  <data name="launcher_language" xml:space="preserve">
+    <value>Launcher language</value>
+  </data>
+  <data name="version_list" xml:space="preserve">
+    <value>Version list : </value>
+  </data>
+  <data name="save_account" xml:space="preserve">
+    <value>Save account</value>
+  </data>
+  <data name="username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="login_without_password" xml:space="preserve">
+    <value>Login without password</value>
+  </data>
+  <data name="login_microsoft" xml:space="preserve">
+    <value>Login through Microsoft</value>
+  </data>
+  <data name="add_account" xml:space="preserve">
+    <value>+ Add account</value>
+  </data>
+  <data name="delete_account" xml:space="preserve">
+    <value>Delete account</value>
+  </data>
+  <data name="error_title" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="notif_create_account" xml:space="preserve">
+    <value>Create new account</value>
+  </data>
+  <data name="notif_create_account_body" xml:space="preserve">
+    <value>A new account "{0}" has been created.</value>
+  </data>
+  <data name="notif_edit_account" xml:space="preserve">
+    <value>Edit account</value>
+  </data>
+  <data name="notif_edit_account_body" xml:space="preserve">
+    <value>A new username has been set: "{0}".</value>
+  </data>
+  <data name="error_microsoft_login" xml:space="preserve">
+    <value>Microsoft sign-in failed. Make sure the account owns Minecraft: Java Edition.</value>
+  </data>
+  <data name="error_empty_username" xml:space="preserve">
+    <value>Enter a username first.</value>
+  </data>
+  <data name="cap_account" xml:space="preserve">
+    <value>ACCOUNT</value>
+  </data>
+  <data name="cap_version" xml:space="preserve">
+    <value>VERSION</value>
+  </data>
+  <data name="nav_home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="nav_settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="vibe_label" xml:space="preserve">
+    <value>Background vibe</value>
+  </data>
+  <data name="vibe_auto" xml:space="preserve">
+    <value>Auto (time of day)</value>
+  </data>
+  <data name="vibe_ocean" xml:space="preserve">
+    <value>Ocean</value>
+  </data>
+  <data name="vibe_sunset" xml:space="preserve">
+    <value>Sunset</value>
+  </data>
+  <data name="vibe_nether" xml:space="preserve">
+    <value>Nether</value>
+  </data>
+  <data name="vibe_cherry" xml:space="preserve">
+    <value>Cherry grove</value>
+  </data>
+  <data name="vibe_end" xml:space="preserve">
+    <value>The End</value>
+  </data>
+  <data name="nav_packs" xml:space="preserve">
+    <value>Modpacks</value>
+  </data>
+  <data name="packs_all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="packs_open" xml:space="preserve">
+    <value>Open page</value>
+  </data>
+  <data name="packs_offline" xml:space="preserve">
+    <value>Modrinth is unavailable. Check your connection.</value>
+  </data>
+  <data name="news_caption" xml:space="preserve">
+    <value>NEWS</value>
+  </data>
+  <data name="quick_continue" xml:space="preserve">
+    <value>CONTINUE</value>
+  </data>
+  <data name="quick_stats" xml:space="preserve">
+    <value>STATISTICS</value>
+  </data>
+  <data name="quick_server" xml:space="preserve">
+    <value>FAVORITE SERVER</value>
+  </data>
+  <data name="quick_launches" xml:space="preserve">
+    <value>launches</value>
+  </data>
+  <data name="quick_no_launches" xml:space="preserve">
+    <value>no launches yet</value>
+  </data>
+  <data name="quick_last" xml:space="preserve">
+    <value>last:</value>
+  </data>
+  <data name="server_online" xml:space="preserve">
+    <value>online · {0} ms</value>
+  </data>
+  <data name="server_offline" xml:space="preserve">
+    <value>offline</value>
+  </data>
+  <data name="show_versions_prefix" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="display_size" xml:space="preserve">
+    <value>Game window size</value>
+  </data>
+  <data name="restart_required" xml:space="preserve">
+    <value>Takes effect after restarting the launcher.</value>
+  </data>
+  <data name="favorite_server_label" xml:space="preserve">
+    <value>Favorite server</value>
+  </data>
+  <data name="show_snapshots" xml:space="preserve">
+    <value>Snapshots</value>
+  </data>
+  <data name="show_betas" xml:space="preserve">
+    <value>Old betas</value>
+  </data>
+  <data name="show_alphas" xml:space="preserve">
+    <value>Old alphas</value>
+  </data>
+  <data name="releases_always" xml:space="preserve">
+    <value>Releases are always shown</value>
+  </data>
+  <data name="mb" xml:space="preserve">
+    <value>MB</value>
+  </data>
+  <data name="saved" xml:space="preserve">
+    <value>Saved</value>
+  </data>
+  <data name="packs_search" xml:space="preserve">
+    <value>Search modpacks…</value>
+  </data>
+  <data name="cat_all" xml:space="preserve">
+    <value>All categories</value>
+  </data>
+  <data name="cat_optimization" xml:space="preserve">
+    <value>Optimization</value>
+  </data>
+  <data name="cat_adventure" xml:space="preserve">
+    <value>Adventure</value>
+  </data>
+  <data name="cat_magic" xml:space="preserve">
+    <value>Magic</value>
+  </data>
+  <data name="cat_technology" xml:space="preserve">
+    <value>Technology</value>
+  </data>
+  <data name="cat_quests" xml:space="preserve">
+    <value>Quests</value>
+  </data>
+  <data name="cat_combat" xml:space="preserve">
+    <value>Combat</value>
+  </data>
+  <data name="sort_downloads" xml:space="preserve">
+    <value>By downloads</value>
+  </data>
+  <data name="sort_newest" xml:space="preserve">
+    <value>Newest</value>
+  </data>
+  <data name="sort_updated" xml:space="preserve">
+    <value>Recently updated</value>
+  </data>
+  <data name="sort_follows" xml:space="preserve">
+    <value>By followers</value>
+  </data>
+  <data name="versions_any" xml:space="preserve">
+    <value>Any version</value>
+  </data>
+  <data name="sec_game" xml:space="preserve">
+    <value>Game</value>
+  </data>
+  <data name="sec_java" xml:space="preserve">
+    <value>Java &amp; files</value>
+  </data>
+  <data name="sec_launcher" xml:space="preserve">
+    <value>Launcher</value>
+  </data>
+  <data name="sec_versions" xml:space="preserve">
+    <value>Versions</value>
+  </data>
+  <data name="sec_data" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="screen_section" xml:space="preserve">
+    <value>Screen</value>
+  </data>
+  <data name="perf_section" xml:space="preserve">
+    <value>Performance</value>
+  </data>
+  <data name="behavior_section" xml:space="preserve">
+    <value>Behaviour</value>
+  </data>
+  <data name="jvm_aikar" xml:space="preserve">
+    <value>Optimized JVM flags</value>
+  </data>
+  <data name="jvm_aikar_hint" xml:space="preserve">
+    <value>Aikar GC flags for smoother gameplay</value>
+  </data>
+  <data name="ram_hint" xml:space="preserve">
+    <value>4–8 GB recommended</value>
+  </data>
+  <data name="parade_label" xml:space="preserve">
+    <value>Mob parade</value>
+  </data>
+  <data name="discord_label" xml:space="preserve">
+    <value>Discord status</value>
+  </data>
+  <data name="cache_label" xml:space="preserve">
+    <value>News and artwork cache</value>
+  </data>
+  <data name="clear_cache" xml:space="preserve">
+    <value>Clear cache</value>
+  </data>
+  <data name="open_data" xml:space="preserve">
+    <value>Open data folder</value>
+  </data>
+  <data name="check_updates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="up_to_date" xml:space="preserve">
+    <value>You are up to date</value>
+  </data>
+  <data name="update_available" xml:space="preserve">
+    <value>Update {0} is available — opening the release page</value>
+  </data>
+  <data name="no_releases" xml:space="preserve">
+    <value>No releases published yet</value>
+  </data>
+  <data name="hero_ready" xml:space="preserve">
+    <value>Ready to launch</value>
+  </data>
+  <data name="quick_continue_btn" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+</root>
