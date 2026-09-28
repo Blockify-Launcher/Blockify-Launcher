@@ -221,17 +221,22 @@ const TimeMachine = (function(){
   function close(){ root.setAttribute('hidden',''); slug = ''; }
   function render(forSlug, items){
     if (!slug || slug !== forSlug) return;
-    if (!items || !items.length){ body.innerHTML = '<div class="empty">Снимков пока нет — сделай первый кнопкой выше</div>'; return; }
-    body.innerHTML = items.map((s, i) => `
-      <div class="sn-row${s.same ? ' cur' : ''}${s.auto ? '' : ' manual'}" data-i="${i}">
-        <span class="sn-dot" title="${s.auto ? 'авто' : 'вручную'}"></span>
+    if (!items || !items.length){ body.innerHTML = '<div class="empty">Снимков пока нет — сделай первый кнопкой выше: он станет профилем сборки</div>'; return; }
+    const row = (s, manual) => `
+      <div class="sn-row${s.same ? ' cur' : ''}${manual ? ' manual' : ''}">
+        <span class="sn-dot" title="${manual ? 'профиль' : 'авто-снимок'}"></span>
         <div class="grow"><b>${esc(s.label || s.reason || 'снимок')}</b>
-          <small>${esc(s.at)} · ${s.enabled}/${s.mods} модов вкл.${s.hasConfig ? ' · конфиги' : ''}${s.auto ? '' : ' · вручную'}</small></div>
+          <small>${esc(s.at)} · ${s.enabled}/${s.mods} модов вкл.${s.hasConfig ? ' · конфиги' : ''}</small></div>
         <div class="sn-diff" title="Отличия от текущего состояния">${s.same ? '<span class="p">= текущее</span>' :
           `${s.added ? `<span class="p">+${s.added}</span>` : ''}${s.removed ? `<span class="m">−${s.removed}</span>` : ''}${s.toggled ? `<span class="t">~${s.toggled}</span>` : ''}`}</div>
-        ${s.same ? '' : `<button class="btn primary" data-restore="${esc(s.id)}">Откатить</button>`}
-        <button class="btn danger" data-del="${esc(s.id)}" title="Удалить снимок">✕</button>
-      </div>`).join('');
+        ${s.same ? '' : `<button class="btn primary" data-restore="${esc(s.id)}">${manual ? 'Переключиться' : 'Откатить'}</button>`}
+        <button class="btn danger" data-del="${esc(s.id)}" title="Удалить">✕</button>
+      </div>`;
+    const manual = items.filter(s => !s.auto), auto = items.filter(s => s.auto);
+    body.innerHTML =
+      `<div class="mm-count">Профили — именованные наборы модов и конфигов; переключение меняет содержимое сборки без переустановки</div>` +
+      (manual.length ? manual.map(s => row(s, true)).join('') : '<div class="empty" style="padding:14px">Профилей нет — «📸 Снимок сейчас» с подписью создаст первый</div>') +
+      (auto.length ? `<div class="mm-count" style="margin-top:10px">История (авто-снимки перед изменениями)</div>` + auto.map(s => row(s, false)).join('') : '');
     body.querySelectorAll('[data-restore]').forEach(b => b.onclick = () =>
       Dialog.confirm('Вернуть сборку к этому снимку? Текущее состояние сохранится отдельным снимком «перед откатом».', 'Откат сборки', { okText: 'Откатить' })
         .then(ok => { if (!ok) return; JobPanel.update('restore:' + slug, 'Откат сборки', 'Восстанавливаю…', 0, 0); send({ type: 'restoreSnapshot', slug, id: b.dataset.restore }); }));
@@ -342,7 +347,7 @@ function renderMyPacks(items){
         <button class="btn" data-a="mods">Моды</button>
         <button class="btn" data-a="export" title="Экспорт в .mrpack">Экспорт</button>
         <button class="btn" data-a="doctor" title="Crash Doctor — разбор последнего краша">🩺</button>
-        <button class="btn" data-a="time" title="Машина времени — снимки и откат">⏳</button>
+        <button class="btn" data-a="time" title="Профили и машина времени">⏳${p.profiles && p.profiles.length ? ' ' + p.profiles.length : ''}</button>
         <button class="btn" data-a="settings" title="RAM / Java / JVM / окно / буст FPS">⚙</button>
         <button class="btn" data-a="reinstall" title="Докачать/обновить">Починить</button>
         <button class="btn danger" data-a="remove">Удалить</button>

@@ -245,6 +245,7 @@ namespace BlockifyLauncher
             try { await Task.Run(() => Snapshot(p, label.Trim(), "вручную", auto: false)); }
             catch (Exception ex) { HandleException(ex); }
             await PushSnapshotsAsync(slug);
+            PushInstalledPacks();   // profile count on the pack row
         }
 
         private async Task DeleteSnapshotAsync(string slug, string id)
@@ -253,6 +254,7 @@ namespace BlockifyLauncher
             if (p == null) return;
             DeleteSnapshotFiles(p, id);
             await PushSnapshotsAsync(slug);
+            PushInstalledPacks();
         }
     }
 }

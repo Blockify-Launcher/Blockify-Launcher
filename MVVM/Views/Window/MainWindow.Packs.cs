@@ -204,7 +204,9 @@ namespace BlockifyLauncher
             {
                 slug = p.Slug, title = p.Title, icon = p.Icon,
                 mc = p.McVersion, loader = p.Loader, version = p.PackVersion, installed = p.InstalledAt,
-                settings = new { ram = p.RamMb, java = p.JavaPath, jvm = p.JvmArgs, w = p.ScreenW, h = p.ScreenH, fps = p.FpsBoost }
+                settings = new { ram = p.RamMb, java = p.JavaPath, jvm = p.JvmArgs, w = p.ScreenW, h = p.ScreenH, fps = p.FpsBoost },
+                // named (manual) snapshots double as switchable mod profiles
+                profiles = ListManifests(p).Where(m => !m.auto).Select(m => new { m.id, label = m.label.Length > 0 ? m.label : m.at }).ToList()
             }).ToList();
             Post(new { type = "installedPacks", items });
         }
