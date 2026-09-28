@@ -26,6 +26,7 @@ namespace BlockifyLauncher
         private string _packQuery = "";
         private string _packMc = "";
         private string _packSort = "";
+        private string _packType = "modpack";   // modpack | mod | shader | resourcepack
 
         [DllImport("user32.dll")] private static extern bool ReleaseCapture();
 
@@ -137,9 +138,19 @@ namespace BlockifyLauncher
                     _packLoader = m.Value<string>("loader") ?? "";
                     _packMc = m.Value<string>("gameVersion") ?? "";
                     _packSort = m.Value<string>("sort") ?? "";
+                    _packType = m.Value<string>("ptype") is string pt && pt is "mod" or "shader" or "resourcepack" ? pt : "modpack";
                     _ = PushPacksAsync();
                     break;
-                case "openPack": OpenUrl("https://modrinth.com/modpack/" + (m.Value<string>("slug") ?? "")); break;
+                case "openPack":
+                {
+                    string ptOpen = m.Value<string>("ptype") ?? "modpack";
+                    OpenUrl($"https://modrinth.com/{ptOpen}/" + (m.Value<string>("slug") ?? ""));
+                    break;
+                }
+                case "installContent":
+                    _ = InstallContentAsync(m.Value<string>("slug") ?? "", m.Value<string>("title") ?? "",
+                        m.Value<string>("ptype") ?? "mod", m.Value<string>("packSlug") ?? "");
+                    break;
                 case "openLink": OpenUrl(m.Value<string>("url") ?? ""); break;
 
                 case "addOffline": AddOfflineAccount(m.Value<string>("nick") ?? ""); break;
@@ -148,6 +159,7 @@ namespace BlockifyLauncher
                 case "removeAccount": RemoveAccount(m.Value<string>("id") ?? ""); break;
 
                 case "setting": ApplySetting(m.Value<string>("key") ?? "", m["value"]); break;
+                case "browseJava": BrowseJava(); break;
 
                 // ── feature screens ──
                 case "loadScreens": PushScreenshots(); break;
@@ -180,6 +192,22 @@ namespace BlockifyLauncher
                 case "openPackFolder": OpenPackFolder(m.Value<string>("slug") ?? ""); break;
                 case "openPackMods": OpenPackMods(m.Value<string>("slug") ?? ""); break;
                 case "reinstallPack": _ = ReinstallPack(m.Value<string>("slug") ?? ""); break;
+                case "savePackSettings": SavePackSettings(m.Value<string>("slug") ?? "", m["settings"]); break;
+                case "exportPack": _ = ExportPackAsync(m.Value<string>("slug") ?? ""); break;
+                case "importPack": _ = ImportPackAsync(); break;
+                case "diagnosePack": _ = DiagnosePackAsync(m.Value<string>("slug") ?? "", auto: false); break;
+                case "loadSnapshots": _ = PushSnapshotsAsync(m.Value<string>("slug") ?? ""); break;
+                case "makeSnapshot": _ = MakeSnapshotAsync(m.Value<string>("slug") ?? "", m.Value<string>("label") ?? ""); break;
+                case "restoreSnapshot": _ = RestoreSnapshotAsync(m.Value<string>("slug") ?? "", m.Value<string>("id") ?? ""); break;
+                case "deleteSnapshot": _ = DeleteSnapshotAsync(m.Value<string>("slug") ?? "", m.Value<string>("id") ?? ""); break;
+                case "crashFix":
+                    _ = ApplyCrashFixAsync(m.Value<string>("slug") ?? "", m.Value<string>("kind") ?? "",
+                        m.Value<string>("file") ?? "", m.Value<string>("modSlug") ?? "", m.Value<int?>("ram") ?? 0);
+                    break;
+                case "loadPackMods": _ = PushPackModsAsync(m.Value<string>("slug") ?? ""); break;
+                case "togglePackMod": _ = TogglePackModAsync(m.Value<string>("slug") ?? "", m.Value<string>("file") ?? ""); break;
+                case "updatePackMod": _ = UpdatePackModAsync(m.Value<string>("slug") ?? "", m.Value<string>("file") ?? "", m.Value<string>("hash") ?? ""); break;
+                case "deletePackMod": _ = DeletePackModAsync(m.Value<string>("slug") ?? "", m.Value<string>("file") ?? ""); break;
                 case "installVersion": _ = InstallVersionAsync(m.Value<string>("name") ?? ""); break;
             }
         }
@@ -213,7 +241,8 @@ namespace BlockifyLauncher
                     swJvm = s.GetJvmAikar(),
                     swDiscord = s.GetDiscordRpc(),
                     swSnap = s.GetShowSnapshots(),
-                    swClose = s.GetHideLauncher() == 0   // true = close launcher after game starts
+                    swClose = s.GetHideLauncher() == 0,  // true = close launcher after game starts
+                    lang = s.GetLanguage() ?? "ru-RU"
                 },
                 javaList = new[] { s.GetJavaPath() ?? "javaw.exe" }
             });
@@ -379,7 +408,37 @@ namespace BlockifyLauncher
                 case "swDiscord": s.SetDiscordRpc(val.Value<bool>()); break;
                 case "swSnap": s.SetShowSnapshots(val.Value<bool>()); break;
                 case "swClose": s.SetHideLauncher(val.Value<bool>() ? 0 : 1); break;
+                case "java":
+                {
+                    string p = (val.Value<string>() ?? "").Trim();
+                    s.SetJavaPath(p.Length == 0 ? "javaw.exe" : p);   // empty = auto (launcher-managed JRE)
+                    break;
+                }
+                case "lang":
+                {
+                    string lang = val.Value<string>() ?? "";
+                    if (lang.Length > 0)
+                    {
+                        s.SetLauguage(lang);
+                        try { ResxLocalizationProvider.Instance.ChangeLanguage(lang); } catch { }
+                    }
+                    break;
+                }
             }
+        }
+
+        // pick javaw.exe through the system dialog; result goes back to the settings field
+        private void BrowseJava()
+        {
+            var dlg = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Выбери javaw.exe",
+                Filter = "Java|javaw.exe;java.exe|Все файлы|*.*",
+                CheckFileExists = true
+            };
+            if (dlg.ShowDialog(this) != true) return;
+            new Properties.Settings().SetJavaPath(dlg.FileName);
+            Post(new { type = "javaPath", path = dlg.FileName });
         }
 
         // ── content: news + packs ──
@@ -410,12 +469,13 @@ namespace BlockifyLauncher
                     query: string.IsNullOrWhiteSpace(_packQuery) ? null : _packQuery,
                     gameVersion: string.IsNullOrWhiteSpace(_packMc) ? null : _packMc.Trim(),
                     sortIndex: string.IsNullOrEmpty(_packSort) ? null : _packSort,
-                    limit: 30);
+                    limit: 30, projectType: _packType);
             }
             catch { packs = new List<ModpackInfo>(); }
 
             var items = packs.Select(p => new
             {
+                ptype = _packType,
                 slug = p.Slug,
                 title = p.Title,
                 description = p.Description,

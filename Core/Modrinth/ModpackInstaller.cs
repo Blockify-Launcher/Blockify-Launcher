@@ -37,6 +37,17 @@ namespace BlockifyLauncher.Core.Modrinth
         public string PackVersion = "";   // human version number (e.g. v26.5)
         public string VersionId = "";     // Modrinth version id (for repair/reinstall)
         public string InstalledAt = "";
+
+        // per-pack launch overrides (0 / empty = use the launcher's global setting)
+        public int RamMb = 0;
+        public string JavaPath = "";
+        public string JvmArgs = "";
+        public int ScreenW = 0;
+        public int ScreenH = 0;
+
+        // one-click FPS boost: optimisation mods added by the launcher (tracked so it can be undone)
+        public bool FpsBoost = false;
+        public List<string> FpsFiles = new();
     }
 
     /// <summary>
@@ -90,16 +101,27 @@ namespace BlockifyLauncher.Core.Modrinth
         {
             log?.Report(new("Скачиваю .mrpack…", 0, 0));
             var mrpackBytes = await Http.GetByteArrayAsync(ver.MrpackUrl);
+            return await InstallFromMrpackAsync(mrpackBytes, slug, title, icon, ver.VersionNumber, ver.Id, ver.GameVersion,
+                versionsDir, instanceDir, log, installLoader);
+        }
 
+        /// <summary>Installs a .mrpack already in memory (catalog download or a local file).</summary>
+        public static async Task<InstalledPack> InstallFromMrpackAsync(
+            byte[] mrpackBytes, string slug, string title, string icon, string packVersion, string versionId, string fallbackMc,
+            string versionsDir, string instanceDir, IProgress<InstallProgress>? log,
+            Func<string, string, string, Task<string>>? installLoader = null)
+        {
             using var zip = new ZipArchive(new MemoryStream(mrpackBytes), ZipArchiveMode.Read);
             var indexEntry = zip.GetEntry("modrinth.index.json")
                 ?? throw new InvalidOperationException("В .mrpack нет modrinth.index.json");
             JObject index;
             using (var r = new StreamReader(indexEntry.Open()))
                 index = JObject.Parse(await r.ReadToEndAsync());
+            if (string.IsNullOrWhiteSpace(title)) title = index.Value<string>("name") ?? slug;
+            if (string.IsNullOrWhiteSpace(packVersion)) packVersion = index.Value<string>("versionId") ?? "local";
 
             var deps = (JObject?)index["dependencies"] ?? new JObject();
-            string mc = deps.Value<string>("minecraft") ?? ver.GameVersion;
+            string mc = deps.Value<string>("minecraft") ?? fallbackMc;
 
             string loader, loaderVer;
             if (deps["fabric-loader"] != null) { loader = "fabric"; loaderVer = deps.Value<string>("fabric-loader")!; }
@@ -109,29 +131,7 @@ namespace BlockifyLauncher.Core.Modrinth
             else throw new NotSupportedException("Не удалось определить загрузчик модов этой сборки.");
 
             // 1. install the loader → get the launch profile id
-            log?.Report(new($"Ставлю загрузчик {loader} {loaderVer}…", 0, 0));
-            string versionName;
-            if (loader is "fabric" or "quilt")
-            {
-                // Fabric/Quilt: fetch a ready profile JSON (libraries carry their own urls)
-                string profileUrl = loader == "fabric"
-                    ? $"https://meta.fabricmc.net/v2/versions/loader/{mc}/{loaderVer}/profile/json"
-                    : $"https://meta.quiltmc.org/v3/versions/loader/{mc}/{loaderVer}/profile/json";
-                var profileJson = JObject.Parse(await Http.GetStringAsync(profileUrl));
-                versionName = profileJson.Value<string>("id") ?? $"{loader}-loader-{loaderVer}-{mc}";
-                string vdir = Path.Combine(versionsDir, versionName);
-                Directory.CreateDirectory(vdir);
-                await File.WriteAllTextAsync(Path.Combine(vdir, versionName + ".json"), profileJson.ToString());
-            }
-            else
-            {
-                // Forge/NeoForge: run the official installer headlessly (needs a JVM → app layer)
-                if (installLoader == null)
-                    throw new NotSupportedException("Установка Forge/NeoForge недоступна в этой сборке лаунчера.");
-                versionName = await installLoader(mc, loader, loaderVer);
-                if (string.IsNullOrWhiteSpace(versionName))
-                    throw new InvalidOperationException($"Не удалось установить {loader} {loaderVer}.");
-            }
+            string versionName = await InstallLoaderAsync(mc, loader, loaderVer, versionsDir, log, installLoader);
 
             // 2. download the pack's mod files into the isolated instance
             Directory.CreateDirectory(instanceDir);
@@ -216,8 +216,252 @@ namespace BlockifyLauncher.Core.Modrinth
                 Slug = slug, Title = title, Icon = icon,
                 VersionName = versionName, McVersion = mc,
                 Loader = loader, LoaderVersion = loaderVer,
-                InstanceDir = instanceDir, PackVersion = ver.VersionNumber, VersionId = ver.Id
+                InstanceDir = instanceDir, PackVersion = packVersion, VersionId = versionId
             };
+        }
+
+        // ── loader install (shared by catalog install, local .mrpack and imports) ──
+        public static async Task<string> InstallLoaderAsync(string mc, string loader, string loaderVer, string versionsDir,
+            IProgress<InstallProgress>? log, Func<string, string, string, Task<string>>? installLoader)
+        {
+            log?.Report(new($"Ставлю загрузчик {loader} {loaderVer}…", 0, 0));
+            if (loader is "fabric" or "quilt")
+            {
+                // Fabric/Quilt: fetch a ready profile JSON (libraries carry their own urls)
+                string profileUrl = loader == "fabric"
+                    ? $"https://meta.fabricmc.net/v2/versions/loader/{mc}/{loaderVer}/profile/json"
+                    : $"https://meta.quiltmc.org/v3/versions/loader/{mc}/{loaderVer}/profile/json";
+                var profileJson = JObject.Parse(await Http.GetStringAsync(profileUrl));
+                string versionName = profileJson.Value<string>("id") ?? $"{loader}-loader-{loaderVer}-{mc}";
+                string vdir = Path.Combine(versionsDir, versionName);
+                Directory.CreateDirectory(vdir);
+                await File.WriteAllTextAsync(Path.Combine(vdir, versionName + ".json"), profileJson.ToString());
+                return versionName;
+            }
+            // Forge/NeoForge: run the official installer headlessly (needs a JVM → app layer)
+            if (installLoader == null)
+                throw new NotSupportedException("Установка Forge/NeoForge недоступна в этой сборке лаунчера.");
+            string vn = await installLoader(mc, loader, loaderVer);
+            if (string.IsNullOrWhiteSpace(vn))
+                throw new InvalidOperationException($"Не удалось установить {loader} {loaderVer}.");
+            return vn;
+        }
+
+        // ── import an instance from another launcher (Prism/MultiMC, CurseForge App) ──
+        private static readonly HashSet<string> SkipOnCopy = new(StringComparer.OrdinalIgnoreCase)
+            { "logs", "crash-reports", ".fabric", ".mixin.out", "cache", "versions", "libraries", "assets", "runtime", "natives" };
+
+        public static async Task<InstalledPack> ImportInstanceAsync(string descriptorPath, string versionsDir, string packsRoot,
+            IProgress<InstallProgress>? log, Func<string, string, string, Task<string>>? installLoader)
+        {
+            string dir = Path.GetDirectoryName(descriptorPath)!;
+            string file = Path.GetFileName(descriptorPath).ToLowerInvariant();
+            string title, mc = "", loader = "", loaderVer = "", srcDir = dir;
+
+            if (file is "mmc-pack.json" or "instance.cfg")
+            {
+                // Prism / MultiMC: components list the game + loader versions
+                var pack = JObject.Parse(File.ReadAllText(Path.Combine(dir, "mmc-pack.json")));
+                foreach (var c in (JArray?)pack["components"] ?? new JArray())
+                {
+                    string uid = c.Value<string>("uid") ?? "", ver = c.Value<string>("version") ?? "";
+                    switch (uid)
+                    {
+                        case "net.minecraft": mc = ver; break;
+                        case "net.fabricmc.fabric-loader": loader = "fabric"; loaderVer = ver; break;
+                        case "org.quiltmc.quilt-loader": loader = "quilt"; loaderVer = ver; break;
+                        case "net.minecraftforge": loader = "forge"; loaderVer = ver; break;
+                        case "net.neoforged.neoforge": loader = "neoforge"; loaderVer = ver; break;
+                    }
+                }
+                title = Path.GetFileName(dir);
+                string cfg = Path.Combine(dir, "instance.cfg");
+                if (File.Exists(cfg))
+                    foreach (var line in File.ReadAllLines(cfg))
+                        if (line.StartsWith("name=", StringComparison.OrdinalIgnoreCase)) { title = line[5..].Trim(); break; }
+                srcDir = Directory.Exists(Path.Combine(dir, ".minecraft")) ? Path.Combine(dir, ".minecraft")
+                       : Directory.Exists(Path.Combine(dir, "minecraft")) ? Path.Combine(dir, "minecraft") : dir;
+            }
+            else if (file == "minecraftinstance.json")
+            {
+                // CurseForge App: baseModLoader.name is e.g. "forge-47.2.0" / "fabric-0.16.9"
+                var j = JObject.Parse(File.ReadAllText(descriptorPath));
+                title = j.Value<string>("name") ?? Path.GetFileName(dir);
+                mc = j["baseModLoader"]?.Value<string>("minecraftVersion") ?? j.Value<string>("gameVersion") ?? "";
+                string ln = j["baseModLoader"]?.Value<string>("name") ?? "";
+                int dash = ln.IndexOf('-');
+                if (dash > 0) { loader = ln[..dash].ToLowerInvariant(); loaderVer = ln[(dash + 1)..]; }
+            }
+            else throw new NotSupportedException(
+                "Не узнаю формат. Выбери .mrpack, mmc-pack.json / instance.cfg (Prism, MultiMC) или minecraftinstance.json (CurseForge App).");
+
+            if (string.IsNullOrEmpty(mc)) throw new InvalidOperationException("Не удалось определить версию Minecraft у этой сборки.");
+
+            string slug = UniqueSlug(Slugify(title), packsRoot);
+            string instanceDir = Path.Combine(packsRoot, slug);
+            log?.Report(new("Копирую файлы сборки…", 0, 0));
+            await Task.Run(() => CopyInstance(srcDir, instanceDir));
+
+            string versionName;
+            if (string.IsNullOrEmpty(loader)) { loader = "vanilla"; versionName = mc; }
+            else versionName = await InstallLoaderAsync(mc, loader, loaderVer, versionsDir, log, installLoader);
+
+            return new InstalledPack
+            {
+                Slug = slug, Title = title, Icon = "",
+                VersionName = versionName, McVersion = mc, Loader = loader, LoaderVersion = loaderVer,
+                InstanceDir = instanceDir, PackVersion = "import"
+            };
+        }
+
+        public static string Slugify(string s)
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (char ch in (s ?? "").ToLowerInvariant())
+                sb.Append(char.IsLetterOrDigit(ch) ? ch : '-');
+            string r = System.Text.RegularExpressions.Regex.Replace(sb.ToString(), "-+", "-").Trim('-');
+            return r.Length == 0 ? "imported-pack" : r;
+        }
+
+        private static string UniqueSlug(string slug, string packsRoot)
+        {
+            string s = slug; int n = 2;
+            while (Directory.Exists(Path.Combine(packsRoot, s))) s = slug + "-" + n++;
+            return s;
+        }
+
+        private static void CopyInstance(string src, string dst)
+        {
+            Directory.CreateDirectory(dst);
+            foreach (var d in Directory.GetDirectories(src))
+            {
+                if (SkipOnCopy.Contains(Path.GetFileName(d))) continue;
+                CopyInstance(d, Path.Combine(dst, Path.GetFileName(d)));
+            }
+            foreach (var f in Directory.GetFiles(src))
+                File.Copy(f, Path.Combine(dst, Path.GetFileName(f)), overwrite: true);
+        }
+
+        // ── one-click FPS boost ──
+        // Each entry is a group of alternatives; the first project with a matching version wins.
+        private static readonly string[][] FpsModsFabric =
+            { new[] { "sodium" }, new[] { "lithium" }, new[] { "ferrite-core" }, new[] { "immediatelyfast" }, new[] { "entityculling" } };
+        private static readonly string[][] FpsModsForge =
+            { new[] { "embeddium", "sodium" }, new[] { "ferrite-core" }, new[] { "immediatelyfast" }, new[] { "entityculling" }, new[] { "modernfix" } };
+        private static readonly string[][] FpsModsNeoForge =
+            { new[] { "sodium", "embeddium" }, new[] { "ferrite-core" }, new[] { "immediatelyfast" }, new[] { "entityculling" }, new[] { "modernfix" } };
+
+        /// <summary>Downloads optimisation mods for the pack's loader/version into its mods folder.
+        /// Returns the file names it added (already-present files are skipped and not tracked).</summary>
+        public static async Task<List<string>> InstallFpsBoostAsync(InstalledPack pack, IProgress<InstallProgress>? log)
+        {
+            var groups = pack.Loader switch
+            {
+                "forge" => FpsModsForge,
+                "neoforge" => FpsModsNeoForge,
+                _ => FpsModsFabric
+            };
+            // Quilt runs Fabric mods; Modrinth often lists only "fabric"
+            string[] loaders = pack.Loader == "quilt" ? new[] { "quilt", "fabric" } : new[] { pack.Loader };
+
+            string modsDir = Path.Combine(pack.InstanceDir, "mods");
+            Directory.CreateDirectory(modsDir);
+            var added = new List<string>();
+            int i = 0;
+            foreach (var group in groups)
+            {
+                log?.Report(new("Буст FPS: " + group[0], ++i, groups.Length));
+                foreach (var slug in group)
+                {
+                    (string Url, string FileName)? hit = null;
+                    foreach (var ld in loaders)
+                    {
+                        hit = await ModrinthService.GetLatestVersionFileAsync(slug, ld, pack.McVersion);
+                        if (hit != null) break;
+                    }
+                    if (hit == null) continue;
+                    string dest = Path.Combine(modsDir, Path.GetFileName(hit.Value.FileName));
+                    if (File.Exists(dest) || File.Exists(dest + ".disabled")) break;   // pack already ships it
+                    try
+                    {
+                        await File.WriteAllBytesAsync(dest, await Http.GetByteArrayAsync(hit.Value.Url));
+                        added.Add(Path.GetFileName(dest));
+                    }
+                    catch { }
+                    break;
+                }
+            }
+            return added;
+        }
+
+        // ── export an instance back to .mrpack ──
+        private static readonly string[] OverrideDirs = { "config", "resourcepacks", "shaderpacks", "datapacks", "kubejs", "scripts", "defaultconfigs" };
+
+        /// <summary>Builds a Modrinth-format pack: mods known to Modrinth go into the index
+        /// (downloadable), everything else is bundled under overrides/.</summary>
+        public static async Task ExportAsync(InstalledPack pack, string outPath, IProgress<InstallProgress>? log)
+        {
+            string modsDir = Path.Combine(pack.InstanceDir, "mods");
+            var jars = Directory.Exists(modsDir) ? new DirectoryInfo(modsDir).GetFiles("*.jar") : Array.Empty<FileInfo>();
+
+            log?.Report(new("Считаю хэши модов", 0, jars.Length));
+            var byHash = new Dictionary<string, FileInfo>();
+            foreach (var f in jars) { try { byHash[FileSha1(f.FullName)] = f; } catch { } }
+
+            log?.Report(new("Сверяю с Modrinth", 0, 0));
+            var known = await ModrinthService.GetVersionsByHashAsync(byHash.Keys.ToList());
+
+            var files = new JArray();
+            var unknown = new List<FileInfo>();
+            foreach (var (sha1, f) in byHash)
+            {
+                var ver = known[sha1];
+                var vf = ((JArray?)ver?["files"])?.FirstOrDefault(x => x["hashes"]?.Value<string>("sha1") == sha1);
+                if (vf == null) { unknown.Add(f); continue; }
+                files.Add(new JObject
+                {
+                    ["path"] = "mods/" + f.Name,
+                    ["hashes"] = new JObject { ["sha1"] = sha1, ["sha512"] = vf["hashes"]?.Value<string>("sha512") ?? FileSha512(f.FullName) },
+                    ["env"] = new JObject { ["client"] = "required", ["server"] = "required" },
+                    ["downloads"] = new JArray(vf.Value<string>("url") ?? ""),
+                    ["fileSize"] = f.Length
+                });
+            }
+
+            string depKey = pack.Loader switch { "fabric" => "fabric-loader", "quilt" => "quilt-loader", _ => pack.Loader };
+            var index = new JObject
+            {
+                ["formatVersion"] = 1,
+                ["game"] = "minecraft",
+                ["versionId"] = string.IsNullOrEmpty(pack.PackVersion) ? "1.0.0" : pack.PackVersion,
+                ["name"] = pack.Title,
+                ["summary"] = "Exported from Blockify Launcher",
+                ["files"] = files,
+                ["dependencies"] = new JObject { ["minecraft"] = pack.McVersion, [depKey] = pack.LoaderVersion }
+            };
+
+            log?.Report(new("Пакую .mrpack", 0, 0));
+            if (File.Exists(outPath)) File.Delete(outPath);
+            using var zip = ZipFile.Open(outPath, ZipArchiveMode.Create);
+            using (var w = new StreamWriter(zip.CreateEntry("modrinth.index.json").Open()))
+                await w.WriteAsync(index.ToString());
+
+            foreach (var f in unknown)
+                zip.CreateEntryFromFile(f.FullName, "overrides/mods/" + f.Name);
+            foreach (var dir in OverrideDirs)
+            {
+                string full = Path.Combine(pack.InstanceDir, dir);
+                if (!Directory.Exists(full)) continue;
+                foreach (var f in Directory.GetFiles(full, "*", SearchOption.AllDirectories))
+                    zip.CreateEntryFromFile(f, "overrides/" + Path.GetRelativePath(pack.InstanceDir, f).Replace('\\', '/'));
+            }
+        }
+
+        private static string FileSha512(string path)
+        {
+            using var s = System.Security.Cryptography.SHA512.Create();
+            using var fs = File.OpenRead(path);
+            return Convert.ToHexString(s.ComputeHash(fs)).ToLowerInvariant();
         }
 
         private static string Sha1(byte[] data)

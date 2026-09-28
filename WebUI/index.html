@@ -275,6 +275,10 @@ input[type=range]{width:100%;accent-color:var(--grass)}
   background:linear-gradient(180deg,#cfd8d0,#9aa69c);box-shadow:0 1px 3px rgba(0,0,0,.4)}
 .sw input:checked + i{background:rgba(107,191,59,.85);border-color:transparent}
 .sw input:checked + i::before{background:linear-gradient(180deg,#fff,#dfe9db);transform:translateX(18px)}
+.set-actions{display:flex;align-items:center;justify-content:flex-end;gap:14px;max-width:880px;margin-top:18px}
+.set-status{font-family:var(--mono);font-size:11px;color:var(--muted);transition:.2s}
+.set-status.ok{color:var(--grass)}
+.set-actions .btn{padding:10px 18px}
 .footnote{margin-top:26px;font-size:11px;color:#57635a;font-family:var(--mono)}
 .empty{padding:40px 8px;text-align:center;color:var(--muted);font-size:12.5px;font-family:var(--mono)}
 
@@ -412,6 +416,34 @@ input[type=range]{width:100%;accent-color:var(--grass)}
 .pm-body{overflow-y:auto;display:flex;flex-direction:column;gap:9px;min-height:0}
 .pv-row{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:11px;
   border:1px solid var(--glass-line);background:rgba(255,255,255,.04)}
+/* per-pack mod rows */
+.mm-row{display:flex;align-items:center;gap:12px;padding:10px 13px;border-radius:11px;
+  border:1px solid var(--glass-line);background:rgba(255,255,255,.04)}
+.mm-row.off{opacity:.55}
+.mm-row .grow b{font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:330px}
+.mm-row .grow small{font-size:10.5px;color:var(--muted);font-family:var(--mono)}
+.mm-row .btn{padding:6px 10px;font-size:11px;flex-shrink:0}
+.mm-count{font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+/* time machine rows */
+.sn-row{display:flex;align-items:center;gap:12px;padding:10px 13px;border-radius:11px;border:1px solid var(--glass-line);background:rgba(255,255,255,.04)}
+.sn-row.cur{border-color:rgba(107,191,59,.4)}
+.sn-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.sn-row.manual .sn-dot{background:var(--gold)}
+.sn-row.cur .sn-dot{background:var(--grass);box-shadow:0 0 8px var(--grass)}
+.sn-row .grow b{font-size:13px;display:block}
+.sn-row .grow small{font-size:10.5px;color:var(--muted);font-family:var(--mono)}
+.sn-diff{font-family:var(--mono);font-size:10.5px;display:flex;gap:6px;flex-shrink:0}
+.sn-diff .p{color:var(--grass)}.sn-diff .m{color:var(--red)}.sn-diff .t{color:var(--gold)}
+.sn-row .btn{padding:6px 10px;font-size:11px}
+/* crash doctor findings */
+.cd-head{font-family:var(--mono);font-size:11.5px;color:var(--red);padding:10px 12px;border-radius:10px;
+  background:rgba(224,86,74,.1);border:1px solid rgba(224,86,74,.3);word-break:break-word}
+.cd-item{padding:12px 14px;border-radius:11px;border:1px solid var(--glass-line);background:rgba(255,255,255,.04)}
+.cd-item b{font-size:13.5px;display:block;margin-bottom:4px}
+.cd-item p{font-size:12px;color:var(--muted);margin:0 0 10px;line-height:1.55}
+.cd-fixes{display:flex;flex-wrap:wrap;gap:8px}
+.cd-fixes .btn.done{opacity:.6;pointer-events:none}
 .pv-row.pv-pick{cursor:pointer;transition:.13s}
 .pv-row.pv-pick:hover{background:rgba(107,191,59,.12);border-color:rgba(107,191,59,.35)}
 .pv-row b{font-size:13px;display:block}
@@ -602,7 +634,10 @@ input[type=range]{width:100%;accent-color:var(--grass)}
       <div class="sub">Твои сборки, установленные моды и каталог модпаков Modrinth</div>
 
       <!-- installed modpacks management -->
-      <h3 class="cat-head" style="margin-top:6px">Установленные сборки <span class="tag" id="myPacksCount"></span></h3>
+      <div class="mods-head" style="margin-top:6px">
+        <h3>Установленные сборки <span class="tag" id="myPacksCount"></span></h3>
+        <div class="mods-actions"><button class="btn" id="packImport" title=".mrpack · Prism/MultiMC · CurseForge App">⤓ Импорт…</button></div>
+      </div>
       <div id="myPacksList"><div class="empty">Пока нет установленных сборок — выбери в каталоге ниже</div></div>
 
       <!-- installed mod updates (real: <mc>/mods matched on Modrinth by hash) -->
@@ -615,7 +650,13 @@ input[type=range]{width:100%;accent-color:var(--grass)}
       </div>
       <div id="modsList"><div class="empty">Открой раздел — проверю моды в папке mods…</div></div>
 
-      <h3 class="cat-head">Каталог модпаков</h3>
+      <h3 class="cat-head">Каталог Modrinth</h3>
+      <div class="toolbar" id="packTypes">
+        <button class="chip on" data-f="modpack">Сборки</button>
+        <button class="chip" data-f="mod">Моды</button>
+        <button class="chip" data-f="shader">Шейдеры</button>
+        <button class="chip" data-f="resourcepack">Ресурспаки</button>
+      </div>
       <div class="pack-search">
         <input id="packQuery" placeholder="Поиск сборок…" autocomplete="off">
         <input id="packMc" class="pack-mc" placeholder="MC, напр. 1.20.1" autocomplete="off">
@@ -703,18 +744,22 @@ input[type=range]{width:100%;accent-color:var(--grass)}
           <h3>Игра</h3>
           <div class="field"><label>Оперативная память — <span class="ram-val" id="ramVal">6 ГБ</span></label>
             <input type="range" id="ramRange" min="2" max="16" value="6"></div>
-          <div class="field"><label>Версия Java</label><select id="javaSel"></select></div>
+          <div class="field"><label>Java (javaw.exe) — пусто = автоматически</label>
+            <div style="display:flex;gap:8px"><input type="text" id="javaPath" placeholder="автоматически" style="flex:1"><button class="btn" id="javaBrowse" style="margin:0">Обзор…</button></div></div>
           <div class="field"><label>Папка Minecraft</label><input type="text" id="mcDir"></div>
         </div>
         <div class="set-card glass" style="background:var(--glass2)">
           <h3>Лаунчер</h3>
-          <div class="field"><label>Язык</label><select id="langSel"><option>Русский</option><option>Українська</option><option>English</option></select></div>
+          <div class="field"><label>Язык (применится после перезапуска)</label><select id="langSel"><option value="ru-RU">Русский</option><option value="uk-UA">Українська</option><option value="en-US">English</option></select></div>
           <div class="field"><label>Любимый сервер</label><input type="text" id="favServer" placeholder="mc.example.net"></div>
           <div class="switch-row">Закрывать лаунчер после запуска игры <label class="sw"><input type="checkbox" id="swClose"><i></i></label></div>
           <div class="switch-row">Оптимизированные JVM-флаги <label class="sw"><input type="checkbox" id="swJvm"><i></i></label></div>
           <div class="switch-row">Discord-статус <label class="sw"><input type="checkbox" id="swDiscord"><i></i></label></div>
           <div class="switch-row">Показывать снапшоты <label class="sw"><input type="checkbox" id="swSnap"><i></i></label></div>
         </div>
+      </div>
+      <div class="set-actions">
+        <span class="set-status" id="setStatus">Изменения сохраняются автоматически</span>
       </div>
       <div class="footnote" id="footVer">// Blockify</div>
     </section>
@@ -774,6 +819,95 @@ input[type=range]{width:100%;accent-color:var(--grass)}
 <div class="dlpanel" id="dlPanel" hidden>
   <div class="dl-head"><span>Загрузки</span><button class="dl-min" id="dlMin" title="Свернуть">▾</button></div>
   <div class="dl-list" id="dlList"></div>
+</div>
+
+<!-- Time machine: snapshots of mods + configs -->
+<div class="pmodal" id="snapModal" hidden>
+  <div class="pm-card glass" style="width:min(620px,100%)">
+    <div class="pm-head">
+      <b id="snTitle">⏳ Машина времени</b>
+      <button class="vw-b vw-close" id="snClose" title="Закрыть">✕</button>
+    </div>
+    <div class="pm-sub">Снимок = набор модов (с вкл/выкл) + конфиги. Авто-снимки делаются перед обновлением, удалением, бустом FPS, починкой и фиксами Crash Doctor. Миры сюда не входят — у них своя вкладка «Миры».</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input type="text" id="snLabel" placeholder="Подпись снимка (необязательно)" style="flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--glass-line);background:rgba(0,0,0,.25);color:var(--text);font:12.5px var(--mono);outline:none">
+      <button class="btn primary" id="snMake" style="margin:0">📸 Снимок сейчас</button>
+    </div>
+    <div class="pm-body" id="snBody"><div class="empty">Загрузка…</div></div>
+  </div>
+</div>
+
+<!-- Crash Doctor -->
+<div class="pmodal" id="crashModal" hidden>
+  <div class="pm-card glass" style="width:min(600px,100%)">
+    <div class="pm-head">
+      <b id="cdTitle">🩺 Crash Doctor</b>
+      <button class="vw-b vw-close" id="cdClose" title="Закрыть">✕</button>
+    </div>
+    <div class="pm-sub" id="cdSub"></div>
+    <div class="pm-body" id="cdBody"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
+      <button class="btn" id="cdLogs">Папка логов</button>
+      <button class="btn primary" id="cdLaunch">▶ Запустить снова</button>
+    </div>
+  </div>
+</div>
+
+<!-- "install into which pack?" chooser for mods / shaders / resource packs -->
+<div class="pmodal" id="installToModal" hidden>
+  <div class="pm-card glass" style="width:min(480px,100%)">
+    <div class="pm-head">
+      <b id="itTitle">В какую сборку?</b>
+      <button class="vw-b vw-close" id="itClose" title="Закрыть">✕</button>
+    </div>
+    <div class="pm-sub" id="itSub">Файл скачается в папку выбранной сборки под её версию и загрузчик.</div>
+    <div class="pm-body" id="itBody"></div>
+  </div>
+</div>
+
+<!-- per-pack launch settings -->
+<div class="pmodal" id="packSetModal" hidden>
+  <div class="pm-card glass" style="width:min(520px,100%)">
+    <div class="pm-head">
+      <b id="psTitle">Настройки сборки</b>
+      <button class="vw-b vw-close" id="psClose" title="Закрыть">✕</button>
+    </div>
+    <div class="pm-sub">Пусто / 0 — используется глобальная настройка лаунчера. Применяется только к этой сборке.</div>
+    <div class="pm-body">
+      <div class="field"><label>Оперативная память — <span class="ram-val" id="psRamVal">глобально</span></label>
+        <input type="range" id="psRam" min="0" max="32" step="1" value="0"></div>
+      <div class="field"><label>Путь к Java (javaw.exe)</label><input type="text" id="psJava" placeholder="глобальный"></div>
+      <div class="field"><label>JVM-аргументы (заменяют Aikar-флаги)</label><input type="text" id="psJvm" placeholder="-XX:+UseG1GC -XX:MaxGCPauseMillis=100 …"></div>
+      <div style="display:flex;gap:10px">
+        <div class="field" style="flex:1"><label>Ширина окна</label><input type="text" id="psW" placeholder="глобально" inputmode="numeric"></div>
+        <div class="field" style="flex:1"><label>Высота окна</label><input type="text" id="psH" placeholder="глобально" inputmode="numeric"></div>
+      </div>
+      <div class="switch-row" style="border-top:1px solid var(--glass-line);margin-top:4px;padding-top:12px">
+        <div><b style="font-size:13px">⚡ Буст FPS</b><div style="font-size:11px;color:var(--muted)">Sodium/Lithium/FerriteCore… под загрузчик сборки + флаги JVM. Обратимо.</div></div>
+        <label class="sw"><input type="checkbox" id="psFps"><i></i></label>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
+        <button class="btn" id="psReset">Сбросить</button>
+        <button class="btn primary" id="psSave">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- per-pack mod manager -->
+<div class="pmodal" id="modsModal" hidden>
+  <div class="pm-card glass" style="width:min(680px,100%)">
+    <div class="pm-head">
+      <b id="mmTitle">Моды сборки</b>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" id="mmRefresh">Обновить список</button>
+        <button class="btn" id="mmFolder">Папка</button>
+        <button class="vw-b vw-close" id="mmClose" title="Закрыть">✕</button>
+      </div>
+    </div>
+    <div class="pm-sub" id="mmSub">Переключатель — вкл/выкл мода (файл ↔ .disabled). Обновления ищутся на Modrinth под версию и загрузчик сборки.</div>
+    <div class="pm-body" id="mmBody"><div class="empty">Загрузка модов…</div></div>
+  </div>
 </div>
 
 <!-- modpack install (pick a pack version) -->

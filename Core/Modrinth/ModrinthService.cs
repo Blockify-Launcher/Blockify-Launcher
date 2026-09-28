@@ -61,10 +61,11 @@ namespace BlockifyLauncher.Core.Modrinth
         public static async Task<List<ModpackInfo>> SearchAsync(
             string? loader = null, string? query = null,
             string? category = null, string? gameVersion = null,
-            string? sortIndex = null, int limit = 20)
+            string? sortIndex = null, int limit = 20, string projectType = "modpack")
         {
-            var facets = new List<string> { "[\"project_type:modpack\"]" };
-            if (!string.IsNullOrEmpty(loader)) facets.Add($"[\"categories:{loader}\"]");
+            var facets = new List<string> { $"[\"project_type:{projectType}\"]" };
+            // loader facets only make sense for mods/modpacks (shaders use iris/optifine, packs use none)
+            if (!string.IsNullOrEmpty(loader) && projectType is "modpack" or "mod") facets.Add($"[\"categories:{loader}\"]");
             if (!string.IsNullOrEmpty(category)) facets.Add($"[\"categories:{category}\"]");
             if (!string.IsNullOrEmpty(gameVersion)) facets.Add($"[\"versions:{gameVersion}\"]");
 
@@ -196,6 +197,73 @@ namespace BlockifyLauncher.Core.Modrinth
         }
 
         public static Task<byte[]> DownloadAsync(string url) => Http.GetByteArrayAsync(url);
+
+        /// <summary>Newest version file of a project for the given loader + game version, or null if none.</summary>
+        public static Task<(string Url, string FileName)?> GetLatestVersionFileAsync(string slug, string loader, string gameVersion)
+            => GetLatestVersionFileAsync(slug, new[] { loader }, gameVersion);
+
+        /// <summary>Newest version object (with files + dependencies) matching optional loader / game-version filters.</summary>
+        public static async Task<JToken?> GetLatestVersionAsync(string slug, string[]? loaders, string? gameVersion)
+        {
+            var q = new List<string>();
+            if (loaders != null && loaders.Length > 0)
+                q.Add("loaders=" + Uri.EscapeDataString("[" + string.Join(",", loaders.Select(l => $"\"{l}\"")) + "]"));
+            if (!string.IsNullOrEmpty(gameVersion))
+                q.Add("game_versions=" + Uri.EscapeDataString($"[\"{gameVersion}\"]"));
+            string url = $"https://api.modrinth.com/v2/project/{slug}/version" + (q.Count > 0 ? "?" + string.Join("&", q) : "");
+            try { return JArray.Parse(await Http.GetStringAsync(url)).FirstOrDefault(); }
+            catch { return null; }
+        }
+
+        public static (string Url, string FileName)? PrimaryFile(JToken? version)
+        {
+            var files = (JArray?)version?["files"];
+            var f = files?.FirstOrDefault(x => x.Value<bool?>("primary") == true) ?? files?.FirstOrDefault();
+            string? u = f?.Value<string>("url"), n = f?.Value<string>("filename");
+            return u == null || n == null ? null : (u, n);
+        }
+
+        /// <summary>Project slug + title by id or slug; null when Modrinth doesn't know it.</summary>
+        public static async Task<(string Slug, string Title)?> GetProjectAsync(string idOrSlug)
+        {
+            try
+            {
+                var j = JObject.Parse(await Http.GetStringAsync($"https://api.modrinth.com/v2/project/{Uri.EscapeDataString(idOrSlug)}"));
+                return (j.Value<string>("slug") ?? idOrSlug, j.Value<string>("title") ?? idOrSlug);
+            }
+            catch
+            {
+                // not a slug — try a mod search by that id/name
+                try
+                {
+                    var hits = await SearchAsync(query: idOrSlug, limit: 1, projectType: "mod");
+                    return hits.Count > 0 ? (hits[0].Slug, hits[0].Title) : null;
+                }
+                catch { return null; }
+            }
+        }
+
+        /// <summary>Same, with optional filters: null loaders / null game version = no filter.</summary>
+        public static async Task<(string Url, string FileName)?> GetLatestVersionFileAsync(string slug, string[]? loaders, string? gameVersion)
+        {
+            var v = await GetLatestVersionAsync(slug, loaders, gameVersion);
+            var files = (JArray?)v?["files"];
+            var f = files?.FirstOrDefault(x => x.Value<bool?>("primary") == true) ?? files?.FirstOrDefault();
+            string? u = f?.Value<string>("url"), n = f?.Value<string>("filename");
+            return u == null || n == null ? null : (u, n);
+        }
+
+        /// <summary>sha1 → Modrinth version object for every hash Modrinth knows (used to build .mrpack indexes).</summary>
+        public static async Task<JObject> GetVersionsByHashAsync(List<string> sha1s)
+        {
+            if (sha1s.Count == 0) return new JObject();
+            try
+            {
+                return await PostJsonAsync("https://api.modrinth.com/v2/version_files",
+                    new JObject { ["hashes"] = new JArray(sha1s), ["algorithm"] = "sha1" });
+            }
+            catch { return new JObject(); }
+        }
 
         private static async Task<JObject> PostJsonAsync(string url, JObject body)
         {

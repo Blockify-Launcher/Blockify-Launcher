@@ -233,23 +233,37 @@ namespace BlockifyLauncher
 
             Display display = setting.GetSettingDisplayGame();
             Session session = await ResolveLaunchSession();
-            string javaPath = new Properties.Settings().GetJavaPath();
+            var globals = new Properties.Settings();
+            string? javaPath = globals.GetJavaPath();
+            if (javaPath == "javaw.exe" || !System.IO.File.Exists(javaPath)) javaPath = null;
+
+            // per-pack overrides win over global settings (0 / empty = keep global)
+            var pk = _packLaunch;
+            int ramMb = pk?.RamMb > 0 ? pk.RamMb : setting.GetMemoryRAM();
+            if (!string.IsNullOrWhiteSpace(pk?.JavaPath) && System.IO.File.Exists(pk!.JavaPath)) javaPath = pk.JavaPath;
+            string[]? jvm = !string.IsNullOrWhiteSpace(pk?.JvmArgs)
+                ? pk!.JvmArgs.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                : (globals.GetJvmAikar() || pk?.FpsBoost == true ? AikarFlags : null);   // boost forces Aikar
+            int w = pk?.ScreenW > 0 ? pk.ScreenW : display.w;
+            int h = pk?.ScreenH > 0 ? pk.ScreenH : display.h;
+            if (pk != null) LogDiag($"pack overrides ram={ramMb} java='{javaPath}' jvm='{pk.JvmArgs}' screen={w}x{h}");
+
             return await setting.launcher
                 .CreateProcessAsync(MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString(),
                 new LaunchOption
                 {
                     Session = session,
-                    MaximumRamMb = setting.GetMemoryRAM(),
-                    JavaPath = javaPath != "javaw.exe" && System.IO.File.Exists(javaPath) ? javaPath : null,
-                    JVMArguments = new Properties.Settings().GetJvmAikar() ? AikarFlags : null,
+                    MaximumRamMb = ramMb,
+                    JavaPath = javaPath,
+                    JVMArguments = jvm,
                     GameDirectory = _packGameDir,   // isolated instance when launching a modpack
 
                     VersionType = this.GameLauncherName,
                     GameLauncherName = this.GameLauncherName,
                     GameLauncherVersion = this.GameLauncherVersion,
 
-                    ScreenWidth = display.w,
-                    ScreenHeight = display.h,
+                    ScreenWidth = w,
+                    ScreenHeight = h,
                     FullScreen = setting.GetFullScrean(),
                 });
         }
@@ -297,6 +311,23 @@ namespace BlockifyLauncher
                 process.Start();
                 Post(new { type = "installDone", id = "launch", ok = true });
 
+                // Crash Doctor: if the launcher stays open, watch the pack's game process and
+                // diagnose automatically when it dies with a crash
+                if (_packLaunch is { } pkExit && new Properties.Settings().GetHideLauncher() != 0)
+                {
+                    string slugExit = pkExit.Slug; var launchedAt = DateTime.Now; var proc = process;
+                    try
+                    {
+                        proc.EnableRaisingEvents = true;
+                        proc.Exited += (_, __) =>
+                        {
+                            int code = 0; try { code = proc.ExitCode; } catch { }
+                            Dispatcher.BeginInvoke(() => OnPackExited(slugExit, launchedAt, code));
+                        };
+                    }
+                    catch { }
+                }
+
                 new Properties.Settings().RegisterLaunch(
                     MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString() ?? "");
 
@@ -318,6 +349,7 @@ namespace BlockifyLauncher
                 ProgressBarLoad.Activ = "Сlose";
                 _launching = false;
                 _packGameDir = null;   // clear instance override after a launch attempt
+                _packLaunch = null;
                 _activeJob = null;
                 LaunchStateChanged?.Invoke(false);
             }

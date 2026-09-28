@@ -191,14 +191,129 @@ function renderVersions(filter){
 wireChips('verFilters', f => renderVersions(f));
 
 // ── PACKS screen: catalog search + filters ──
-let packLoader = '';
+let packLoader = '', packType = 'modpack';
 function doPackSearch(){
   const q = document.getElementById('packQuery').value.trim();
   const mc = document.getElementById('packMc').value.trim();
   const sort = document.getElementById('packSort').value;
   document.getElementById('packsList').innerHTML = '<div class="empty">Поиск…</div>';
-  send({ type: 'searchPacks', query: q, loader: packLoader, gameVersion: mc, sort });
+  send({ type: 'searchPacks', query: q, loader: packLoader, gameVersion: mc, sort, ptype: packType });
 }
+wireChips('packTypes', t => {
+  packType = t;
+  // loader chips only apply to mods/modpacks
+  document.getElementById('packFilters').style.display = (t === 'modpack' || t === 'mod') ? '' : 'none';
+  doPackSearch();
+});
+
+// ── Time machine: snapshots timeline for a pack ──
+const TimeMachine = (function(){
+  const root = document.getElementById('snapModal'), body = document.getElementById('snBody');
+  let slug = '';
+  function open(packSlug, title){
+    slug = packSlug;
+    document.getElementById('snTitle').textContent = '⏳ Машина времени — ' + (title || packSlug);
+    document.getElementById('snLabel').value = '';
+    body.innerHTML = '<div class="empty">Загрузка…</div>';
+    root.removeAttribute('hidden');
+    send({ type: 'loadSnapshots', slug });
+  }
+  function close(){ root.setAttribute('hidden',''); slug = ''; }
+  function render(forSlug, items){
+    if (!slug || slug !== forSlug) return;
+    if (!items || !items.length){ body.innerHTML = '<div class="empty">Снимков пока нет — сделай первый кнопкой выше</div>'; return; }
+    body.innerHTML = items.map((s, i) => `
+      <div class="sn-row${s.same ? ' cur' : ''}${s.auto ? '' : ' manual'}" data-i="${i}">
+        <span class="sn-dot" title="${s.auto ? 'авто' : 'вручную'}"></span>
+        <div class="grow"><b>${esc(s.label || s.reason || 'снимок')}</b>
+          <small>${esc(s.at)} · ${s.enabled}/${s.mods} модов вкл.${s.hasConfig ? ' · конфиги' : ''}${s.auto ? '' : ' · вручную'}</small></div>
+        <div class="sn-diff" title="Отличия от текущего состояния">${s.same ? '<span class="p">= текущее</span>' :
+          `${s.added ? `<span class="p">+${s.added}</span>` : ''}${s.removed ? `<span class="m">−${s.removed}</span>` : ''}${s.toggled ? `<span class="t">~${s.toggled}</span>` : ''}`}</div>
+        ${s.same ? '' : `<button class="btn primary" data-restore="${esc(s.id)}">Откатить</button>`}
+        <button class="btn danger" data-del="${esc(s.id)}" title="Удалить снимок">✕</button>
+      </div>`).join('');
+    body.querySelectorAll('[data-restore]').forEach(b => b.onclick = () =>
+      Dialog.confirm('Вернуть сборку к этому снимку? Текущее состояние сохранится отдельным снимком «перед откатом».', 'Откат сборки', { okText: 'Откатить' })
+        .then(ok => { if (!ok) return; JobPanel.update('restore:' + slug, 'Откат сборки', 'Восстанавливаю…', 0, 0); send({ type: 'restoreSnapshot', slug, id: b.dataset.restore }); }));
+    body.querySelectorAll('[data-del]').forEach(b => b.onclick = () => send({ type: 'deleteSnapshot', slug, id: b.dataset.del }));
+  }
+  document.getElementById('snMake').onclick = () => {
+    body.innerHTML = '<div class="empty">Считаю хэши модов…</div>';
+    send({ type: 'makeSnapshot', slug, label: document.getElementById('snLabel').value.trim() });
+  };
+  document.getElementById('snClose').onclick = close;
+  root.addEventListener('click', e => { if (e.target === root) close(); });
+  return { open, close, render };
+})();
+
+// ── Crash Doctor: diagnosis + one-click fixes for a pack ──
+const CrashDoctor = (function(){
+  const root = document.getElementById('crashModal'), body = document.getElementById('cdBody');
+  let slug = '';
+  function show(m){
+    slug = m.slug;
+    document.getElementById('cdTitle').textContent = '🩺 Crash Doctor — ' + (m.packTitle || slug);
+    const r = m.result || {};
+    document.getElementById('cdSub').textContent = r.found
+      ? `${r.file} · ${r.when} · ${r.mods} модов в сборке${m.auto ? ' · игра завершилась с ошибкой' : ''}`
+      : '';
+    if (!r.found){ body.innerHTML = `<div class="empty">${esc(r.headline || 'Нет данных')}</div>`; }
+    else body.innerHTML = `<div class="cd-head">${esc(r.headline)}</div>` + (r.items || []).map((it, i) => `
+      <div class="cd-item">
+        <b>${esc(it.title)}</b><p>${esc(it.detail)}</p>
+        <div class="cd-fixes">${(it.fixes || []).map((f, j) =>
+          `<button class="btn ${f.kind === 'disable' || f.kind === 'install' || f.kind === 'ram' ? 'primary' : ''}" data-i="${i}" data-j="${j}">${esc(f.label)}</button>`).join('')}</div>
+      </div>`).join('');
+    body.querySelectorAll('[data-i]').forEach(b => b.onclick = () => {
+      const f = r.items[+b.dataset.i].fixes[+b.dataset.j];
+      b.textContent = '…'; b.classList.add('done');
+      send({ type: 'crashFix', slug, kind: f.kind, file: f.file || '', modSlug: f.slug || '', ram: f.ram || 0 });
+      b.dataset.label = f.label;
+    });
+    root.removeAttribute('hidden');
+  }
+  function fixDone(m){
+    if (m.slug !== slug) return;
+    body.querySelectorAll('.btn.done').forEach(b => {
+      if (b.textContent === '…'){ b.textContent = m.ok ? '✓ ' + (b.dataset.label || 'Готово') : '✕ ' + (m.error || 'ошибка'); }
+    });
+  }
+  function close(){ root.setAttribute('hidden',''); slug = ''; }
+  document.getElementById('cdClose').onclick = close;
+  document.getElementById('cdLogs').onclick = () => send({ type: 'crashFix', slug, kind: 'openLogs' });
+  document.getElementById('cdLaunch').onclick = () => { const s = slug; close(); send({ type: 'launchPack', slug: s }); };
+  root.addEventListener('click', e => { if (e.target === root) close(); });
+  return { show, fixDone, close };
+})();
+
+// choose which installed pack receives a mod / shader / resource pack
+let installedPacksCache = [];
+const InstallTo = (function(){
+  const root = document.getElementById('installToModal'), body = document.getElementById('itBody');
+  let item = null;
+  const KIND = { mod: 'мод', shader: 'шейдер', resourcepack: 'ресурспак' };
+  function open(p){
+    item = p;
+    document.getElementById('itTitle').textContent = `${KIND[p.ptype] || 'файл'} «${p.title}» — в какую сборку?`;
+    if (!installedPacksCache.length){ body.innerHTML = '<div class="empty">Нет установленных сборок — сначала поставь любую</div>'; }
+    else body.innerHTML = installedPacksCache.map((k, i) => `
+      <div class="pv-row pv-pick" data-i="${i}">
+        <div class="mp-ico" style="width:34px;height:34px${k.icon ? `;background-image:url('${esc(k.icon)}')` : ''}"></div>
+        <div class="grow" style="flex:1"><b>${esc(k.title)}</b><small><span class="pv-badge">${esc(k.loader)}</span> ${esc(k.mc)}</small></div>
+      </div>`).join('');
+    body.querySelectorAll('.pv-pick').forEach(r => r.onclick = () => {
+      const k = installedPacksCache[+r.dataset.i];
+      JobPanel.update(`content:${item.ptype}:${item.slug}`, item.title + ' → ' + k.title, 'Ищу версию…', 0, 0);
+      send({ type: 'installContent', slug: item.slug, title: item.title, ptype: item.ptype, packSlug: k.slug });
+      close();
+    });
+    root.removeAttribute('hidden');
+  }
+  function close(){ root.setAttribute('hidden',''); item = null; }
+  document.getElementById('itClose').onclick = close;
+  root.addEventListener('click', e => { if (e.target === root) close(); });
+  return { open, close };
+})();
 let packSearchT;
 function debouncedPackSearch(){ clearTimeout(packSearchT); packSearchT = setTimeout(doPackSearch, 350); }
 document.getElementById('packQuery').addEventListener('input', debouncedPackSearch);
@@ -206,9 +321,11 @@ document.getElementById('packMc').addEventListener('input', debouncedPackSearch)
 document.getElementById('packSort').addEventListener('change', doPackSearch);
 enhanceSelect(document.getElementById('packSort'));
 wireChips('packFilters', f => { packLoader = f; doPackSearch(); });
+document.getElementById('packImport').onclick = () => send({ type: 'importPack' });
 
 // ── installed modpacks management (Packs screen) ──
 function renderMyPacks(items){
+  installedPacksCache = items || [];
   const box = document.getElementById('myPacksList');
   const cnt = document.getElementById('myPacksCount');
   cnt.textContent = items && items.length ? items.length : '';
@@ -218,20 +335,32 @@ function renderMyPacks(items){
   box.innerHTML = items.map(p => `
     <div class="mp-row glass" style="background:var(--glass2)" data-slug="${esc(p.slug)}">
       <div class="mp-ico"${p.icon ? ` style="background-image:url('${esc(p.icon)}')"` : ''}></div>
-      <div class="grow"><b>${esc(p.title)}</b><small><span class="mp-badge">${esc(p.loader)}</span> ${esc(p.mc)}${p.version ? ' · ' + esc(p.version) : ''}${p.installed ? ' · ' + esc(p.installed) : ''}</small></div>
+      <div class="grow"><b>${esc(p.title)}${p.settings && p.settings.fps ? ' <span class="badge b-update" title="Буст FPS включён">⚡</span>' : ''}</b><small><span class="mp-badge">${esc(p.loader)}</span> ${esc(p.mc)}${p.version ? ' · ' + esc(p.version) : ''}${p.installed ? ' · ' + esc(p.installed) : ''}</small></div>
       <div class="mp-actions">
         <button class="btn primary" data-a="play">▶ Играть</button>
         <button class="btn" data-a="folder">Папка</button>
         <button class="btn" data-a="mods">Моды</button>
+        <button class="btn" data-a="export" title="Экспорт в .mrpack">Экспорт</button>
+        <button class="btn" data-a="doctor" title="Crash Doctor — разбор последнего краша">🩺</button>
+        <button class="btn" data-a="time" title="Машина времени — снимки и откат">⏳</button>
+        <button class="btn" data-a="settings" title="RAM / Java / JVM / окно / буст FPS">⚙</button>
         <button class="btn" data-a="reinstall" title="Докачать/обновить">Починить</button>
         <button class="btn danger" data-a="remove">Удалить</button>
       </div>
     </div>`).join('');
   box.querySelectorAll('.mp-row').forEach(el => {
     const slug = el.dataset.slug;
+    const pack = items.find(p => p.slug === slug);
+    el.querySelector('[data-a=settings]').onclick = () => PackSettings.open(pack);
+    el.querySelector('[data-a=doctor]').onclick = () => send({ type: 'diagnosePack', slug });
+    el.querySelector('[data-a=time]').onclick = () => TimeMachine.open(slug, pack && pack.title);
+    el.querySelector('[data-a=export]').onclick = () => {
+      JobPanel.update('export:' + slug, pack ? pack.title : slug, 'Экспорт .mrpack…', 0, 0);
+      send({ type: 'exportPack', slug });
+    };
     el.querySelector('[data-a=play]').onclick = () => send({ type: 'launchPack', slug });
     el.querySelector('[data-a=folder]').onclick = () => send({ type: 'openPackFolder', slug });
-    el.querySelector('[data-a=mods]').onclick = () => send({ type: 'openPackMods', slug });
+    el.querySelector('[data-a=mods]').onclick = () => ModsModal.open(slug, pack && pack.title);
     el.querySelector('[data-a=reinstall]').onclick = () => send({ type: 'reinstallPack', slug });
     el.querySelector('[data-a=remove]').onclick = () =>
       Dialog.confirm('Удалить сборку и её файлы (в корзину)?', 'Удаление сборки', { danger: true, okText: 'Удалить' })
@@ -253,14 +382,15 @@ function renderPacks(items){
         <div class="pack-meta"><span>${esc(p.gameVersion)}</span><span>▼ ${esc(p.downloads)}</span></div>
       </div>
       <div style="display:flex;gap:8px;margin:0 14px 14px">
-        <button class="btn primary" data-act="install" style="flex:1;margin:0">Установить</button>
+        <button class="btn primary" data-act="install" style="flex:1;margin:0">${p.ptype === 'modpack' || !p.ptype ? 'Установить' : 'В сборку…'}</button>
         <button class="btn" data-act="page" title="Открыть на Modrinth" style="margin:0">↗</button>
       </div>
     </div>`).join('');
   list.querySelectorAll('.pack').forEach(el => {
     const p = packsData[+el.dataset.i];
-    el.querySelector('[data-act=install]').onclick = () => PackModal.open(p);
-    el.querySelector('[data-act=page]').onclick = () => send({ type: 'openPack', slug: p.slug });
+    el.querySelector('[data-act=install]').onclick = () =>
+      (p.ptype === 'modpack' || !p.ptype) ? PackModal.open(p) : InstallTo.open(p);
+    el.querySelector('[data-act=page]').onclick = () => send({ type: 'openPack', slug: p.slug, ptype: p.ptype || 'modpack' });
   });
 }
 
@@ -661,13 +791,25 @@ function renderNews(items){
 
 // ── SETTINGS ──
 const ramRange = document.getElementById('ramRange');
+// visible confirmation for every saved change (settings auto-save, but the user should see it)
+let setStatusT;
+function flashSaved(text){
+  const st = document.getElementById('setStatus');
+  st.textContent = text || 'Сохранено ✓'; st.classList.add('ok');
+  clearTimeout(setStatusT);
+  setStatusT = setTimeout(() => { st.textContent = 'Изменения сохраняются автоматически'; st.classList.remove('ok'); }, 2200);
+}
+function saveSetting(key, value){ send({ type: 'setting', key, value }); flashSaved(); }
 ramRange.oninput = () => document.getElementById('ramVal').textContent = ramRange.value + ' ГБ';
-ramRange.onchange = () => send({ type: 'setting', key: 'ram', value: +ramRange.value });
-document.getElementById('favServer').onchange = e => send({ type: 'setting', key: 'favServer', value: e.target.value });
-document.getElementById('mcDir').onchange = e => send({ type: 'setting', key: 'mcDir', value: e.target.value });
+ramRange.onchange = () => saveSetting('ram', +ramRange.value);
+document.getElementById('favServer').onchange = e => saveSetting('favServer', e.target.value);
+document.getElementById('mcDir').onchange = e => saveSetting('mcDir', e.target.value);
+document.getElementById('javaPath').onchange = e => saveSetting('java', e.target.value.trim());
+document.getElementById('javaBrowse').onclick = () => send({ type: 'browseJava' });
+document.getElementById('langSel').addEventListener('change', e => saveSetting('lang', e.target.value));
 ['swJvm','swDiscord','swSnap','swClose'].forEach(id => {
   const el = document.getElementById(id);
-  el.onchange = () => send({ type: 'setting', key: id, value: el.checked });
+  el.onchange = () => saveSetting(id, el.checked);
 });
 
 // ── HOME: installed modpacks strip ──
@@ -784,6 +926,102 @@ const PackModal = (function(){
   return { open, close, renderVersions };
 })();
 
+// ── per-pack launch settings (RAM / Java / JVM / window) ──
+const PackSettings = (function(){
+  const root = document.getElementById('packSetModal');
+  const ram = document.getElementById('psRam');
+  let slug = '';
+  const ramLabel = () => document.getElementById('psRamVal').textContent = +ram.value ? ram.value + ' ГБ' : 'глобально';
+  ram.oninput = ramLabel;
+  function open(pack){
+    if (!pack) return;
+    slug = pack.slug;
+    const s = pack.settings || {};
+    document.getElementById('psTitle').textContent = 'Настройки — ' + pack.title;
+    ram.value = s.ram ? Math.round(s.ram / 1024) : 0; ramLabel();
+    document.getElementById('psJava').value = s.java || '';
+    document.getElementById('psJvm').value = s.jvm || '';
+    document.getElementById('psW').value = s.w || '';
+    document.getElementById('psH').value = s.h || '';
+    document.getElementById('psFps').checked = !!s.fps;
+    root.removeAttribute('hidden');
+  }
+  function close(){ root.setAttribute('hidden',''); slug = ''; }
+  function save(){
+    send({ type:'savePackSettings', slug, settings: {
+      ram: (+ram.value || 0) * 1024,
+      java: document.getElementById('psJava').value.trim(),
+      jvm: document.getElementById('psJvm').value.trim(),
+      w: parseInt(document.getElementById('psW').value, 10) || 0,
+      h: parseInt(document.getElementById('psH').value, 10) || 0,
+      fps: document.getElementById('psFps').checked
+    }});
+    close();
+  }
+  document.getElementById('psSave').onclick = save;
+  document.getElementById('psReset').onclick = () => {
+    ram.value = 0; ramLabel();
+    ['psJava','psJvm','psW','psH'].forEach(id => document.getElementById(id).value = '');
+  };
+  document.getElementById('psClose').onclick = close;
+  root.addEventListener('click', e => { if (e.target === root) close(); });
+  return { open, close };
+})();
+
+// ── per-pack mod manager ──
+const ModsModal = (function(){
+  const root = document.getElementById('modsModal');
+  const body = document.getElementById('mmBody');
+  let slug = '';
+
+  function open(packSlug, title){
+    slug = packSlug;
+    document.getElementById('mmTitle').textContent = 'Моды — ' + (title || packSlug);
+    body.innerHTML = '<div class="empty">Сканирую моды и проверяю обновления…</div>';
+    root.removeAttribute('hidden');
+    send({ type:'loadPackMods', slug });
+  }
+  function close(){ root.setAttribute('hidden',''); slug = ''; }
+
+  function render(forSlug, items){
+    if (!slug || slug !== forSlug) return;
+    if (!items || !items.length){ body.innerHTML = '<div class="empty">В сборке нет модов</div>'; return; }
+    const upd = items.filter(m => m.hasUpdate).length;
+    const off = items.filter(m => !m.enabled).length;
+    body.innerHTML = `<div class="mm-count">${items.length} модов · ${upd ? upd + ' обновл. · ' : ''}${off ? off + ' выкл.' : 'все включены'}</div>`
+      + items.map((m, i) => `
+      <div class="mm-row${m.enabled ? '' : ' off'}" data-i="${i}">
+        <label class="sw"><input type="checkbox" data-tgl="${i}"${m.enabled ? ' checked' : ''}><i></i></label>
+        <div class="grow"><b>${esc(m.name)}</b>
+          <small>${m.known
+            ? esc(m.current || '—') + (m.hasUpdate ? ' → ' + esc(m.latest) : '') + ' · ' + esc(m.size)
+            : esc(m.size) + ' · нет на Modrinth'}</small></div>
+        ${m.hasUpdate ? `<button class="btn primary" data-upd="${i}">Обновить</button>` : ''}
+        <button class="btn danger" data-del="${i}">✕</button>
+      </div>`).join('');
+    body.querySelectorAll('[data-tgl]').forEach(el => el.onchange = () =>
+      send({ type:'togglePackMod', slug, file: items[+el.dataset.tgl].file }));
+    body.querySelectorAll('[data-upd]').forEach(b => b.onclick = () => {
+      b.textContent = '…'; b.disabled = true;
+      const m = items[+b.dataset.upd];
+      send({ type:'updatePackMod', slug, file: m.file, hash: m.hash });
+    });
+    body.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+      const m = items[+b.dataset.del];
+      Dialog.confirm('Удалить мод «' + m.name + '» в корзину?', 'Удаление мода', { danger: true, okText: 'Удалить' })
+        .then(ok => { if (ok) send({ type:'deletePackMod', slug, file: m.file }); });
+    });
+  }
+  document.getElementById('mmClose').onclick = close;
+  document.getElementById('mmRefresh').onclick = () => {
+    body.innerHTML = '<div class="empty">Сканирую моды и проверяю обновления…</div>';
+    send({ type:'loadPackMods', slug });
+  };
+  document.getElementById('mmFolder').onclick = () => send({ type:'openPackMods', slug });
+  root.addEventListener('click', e => { if (e.target === root) close(); });
+  return { open, close, render };
+})();
+
 // ── receive from C# ──
 if (host) host.addEventListener('message', e => {
   const m = e.data;
@@ -812,8 +1050,13 @@ if (host) host.addEventListener('message', e => {
     case 'shotData': Viewer.onData(m.file, m.dataUrl); break;
     case 'installedPacks': renderInstalledPacks(m.items); renderMyPacks(m.items); break;
     case 'packVersions': PackModal.renderVersions(m.slug, m.items, m.error); break;
+    case 'packMods': ModsModal.render(m.slug, m.items); break;
+    case 'crashDoctor': CrashDoctor.show(m); break;
+    case 'snapshots': TimeMachine.render(m.slug, m.items); break;
+    case 'crashFixDone': CrashDoctor.fixDone(m); break;
     case 'jobProgress': JobPanel.update(m.id, m.title, m.phase, m.cur, m.total); break;
     case 'error': Dialog.alert(m.message, 'Ошибка'); break;
+    case 'javaPath': document.getElementById('javaPath').value = m.path || ''; flashSaved(); break;
     case 'installDone':
       JobPanel.finish(m.id, m.ok, m.error);
       if (m.ok) send({ type: 'loadInstalledPacks' });
@@ -837,12 +1080,12 @@ function setLaunchState(busy){
   b.style.pointerEvents = busy ? 'none' : 'auto';
 }
 function fillJava(list, sel){
-  const s = document.getElementById('javaSel');
-  s.innerHTML = (list || []).map(j => `<option${j === sel ? ' selected' : ''}>${esc(j)}</option>`).join('');
-  if (s._render) s._render();
+  const v = sel && sel !== 'javaw.exe' ? sel : '';
+  document.getElementById('javaPath').value = v;
 }
 function applySettings(s){
   if (s.ram != null){ ramRange.value = s.ram; document.getElementById('ramVal').textContent = s.ram + ' ГБ'; }
+  if (s.lang){ const ls = document.getElementById('langSel'); ls.value = s.lang; if (ls._render) ls._render(); }
   if (s.favServer != null) document.getElementById('favServer').value = s.favServer;
   if (s.mcDir != null) document.getElementById('mcDir').value = s.mcDir;
   document.getElementById('swJvm').checked = !!s.swJvm;
