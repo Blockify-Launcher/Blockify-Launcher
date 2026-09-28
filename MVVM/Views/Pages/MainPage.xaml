@@ -1,35 +1,161 @@
-﻿<Page x:Class="BlockifyLauncher.MVVM.Views.Pages.MainPage"
+<Page x:Class="BlockifyLauncher.MVVM.Views.Pages.MainPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
-      xmlns:controls="clr-namespace:BlockifyLauncher.MVVM.Views.Style.Effect"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      xmlns:lang="clr-namespace:BlockifyLauncher.Resources"
+      mc:Ignorable="d"
+      d:DesignHeight="620" d:DesignWidth="900"
       Title="MainPage" Loaded="LoadingMainPage">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30*"/>
-            <RowDefinition Height="70*"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="26,4,30,30">
+        <StackPanel>
 
-        <controls:WindowBlur BlurRadius="45" Magnification="0.25" Background="Transparent" x:Name="Blur_WindowBlur">
-            <Border CornerRadius="15" Background="#C0121212" BorderBrush="#3F5A5A5A" BorderThickness="1">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                   
-                </StackPanel>
+            <!-- ═══ hero ═══ -->
+            <Border CornerRadius="18" MinHeight="250" ClipToBounds="True" BorderBrush="{StaticResource G.Line}" BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40" ShadowDepth="16" Direction="270" Color="#000000" Opacity="0.4"/>
+                </Border.Effect>
+                <!-- base texture: vertical pixel stripes 26px (#243b17 / #2c4a1d / #1f3413) -->
+                <Border.Background>
+                    <DrawingBrush TileMode="Tile" Viewport="0,0,78,20" ViewportUnits="Absolute" Stretch="None">
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <GeometryDrawing Brush="#243B17"><GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,26,20"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                <GeometryDrawing Brush="#2C4A1D"><GeometryDrawing.Geometry><RectangleGeometry Rect="26,0,26,20"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                <GeometryDrawing Brush="#1F3413"><GeometryDrawing.Geometry><RectangleGeometry Rect="52,0,26,20"/></GeometryDrawing.Geometry></GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Border.Background>
+                <Grid>
+                    <!-- darkening overlay: rgba(11,14,16,.1) -> .82 at 78% -->
+                    <Rectangle>
+                        <Rectangle.Fill>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#400B0E10" Offset="0"/>
+                                <GradientStop Color="#8A0B0E10" Offset="0.4"/>
+                                <GradientStop Color="#E00B0E10" Offset="0.82"/>
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+
+                    <!-- pixel grass strip on top -->
+                    <Rectangle VerticalAlignment="Top" Height="10">
+                        <Rectangle.Fill>
+                            <DrawingBrush TileMode="Tile" Viewport="0,0,30,10" ViewportUnits="Absolute" Stretch="None">
+                                <DrawingBrush.Drawing>
+                                    <DrawingGroup>
+                                        <GeometryDrawing Brush="#6BBF3B"><GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,10,10"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                        <GeometryDrawing Brush="#4E9427"><GeometryDrawing.Geometry><RectangleGeometry Rect="10,0,10,10"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                        <GeometryDrawing Brush="#7CCF49"><GeometryDrawing.Geometry><RectangleGeometry Rect="20,0,10,10"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                    </DrawingGroup>
+                                </DrawingBrush.Drawing>
+                            </DrawingBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+
+                    <StackPanel VerticalAlignment="Bottom" Margin="26,0,26,26">
+                        <TextBlock x:Name="HeroTitle" FontFamily="{StaticResource G.Display}" FontWeight="Black" FontSize="26"
+                                   Foreground="{StaticResource G.Text}" Margin="0,0,0,6"/>
+                        <TextBlock x:Name="HeroSub" Foreground="#C9D3C4" FontSize="13" TextWrapping="Wrap" MaxWidth="480" Margin="0,0,0,18"/>
+                        <Grid HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="PlayButton" Style="{StaticResource PlayButton}" Content="▶  ИГРАТЬ" Click="PlayClick"/>
+                            <ComboBox Grid.Column="2" x:Name="VersionCombo" Style="{StaticResource HeroVersionCombo}"
+                                      VerticalAlignment="Stretch" MinWidth="180" SelectionChanged="VersionChanged"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
             </Border>
-        </controls:WindowBlur>
 
+            <!-- ═══ news ═══ -->
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="320"/>
+                </Grid.ColumnDefinitions>
 
-        <controls:WindowBlur Grid.Row="1" Margin="0,20,0,0"
-                BlurRadius="25" Magnification="0.15" Background="Transparent" x:Name="Blur_WindowBlur_Two">
-            <Border  Background="#C0121212" CornerRadius="15" SizeChanged="ResizeStackPanelNew"
-                 BorderBrush="#3F5A5A5A" BorderThickness="1">
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" x:Name="StackPanelNews"></StackPanel>
+                <!-- news list -->
+                <Border Style="{StaticResource GlassPanel2}" Padding="18">
+                    <StackPanel>
+                        <TextBlock Text="{Binding [news_caption], Source={x:Static lang:ResxLocalizationProvider.Instance}}"
+                                   FontWeight="ExtraBold" FontSize="15" Foreground="{StaticResource G.Text}" Margin="0,0,0,12"/>
+                        <StackPanel x:Name="NewsList"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ad slot #1 · 300×250 · partner server (fictional placeholder) -->
+                <Border Grid.Column="2" Style="{StaticResource GlassPanel2}" ClipToBounds="True">
+                    <Grid>
+                        <StackPanel>
+                            <!-- art: teal stripes + gold glow + pickaxe -->
+                            <Border Height="120" ClipToBounds="True">
+                                <Grid>
+                                    <Rectangle>
+                                        <Rectangle.Fill>
+                                            <DrawingBrush TileMode="Tile" Viewport="0,0,44,20" ViewportUnits="Absolute" Stretch="None">
+                                                <DrawingBrush.Drawing>
+                                                    <DrawingGroup>
+                                                        <GeometryDrawing Brush="#1D3B46"><GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,22,20"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                                        <GeometryDrawing Brush="#234A57"><GeometryDrawing.Geometry><RectangleGeometry Rect="22,0,22,20"/></GeometryDrawing.Geometry></GeometryDrawing>
+                                                    </DrawingGroup>
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Rectangle>
+                                        <Rectangle.Fill>
+                                            <RadialGradientBrush Center="0.7,0.2" GradientOrigin="0.7,0.2" RadiusX="0.6" RadiusY="0.8">
+                                                <GradientStop Color="#59F2C14E" Offset="0"/>
+                                                <GradientStop Color="#00F2C14E" Offset="1"/>
+                                            </RadialGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <TextBlock Text="⛏" FontSize="34" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="18,0,0,8"/>
+                                </Grid>
+                            </Border>
+                            <StackPanel Margin="14">
+                                <TextBlock Text="GIGACRAFT" FontFamily="{StaticResource G.Display}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource G.Text}"/>
+                                <TextBlock Text="Сервер выживания 1.21.4 · без вайпов · кланы и ивенты каждую неделю"
+                                           Foreground="{StaticResource G.Muted}" FontSize="11.5" TextWrapping="Wrap" Margin="0,6,0,8"/>
+                                <TextBlock Text="● онлайн: 1 247 игроков" Foreground="{StaticResource G.Primary}" FontFamily="{StaticResource G.Mono}" FontSize="10.5" Margin="0,0,0,10"/>
+                                <Button Style="{StaticResource AdCta}" Content="Играть → mc.gigacraft.ua"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <Border Style="{StaticResource AdMark}">
+                            <TextBlock Text="РЕКЛАМА" FontFamily="{StaticResource G.Mono}" FontSize="8.5" Foreground="#A6FFFFFF"/>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ad slot #2 · 728×90 · hosting banner (fictional placeholder) -->
+            <Border Style="{StaticResource GlassPanel2}" Margin="0,16,0,0" Padding="20,16">
+                <Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="52" Height="52" CornerRadius="13" Background="#FF203C4B">
+                            <TextBlock Text="🖥" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Margin="18,0,0,0">
+                            <TextBlock Text="MineHost — свой сервер за 5 минут" Foreground="{StaticResource G.Text}" FontSize="14.5" FontWeight="Bold"/>
+                            <TextBlock Foreground="{StaticResource G.Muted}" FontSize="12" Margin="0,2,0,0">
+                                <Run Text="NVMe-диски · защита от DDoS · панель на русском · от "/><Run Text="99 ₴/мес" Foreground="{StaticResource G.Gold}" FontFamily="{StaticResource G.Mono}"/>
+                            </TextBlock>
+                        </StackPanel>
+                        <Button Style="{StaticResource AdCta}" Content="Создать сервер" VerticalAlignment="Center" Margin="24,0,0,0"/>
+                    </StackPanel>
+                    <Border Style="{StaticResource AdMark}">
+                        <TextBlock Text="РЕКЛАМА" FontFamily="{StaticResource G.Mono}" FontSize="8.5" Foreground="#A6FFFFFF"/>
+                    </Border>
+                </Grid>
             </Border>
-        </controls:WindowBlur>
-    </Grid>
+        </StackPanel>
+    </ScrollViewer>
 </Page>

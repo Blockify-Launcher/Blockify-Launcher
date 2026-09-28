@@ -47,6 +47,53 @@ namespace BlockifyLauncher.MVVM.Views.Components
             Description = news.Description;
         }
 
+        public NewsComponent(Core.News.NewsItem item)
+        {
+            InitializeComponent();
+
+            DataContext = this;
+
+            Title = item.Title;
+            Description = item.Date == default
+                ? item.Subtitle
+                : item.Date.ToString("d MMMM yyyy").ToUpper();
+
+            BadgeText.Text = item.IsOwn ? "BLOCKIFY" : "MOJANG";
+            BadgeBorder.Visibility = Visibility.Visible;
+            if (item.IsOwn)
+                BadgeBorder.Background = (System.Windows.Media.Brush)FindResource("GreenAccent");
+
+            if (!string.IsNullOrEmpty(item.LocalImagePath) && File.Exists(item.LocalImagePath))
+            {
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.UriSource = new Uri(item.LocalImagePath);
+                bmp.CacheOption = BitmapCacheOption.OnLoad;
+                bmp.DecodePixelWidth = 520;
+                bmp.EndInit();
+                bmp.Freeze();
+                ImageSour = bmp;
+            }
+
+            if (!string.IsNullOrEmpty(item.Link))
+            {
+                Cursor = System.Windows.Input.Cursors.Hand;
+                ToolTip = item.Link;
+                MoreArrow.Visibility = Visibility.Visible;
+                MouseLeftButtonUp += (_, _) =>
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(item.Link)
+                        {
+                            UseShellExecute = true
+                        });
+                    }
+                    catch { /* no browser handler — ignore */ }
+                };
+            }
+        }
+
         public static ImageSource ConvertToImageSource(System.Drawing.Image image)
         {
             if (image == null) return null;

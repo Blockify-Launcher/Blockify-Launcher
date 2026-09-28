@@ -145,10 +145,10 @@ namespace BlockifyLauncher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int Language {
+        [global::System.Configuration.DefaultSettingValueAttribute("en-US")]
+        public string Language {
             get {
-                return ((int)(this["Language"]));
+                return ((string)(this["Language"]));
             }
             set {
                 this["Language"] = value;
@@ -176,6 +176,150 @@ namespace BlockifyLauncher.Properties {
             }
             set {
                 this["UserLastID"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("auto")]
+        public string Vibe {
+            get {
+                return ((string)(this["Vibe"]));
+            }
+            set {
+                this["Vibe"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastVersion {
+            get {
+                return ((string)(this["LastVersion"]));
+            }
+            set {
+                this["LastVersion"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastPlayed {
+            get {
+                return ((string)(this["LastPlayed"]));
+            }
+            set {
+                this["LastPlayed"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int LaunchCount {
+            get {
+                return ((int)(this["LaunchCount"]));
+            }
+            set {
+                this["LaunchCount"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("mc.hypixel.net")]
+        public string FavoriteServer {
+            get {
+                return ((string)(this["FavoriteServer"]));
+            }
+            set {
+                this["FavoriteServer"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MinecraftDir {
+            get {
+                return ((string)(this["MinecraftDir"]));
+            }
+            set {
+                this["MinecraftDir"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowSnapshots {
+            get {
+                return ((bool)(this["ShowSnapshots"]));
+            }
+            set {
+                this["ShowSnapshots"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowBetas {
+            get {
+                return ((bool)(this["ShowBetas"]));
+            }
+            set {
+                this["ShowBetas"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowAlphas {
+            get {
+                return ((bool)(this["ShowAlphas"]));
+            }
+            set {
+                this["ShowAlphas"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool JvmAikar {
+            get {
+                return ((bool)(this["JvmAikar"]));
+            }
+            set {
+                this["JvmAikar"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowParade {
+            get {
+                return ((bool)(this["ShowParade"]));
+            }
+            set {
+                this["ShowParade"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DiscordRpc {
+            get {
+                return ((bool)(this["DiscordRpc"]));
+            }
+            set {
+                this["DiscordRpc"] = value;
             }
         }
     }

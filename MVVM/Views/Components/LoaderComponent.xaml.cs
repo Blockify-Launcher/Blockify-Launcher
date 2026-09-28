@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace BlockifyLauncher.MVVM.Views.Components
 {
@@ -48,12 +50,36 @@ namespace BlockifyLauncher.MVVM.Views.Components
         }
 
         public static readonly DependencyProperty ActivProperty =
-            DependencyProperty.Register("Activ", typeof(string), typeof(LoaderComponent), new PropertyMetadata(string.Empty));
+            DependencyProperty.Register("Activ", typeof(string), typeof(LoaderComponent),
+                new PropertyMetadata(string.Empty, OnActivChanged));
+
+        private static void OnActivChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if ((string)e.NewValue == "Use")
+                ((LoaderComponent)d).PlayDropIn();
+        }
+
+        private readonly TranslateTransform _drop = new();
 
         public LoaderComponent()
         {
             InitializeComponent();
             DataContext = this;
+            RenderTransform = _drop;
+        }
+
+        // A1 "block drop" entrance, matching the notification toast
+        private void PlayDropIn()
+        {
+            var y = new DoubleAnimationUsingKeyFrames();
+            y.KeyFrames.Add(new EasingDoubleKeyFrame(70, KeyTime.FromTimeSpan(TimeSpan.Zero)));
+            y.KeyFrames.Add(new EasingDoubleKeyFrame(-6, KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0.28)),
+                new QuadraticEase { EasingMode = EasingMode.EaseOut }));
+            y.KeyFrames.Add(new EasingDoubleKeyFrame(3, KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0.4)),
+                new QuadraticEase { EasingMode = EasingMode.EaseInOut }));
+            y.KeyFrames.Add(new EasingDoubleKeyFrame(0, KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0.5)),
+                new QuadraticEase { EasingMode = EasingMode.EaseOut }));
+            _drop.BeginAnimation(TranslateTransform.YProperty, y);
         }
     }
 }

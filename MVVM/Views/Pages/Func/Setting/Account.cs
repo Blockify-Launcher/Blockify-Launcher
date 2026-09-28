@@ -82,26 +82,32 @@ namespace BlockifyLauncher.MVVM.Views.Pages.Func.Setting
                     _session[i].Username = userName;
         }
 
-        public void CreateUser(string username)
+        public void CreateUser(string username) =>
+            CreateUser(Session.GetOfflineSession(username));
+
+        public void CreateUser(SessionStruct sessionUser)
         {
             try
             {
-                SessionStruct sessiouUser = Session.GetOfflineSession(username);
-
-                // Check file. 
+                // Check file.
                 if (File.Exists(filePath + fileName))
                 {
-                    var sessionFromFile = JsonConvert.DeserializeObject<List<SessionStruct>>(File.ReadAllText(filePath + fileName));
-                    sessionFromFile?.Add(sessiouUser);
+                    var sessionFromFile = JsonConvert.DeserializeObject<List<SessionStruct>>(File.ReadAllText(filePath + fileName))
+                        ?? new List<SessionStruct>();
+                    // Re-login of an existing account replaces the old entry.
+                    sessionFromFile.RemoveAll(s => s.Id == sessionUser.Id);
+                    sessionFromFile.Add(sessionUser);
                     File.WriteAllText(filePath + fileName, JsonConvert.SerializeObject(sessionFromFile, Formatting.Indented));
                 }
                 else
                 {
                     SessionStruct[] sessions = new SessionStruct[1];
-                    sessions[0] = sessiouUser;
+                    sessions[0] = sessionUser;
                     File.WriteAllText(filePath + fileName, JsonConvert.SerializeObject(sessions, Formatting.Indented));
                 }
-                AddUser(sessiouUser);
+
+                _session = _session.Where(s => s.Id != sessionUser.Id).ToArray();
+                AddUser(sessionUser);
             }
             catch (Exception e)
             {

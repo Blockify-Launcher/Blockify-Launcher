@@ -10,3 +10,6 @@
 
 #File json
 **/Core/discord_config.json
+# runtime / local account session (never commit — contains tokens)
+account.json
+blockify_err.txt

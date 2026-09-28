@@ -20,6 +20,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.en-US.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="MVVM\Views\Components\NewsComponent.xaml">
       <SubType>Designer</SubType>
     </Page>

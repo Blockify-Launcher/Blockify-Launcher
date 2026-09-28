@@ -1,46 +1,62 @@
-﻿<UserControl x:Class="BlockifyLauncher.MVVM.Views.Components.NewsComponent"
+<UserControl x:Class="BlockifyLauncher.MVVM.Views.Components.NewsComponent"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:BlockifyLauncher.MVVM.Views.Components"
-             mc:Ignorable="d" 
-             d:DesignWidth="260" VerticalAlignment="Stretch"> 
-    <Grid>
-        <Border Style="{StaticResource CustomItemNews}" Margin="10">
-            <Grid Margin="5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="120"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+             mc:Ignorable="d"
+             d:DesignWidth="260" VerticalAlignment="Stretch">
+    <Border Margin="8" CornerRadius="16" Background="#B80E1114" BorderThickness="1">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="BorderBrush" Value="#17FFFFFF"/>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="BorderBrush" Value="#7300B558"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="104"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-                <Rectangle RadiusX="15" RadiusY="15" Margin="5">
+            <!-- artwork -->
+            <Border CornerRadius="15,15,0,0" Background="#FF12253A">
+                <Border.OpacityMask>
+                    <VisualBrush>
+                        <VisualBrush.Visual>
+                            <Border Background="White" CornerRadius="15,15,0,0"
+                                    Width="260" Height="104"/>
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </Border.OpacityMask>
+                <Rectangle>
                     <Rectangle.Fill>
-                        <ImageBrush ImageSource="{Binding ImageSour}"/>
+                        <ImageBrush ImageSource="{Binding ImageSour}" Stretch="UniformToFill"/>
                     </Rectangle.Fill>
                 </Rectangle>
+            </Border>
 
-                <StackPanel Grid.Row="1" Margin="0, 10">
-                    <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding Title}">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="#FFF"/>
-                                <Setter Property="FontSize" Value="18"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding Description}">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="#FFF"/>
-                                <Setter Property="FontSize" Value="12"/>
-                                <Setter Property="FontWeight" Value="Regular"/>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </StackPanel>
-            </Grid>
-        </Border>
-    </Grid>
+            <!-- source badge -->
+            <Border x:Name="BadgeBorder" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9,9,0,0"
+                    CornerRadius="5" Padding="7,2" Background="#C00A0C0E"
+                    BorderBrush="#40FFFFFF" BorderThickness="1" Visibility="Collapsed">
+                <TextBlock x:Name="BadgeText" FontSize="9" FontWeight="Bold" Foreground="#FFF"/>
+            </Border>
+
+            <StackPanel Grid.Row="1" Margin="13,9,13,11">
+                <TextBlock Text="{Binding Title}" Foreground="#FFF" FontSize="13.5" FontWeight="SemiBold"
+                           TextTrimming="CharacterEllipsis"/>
+                <Grid Margin="0,5,0,0">
+                    <TextBlock Text="{Binding Description}" Foreground="#5F7280" FontSize="10"
+                               TextTrimming="CharacterEllipsis" Margin="0,0,18,0"/>
+                    <TextBlock x:Name="MoreArrow" Text="→" Foreground="#00B558" FontWeight="Bold"
+                               HorizontalAlignment="Right" FontSize="11" Visibility="Collapsed"/>
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </Border>
 </UserControl>
