@@ -49,7 +49,7 @@ namespace BlockifyLauncher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Palma")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string UserName {
             get {
                 return ((string)(this["UserName"]));
@@ -133,7 +133,7 @@ namespace BlockifyLauncher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int HideLauncher {
             get {
                 return ((int)(this["HideLauncher"]));
@@ -145,7 +145,7 @@ namespace BlockifyLauncher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("en-US")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ru-RU")]
         public string Language {
             get {
                 return ((string)(this["Language"]));
@@ -313,7 +313,7 @@ namespace BlockifyLauncher.Properties {
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool DiscordRpc {
             get {
                 return ((bool)(this["DiscordRpc"]));

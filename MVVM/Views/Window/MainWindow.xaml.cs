@@ -32,6 +32,9 @@ namespace BlockifyLauncher
 
             this.Width = Settings.Default.WidthProgram;
             this.Height = Settings.Default.HeightProgram;
+
+            // blockify:// links from a second start of the exe (App single instance)
+            InitExternalLinks();
         }
 
         private async void LoadingMainWindow(object sender, RoutedEventArgs e)
@@ -40,21 +43,70 @@ namespace BlockifyLauncher
             try
             {
                 await InitWebAsync();
-
-                await InitializeAccountsAsync();
-                await InitializeVersionsAsync();
-
-                MinecraftAccountComboBox.SelectionChanged += MinecraftAccountSelectionChanged;
-                setting.launcher.FileChanged += LauncherFileChanged;
-
-                ShellReady?.Invoke();
-                MarkDataReady();
             }
             catch (Exception ex)
             {
-                try { System.IO.File.WriteAllText(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "blockify_err.txt"), ex.ToString()); } catch { }
-                HandleException(ex);
+                // the window has no frame or buttons of its own — without the page it's a black rectangle
+                // nobody can close: explain in Russian and quit (closing the window ends the process)
+                LogDiag("STARTUP FAILED (WebView2) " + ex);
+                App.ShowStartupProblem(
+                    "Не удалось запустить интерфейс лаунчера (компонент Microsoft Edge WebView2).\n\n" + ex.Message +
+                    "\n\nПерезагрузи компьютер или переустанови WebView2 Runtime. Подробности записаны в журнал:\n" + LogFile,
+                    offerWebView2Download: true);
+                Dispatcher.BeginInvoke(new Action(Close));
+                return;
             }
+
+            // each step on its own: a broken account file or no network must not leave the page without data
+            try { await InitializeAccountsAsync(); }
+            catch (Exception ex) { LogDiag("STARTUP accounts failed " + ex); }
+            try { await InitializeVersionsAsync(); }
+            catch (Exception ex) { LogDiag("STARTUP versions failed " + ex); }
+
+            MinecraftAccountComboBox.SelectionChanged += MinecraftAccountSelectionChanged;
+            try { setting.launcher.FileChanged += LauncherFileChanged; }
+            catch (Exception ex) { LogDiag("STARTUP launcher failed " + ex); }
+
+            try { ShellReady?.Invoke(); }
+            catch (Exception ex) { LogDiag("STARTUP shell handlers failed " + ex); }
+            MarkDataReady();
+            ShowStartupWarningsWhenReady();
+        }
+
+        // App.StartupWarnings (unreachable Minecraft folder, damaged settings / accounts file) go to the page's
+        // dialog once it has loaded; the native box only if the page never came up
+        private void ShowStartupWarningsWhenReady()
+        {
+            int ticks = 0;
+            var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+            timer.Tick += (_, _) =>
+            {
+                if (!_webReady && ++ticks < 60) return;   // wait up to 30 s for the page's "ready"
+                timer.Stop();
+                var warnings = App.TakeStartupWarnings();
+                if (warnings.Length == 0) return;
+                string text = string.Join("\n\n", warnings);
+                LogDiag("startup warnings shown: " + text);
+                if (_webReady && Web?.CoreWebView2 != null)
+                    Post(new { type = "error", message = text });
+                else
+                    new MessageBox(text, MessageBox.TypeMessage.Warning).Show();
+            };
+            timer.Start();
+        }
+
+        // ✕ in the page, Alt+F4, «закрывать после запуска игры»: remember the window size; App ends the process
+        // when this window is closed
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            if (e.Cancel) return;
+            try
+            {
+                if (WindowState == WindowState.Normal && !WindowStateHelper.IsMaximized)
+                    setting.SettingsSavingSizeForms((int)this.Width, (int)this.Height);
+            }
+            catch { }
         }
 
         // Initialize account comboBox
@@ -66,13 +118,15 @@ namespace BlockifyLauncher
             bool IsUser = true;
             foreach (var accountItem in account.GetAllUserArray())
             {
-                MinecraftAccountComboBox.Items.Add(accountItem.Username);
+                MinecraftAccountComboBox.Items.Add(accountItem.Username ?? "");
                 if (accountItem.Id == setting.GetLastUser() && IsUser)
                     IsUser = false;
                 else if (IsUser)
                     index++;
             }
 
+            // saved active id not found (account removed, first start): take the first account
+            if (index >= MinecraftAccountComboBox.Items.Count) index = 0;
             if (MinecraftAccountComboBox.Items.Count > 0)
                 MinecraftAccountComboBox.SelectedIndex = index;
 
@@ -152,7 +206,7 @@ namespace BlockifyLauncher
         private static readonly string[] AikarFlags =
         {
             "-XX:+UseG1GC", "-XX:+ParallelRefProcEnabled", "-XX:MaxGCPauseMillis=200",
-            "-XX:+UnlockExperimentalVMOptions", "-XX:+DisableExplicitGC", "-XX:+AlwaysPreTouch",
+            "-XX:+UnlockExperimentalVMOptions", "-XX:+DisableExplicitGC",
             "-XX:G1NewSizePercent=30", "-XX:G1MaxNewSizePercent=40", "-XX:G1HeapRegionSize=8M",
             "-XX:G1ReservePercent=20", "-XX:G1HeapWastePercent=5", "-XX:G1MixedGCCountTarget=4",
             "-XX:InitiatingHeapOccupancyPercent=15", "-XX:G1MixedGCLiveThresholdPercent=90",
@@ -162,15 +216,23 @@ namespace BlockifyLauncher
 
         // Error message box — routed into the web UI's glass dialog when it's ready
         // so all popups share the launcher's style; native box only as a fallback.
+        // Safe to call from any thread: WebView2 and WPF windows are touched on the UI thread only.
         private void HandleException(Exception ex)
         {
+            if (!Dispatcher.CheckAccess())
+            {
+                if (!Dispatcher.HasShutdownStarted)
+                    Dispatcher.BeginInvoke(new Action(() => HandleException(ex)));
+                else LogDiag("EXCEPTION (during shutdown) " + ex);
+                return;
+            }
+
             LogDiag("EXCEPTION " + ex);
             try
             {
                 if (_webReady && Web?.CoreWebView2 != null)
                 {
-                    if (Dispatcher.CheckAccess()) Post(new { type = "error", message = ex.Message });
-                    else Dispatcher.Invoke(() => Post(new { type = "error", message = ex.Message }));
+                    Post(new { type = "error", message = ex.Message });
                     return;
                 }
             }
@@ -178,17 +240,12 @@ namespace BlockifyLauncher
             new MessageBox(ex.Message, MessageBox.TypeMessage.Error).ShowDialog();
         }
 
-        // append a diagnostic line to %TEMP%/blockify_err.txt (for debugging launch issues)
-        private static void LogDiag(string msg)
-        {
-            try
-            {
-                System.IO.File.AppendAllText(
-                    System.IO.Path.Combine(System.IO.Path.GetTempPath(), "blockify_err.txt"),
-                    DateTime.Now.ToString("HH:mm:ss") + " " + msg + "\n");
-            }
-            catch { }
-        }
+        // launcher journal: %APPDATA%\BlockifyLauncher\logs\launcher.log (rotated at 1 MB, one previous file kept);
+        // one writer (Core/AppLog) shared with App's startup checks and global exception handlers
+        internal static readonly string LogDir = BlockifyLauncher.Core.AppLog.LogDir;
+        internal static string LogFile => BlockifyLauncher.Core.AppLog.LogFile;
+
+        private static void LogDiag(string msg) => BlockifyLauncher.Core.AppLog.Write(msg);
 
         private string GameLauncherName = "BlockifyLauncher";
         private string GameLauncherVersion = "1";
@@ -197,7 +254,12 @@ namespace BlockifyLauncher
         // offline accounts as-is, Microsoft accounts get a fresh token.
         private async Task<Session> ResolveLaunchSession()
         {
-            SessionStruct selected = account!.GetAllUserArray()[MinecraftAccountComboBox.SelectedIndex];
+            // the active account («Сделать активным») is the saved id; the combo index is only the fallback
+            var all = account!.GetAllUserArray();
+            string activeId = setting.GetLastUser() ?? "";
+            SessionStruct selected = all.FirstOrDefault(a => a.Id == activeId)
+                                     ?? all[MinecraftAccountComboBox.SelectedIndex];
+            LogDiag($"launch account type={selected.UserType ?? "offline"} byId={selected.Id == activeId}");
 
             if (selected.UserType != "msa")
                 return Session.GetOfflineSession(selected.Username ?? string.Empty);
@@ -240,6 +302,9 @@ namespace BlockifyLauncher
             // per-pack overrides win over global settings (0 / empty = keep global)
             var pk = _packLaunch;
             int ramMb = pk?.RamMb > 0 ? pk.RamMb : setting.GetMemoryRAM();
+            // never ask for more heap than the PC has: leave ~1.5 GB for Windows and the launcher
+            long physMb = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / (1024 * 1024);
+            if (physMb > 0 && ramMb > physMb - 1536) ramMb = (int)Math.Max(1024, physMb - 1536);
             if (!string.IsNullOrWhiteSpace(pk?.JavaPath) && System.IO.File.Exists(pk!.JavaPath)) javaPath = pk.JavaPath;
             string[]? jvm = !string.IsNullOrWhiteSpace(pk?.JvmArgs)
                 ? pk!.JvmArgs.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -271,22 +336,59 @@ namespace BlockifyLauncher
         private bool _launching;
         public event Action<bool>? LaunchStateChanged;
 
+        // ── running games (F008): instance folder → game process, filled on start, emptied on exit ──
+        private readonly Dictionary<string, Process> _runningGames = new(StringComparer.OrdinalIgnoreCase);
+
+        private static string GameDirKey(string dir)
+        {
+            try { return System.IO.Path.GetFullPath(dir).TrimEnd('\\', '/'); }
+            catch { return dir.TrimEnd('\\', '/'); }
+        }
+
+        /// <summary>Is a game started by this launcher still running in this folder (pack instance or .minecraft)?</summary>
+        public bool IsGameRunning(string gameDir)
+        {
+            if (string.IsNullOrWhiteSpace(gameDir)) return false;
+            lock (_runningGames)
+            {
+                if (!_runningGames.TryGetValue(GameDirKey(gameDir), out var p)) return false;
+                try { return !p.HasExited; } catch { return false; }
+            }
+        }
+
+        // {type:'gameState', state:'starting'|'running'|'idle', slug:'<pack slug or "">'} — UI thread only
+        private void PostGameState(string state, string slug)
+        {
+            try { Post(new { type = "gameState", state, slug }); }
+            catch (Exception ex) { LogDiag("gameState post failed: " + ex.Message); }
+        }
+
+        // nothing to launch with: the page opens the accounts / versions screen instead of a native error box
+        private void NotifyLaunchBlocked(string type, string fallbackText)
+        {
+            LogDiag("launch blocked: " + type);
+            _packGameDir = null;   // a pack launch that stopped here must not leak into the next Play
+            _packLaunch = null;
+            if (Web?.CoreWebView2 != null) Post(new { type });
+            else new MessageBox(fallbackText, MessageBox.TypeMessage.Error).ShowDialog();
+        }
+
         // Launch the selected version. Called by the home page Play button.
         public async void LaunchSelected()
         {
             if (_launching) return;
             var lang = ResxLocalizationProvider.Instance;
 
-            if (MinecraftVerisonComboBox.SelectedIndex < 0)
-            {
-                new MessageBox(lang["error_no_version"], MessageBox.TypeMessage.Error).ShowDialog();
-                return;
-            }
-
             if (MinecraftAccountComboBox.SelectedIndex < 0 ||
                 MinecraftAccountComboBox.Items[MinecraftAccountComboBox.SelectedIndex] is not string)
             {
-                new MessageBox(lang["error_no_account"], MessageBox.TypeMessage.Error).ShowDialog();
+                NotifyLaunchBlocked("needAccount", lang["error_no_account"]);
+                return;
+            }
+
+            if (MinecraftVerisonComboBox.SelectedIndex < 0)
+            {
+                NotifyLaunchBlocked("needVersion", lang["error_no_version"]);
                 return;
             }
 
@@ -302,6 +404,12 @@ namespace BlockifyLauncher
             _activeJob = ("launch", "Запуск " + launchVer);
             PostJob("launch", "Запуск " + launchVer, "Проверка файлов…", 0, 0);
 
+            var pack = _packLaunch;
+            string gameSlug = pack?.Slug ?? "";
+            string gameDir = _packGameDir ?? McBase();
+            bool started = false, closeAfterStart = false;
+            PostGameState("starting", gameSlug);
+
             try
             {
                 var process = await StartGame();
@@ -309,40 +417,46 @@ namespace BlockifyLauncher
                     throw new InvalidOperationException(lang["error_start_failed"]);
 
                 process.Start();
+                started = true;
                 Post(new { type = "installDone", id = "launch", ok = true });
+                PostGameState("running", gameSlug);
+                lock (_runningGames) _runningGames[GameDirKey(gameDir)] = process;
+                LogDiag($"game started slug='{gameSlug}' dir='{gameDir}'");
 
-                // Crash Doctor: if the launcher stays open, watch the pack's game process and
-                // diagnose automatically when it dies with a crash
-                if (_packLaunch is { } pkExit && new Properties.Settings().GetHideLauncher() != 0)
+                int hideLauncher = setting.GetHideLauncher();
+
+                // watch the game: "idle" for the page when it ends, Crash Doctor for a pack that crashed
+                var launchedAt = DateTime.Now; var proc = process;
+                try
                 {
-                    string slugExit = pkExit.Slug; var launchedAt = DateTime.Now; var proc = process;
-                    try
+                    proc.EnableRaisingEvents = true;
+                    proc.Exited += (_, __) =>
                     {
-                        proc.EnableRaisingEvents = true;
-                        proc.Exited += (_, __) =>
-                        {
-                            int code = 0; try { code = proc.ExitCode; } catch { }
-                            Dispatcher.BeginInvoke(() => OnPackExited(slugExit, launchedAt, code));
-                        };
-                    }
-                    catch { }
+                        int code = 0; try { code = proc.ExitCode; } catch { }
+                        Dispatcher.BeginInvoke(new Action(() => OnGameProcessExited(proc, gameDir, gameSlug, pack != null, launchedAt, code)));
+                    };
                 }
+                catch (Exception ex) { LogDiag("cannot watch the game process: " + ex.Message); }
 
-                new Properties.Settings().RegisterLaunch(
-                    MinecraftVerisonComboBox.Items[MinecraftVerisonComboBox.SelectedIndex].ToString() ?? "");
+                setting.RegisterLaunch(launchVer);
 
                 // Discord Rich Presence is optional — never let it break a launch
-                if (new Properties.Settings().GetDiscordRpc())
+                if (setting.GetDiscordRpc())
                     try { App._discordController?.UpdateDiscordActivity("play"); } catch { }
 
                 /*Closing the Launcher after launching minecraft.*/
-                if (new Properties.Settings().GetHideLauncher() == 0)
-                    this.Close();
+                closeAfterStart = hideLauncher == 0;
             }
             catch (Exception ex)
             {
-                Post(new { type = "installDone", id = "launch", ok = false, error = ex.Message });
-                HandleException(ex);
+                if (!started) PostGameState("idle", gameSlug);
+                // one message only: the page shows the failed launch job with its error
+                if (Web?.CoreWebView2 != null)
+                {
+                    LogDiag("LAUNCH FAILED " + ex);
+                    Post(new { type = "installDone", id = "launch", ok = false, error = ex.Message });
+                }
+                else HandleException(ex);
             }
             finally
             {
@@ -353,6 +467,35 @@ namespace BlockifyLauncher
                 _activeJob = null;
                 LaunchStateChanged?.Invoke(false);
             }
+
+            // «закрывать лаунчер после запуска игры»: close the window and with it the whole process (App shuts
+            // down on MainWindow.Closed). The game is a separate process and keeps running. A bare Close() under
+            // OnExplicitShutdown used to leave an invisible launcher process behind.
+            if (closeAfterStart)
+            {
+                LogDiag("closing the launcher after the game started");
+                Close();
+            }
+        }
+
+        private void OnGameProcessExited(Process proc, string gameDir, string slug, bool isPack, DateTime launchedAt, int exitCode)
+        {
+            LogDiag($"game exited code={exitCode} slug='{slug}'");
+            lock (_runningGames)
+            {
+                string key = GameDirKey(gameDir);
+                if (_runningGames.TryGetValue(key, out var p) && ReferenceEquals(p, proc)) _runningGames.Remove(key);
+            }
+            PostGameState("idle", slug);
+
+            // a crash while the launcher sits minimized: bring it back so the diagnosis is seen
+            if (exitCode != 0 && WindowState == WindowState.Minimized)
+            {
+                try { WindowState = WindowState.Normal; Activate(); } catch { }
+            }
+
+            // Crash Doctor: diagnose a pack automatically when its game dies with a crash
+            if (isPack) OnPackExited(slug, launchedAt, exitCode);
         }
 
         private void LauncherFileChanged(DownloadFileChangedEventArgs e)

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Уязвимость безопасности
+    url: https://github.com/Blockify-Launcher/Blockify-Launcher/security/advisories/new
+    about: Не публикуйте уязвимости в открытых issue — сообщите о них приватно (см. SECURITY.md).
+  - name: Скачать лаунчер и прочитать FAQ
+    url: https://blockify-launcher.github.io/Blockify-Launcher/#faq
+    about: Требования, SmartScreen, WebView2 и частые вопросы.

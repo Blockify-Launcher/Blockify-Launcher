@@ -59,8 +59,8 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);ove
 /* ── window title bar ── */
 .titlebar{position:relative;z-index:55;height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 20px;flex-shrink:0}
 .tb-brand{display:flex;align-items:center;gap:9px;font-family:'Unbounded';font-weight:700;font-size:12.5px;color:var(--muted);pointer-events:none}
-.tb-brand .tb-cube{width:16px;height:16px;border-radius:4px;image-rendering:pixelated;
-  background:linear-gradient(180deg,var(--grass) 0 34%,#8a6a3f 34% 58%,#6e4f2c 58% 100%)}
+.tb-brand .tb-cube{width:16px;height:16px;flex-shrink:0;
+  background:url('img/logo.png') center/contain no-repeat}
 .tb-brand b{color:var(--text);font-weight:700}
 .tb-brand b span{color:var(--grass)}
 .tb-btns{display:flex;gap:4px}
@@ -95,9 +95,9 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);ove
 
 .sidebar{width:224px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden}
 .logo{padding:20px 18px 16px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--glass-line)}
-.logo-cube{width:34px;height:34px;flex-shrink:0;image-rendering:pixelated;border-radius:8px;
-  background:linear-gradient(180deg,var(--grass) 0 32%,#8a6a3f 32% 55%,#6e4f2c 55% 100%);
-  box-shadow:0 4px 12px rgba(107,191,59,.35), inset 0 1px 0 rgba(255,255,255,.35)}
+.logo-cube{width:34px;height:34px;flex-shrink:0;
+  background:url('img/logo.png') center/contain no-repeat;
+  filter:drop-shadow(0 4px 10px rgba(107,191,59,.35))}
 .logo b{font-family:'Unbounded';font-weight:900;font-size:15px;white-space:nowrap;line-height:1.15}
 .logo b span{color:var(--grass)}
 #verTag{display:block;font-size:10px;color:var(--muted);font-family:var(--mono);white-space:nowrap}
@@ -378,6 +378,16 @@ input[type=range]{width:100%;accent-color:var(--grass)}
 .shot:hover{transform:scale(1.02);box-shadow:0 12px 26px rgba(0,0,0,.45)}
 .shot .meta{position:absolute;inset:auto 0 0 0;padding:8px 11px;
   background:linear-gradient(transparent,rgba(0,0,0,.8));font-family:var(--mono);font-size:10px;color:#cfd8d0}
+.shot .shot-album{position:absolute;top:8px;left:8px;max-width:calc(100% - 16px);padding:3px 9px;border-radius:20px;
+  font:600 10px var(--mono);color:#e8efe9;background:rgba(12,16,14,.5);border:1px solid rgba(255,255,255,.16);
+  backdrop-filter:blur(8px);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shot .shot-album.main{color:var(--grass)}
+.shot-albums{margin-bottom:16px}
+.shot-albums .chip{display:inline-flex;align-items:center;gap:7px;max-width:260px}
+.shot-albums .chip .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shot-albums .chip .n{font:600 10.5px var(--mono);opacity:.75}
+.shot-albums .chip.empty-album:not(.on){opacity:.55}
 
 /* ── HOME: when packs are shown, let the page flow/scroll instead of hard-fitting ── */
 #s-home.has-packs{overflow-y:auto;padding-right:6px}
@@ -439,6 +449,8 @@ input[type=range]{width:100%;accent-color:var(--grass)}
 /* crash doctor findings */
 .cd-head{font-family:var(--mono);font-size:11.5px;color:var(--red);padding:10px 12px;border-radius:10px;
   background:rgba(224,86,74,.1);border:1px solid rgba(224,86,74,.3);word-break:break-word}
+.cd-head.low{color:var(--gold);background:rgba(242,193,78,.08);border-color:rgba(242,193,78,.3)}
+.cd-note{font-size:12px;color:var(--muted);line-height:1.5;padding:2px 2px 4px}
 .cd-item{padding:12px 14px;border-radius:11px;border:1px solid var(--glass-line);background:rgba(255,255,255,.04)}
 .cd-item b{font-size:13.5px;display:block;margin-bottom:4px}
 .cd-item p{font-size:12px;color:var(--muted);margin:0 0 10px;line-height:1.55}
@@ -486,7 +498,64 @@ input[type=range]{width:100%;accent-color:var(--grass)}
 .dl-job.ok .dl-fill{background:var(--grass);width:100%!important}
 .dl-job.err .dl-fill{background:var(--red);width:100%!important}
 .dl-job.ok small{color:var(--grass)}
-.dl-job.err small{color:var(--red)}
+.dl-job.err small{color:var(--red);white-space:normal;overflow:visible;line-height:1.45;word-break:break-word}
+.dl-job{position:relative}
+.dl-job.ok b,.dl-job.err b{padding-right:24px}
+.dl-x{position:absolute;top:-2px;right:0;width:22px;height:20px;border:0;border-radius:6px;cursor:pointer;
+  background:rgba(255,255,255,.06);color:var(--muted);font:700 11px 'Manrope';line-height:20px}
+.dl-x:hover{background:rgba(255,255,255,.14);color:var(--text)}
+
+/* ── dialog: optional technical details under «Подробнее» ── */
+.dlg-more{margin:-8px 0 16px}
+.dlg-more summary{cursor:pointer;font-size:11.5px;color:var(--muted);user-select:none}
+.dlg-more pre{margin-top:8px;max-height:140px;overflow:auto;padding:9px 11px;border-radius:9px;
+  background:rgba(0,0,0,.3);border:1px solid var(--glass-line);font:11px/1.45 var(--mono);color:var(--muted);
+  white-space:pre-wrap;word-break:break-word;user-select:text}
+.dlg-more[hidden]{display:none}
+
+/* ── small glass toast (bottom-center) ── */
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,12px);z-index:260;opacity:0;pointer-events:none;
+  padding:10px 16px;border-radius:12px;font:700 12.5px 'Manrope';color:var(--text);max-width:min(460px,calc(100vw - 32px));
+  background:rgba(16,22,20,.95);border:1px solid var(--glass-hi);box-shadow:0 14px 34px rgba(0,0,0,.5);transition:.22s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ── game state: play buttons + running pack ── */
+.btn-play[disabled]{cursor:default;opacity:.8;transform:none;filter:saturate(.7)}
+.btn-play.running{background:linear-gradient(180deg,rgba(255,255,255,.12),transparent),rgba(30,38,34,.85);
+  color:var(--grass);border-color:rgba(107,191,59,.45);box-shadow:0 0 0 1px rgba(107,191,59,.2)}
+.btn-cont{font:800 13px 'Manrope';padding:0 18px;border-radius:12px;cursor:pointer;color:var(--text);
+  background:rgba(20,26,24,.6);backdrop-filter:blur(14px);border:1px solid rgba(107,191,59,.4);
+  box-shadow:inset 0 1px 0 var(--glass-hi);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:.15s}
+.btn-cont:hover{background:rgba(107,191,59,.16)}
+.btn-cont[hidden]{display:none}
+.btn[disabled]{opacity:.55;cursor:default;pointer-events:none}
+.run-badge{font-family:var(--mono);font-size:9.5px;padding:2px 7px;border-radius:5px;margin-left:6px;vertical-align:middle;
+  background:rgba(107,191,59,.18);color:var(--grass)}
+.mp-row.running,.hp-card.running{border-color:rgba(107,191,59,.55);box-shadow:0 0 0 1px rgba(107,191,59,.3), inset 0 1px 0 var(--glass-hi)}
+body.game-on .blob{animation-play-state:paused}
+.dot.off{background:#5c665f;box-shadow:none}
+
+/* ── first run: «add a profile» card on Home ── */
+.onboard{flex-shrink:0;margin-top:16px;display:flex;align-items:center;gap:16px;padding:16px 20px;
+  border-color:rgba(242,193,78,.35)}
+.onboard[hidden]{display:none}
+.onboard .ob-ic{width:44px;height:44px;border-radius:12px;flex-shrink:0;display:grid;place-items:center;font-size:20px;
+  background:rgba(242,193,78,.14);box-shadow:inset 0 1px 0 var(--glass-hi)}
+.onboard{flex-wrap:wrap}
+.onboard .ob-txt{flex:1;min-width:220px}
+.onboard .ob-txt b{font-size:14.5px;display:block}
+.onboard .ob-txt span{font-size:12px;color:var(--muted)}
+.onboard .ob-act{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+/* ── settings: «О программе» ── */
+.about-card{max-width:880px;margin-top:16px;padding:18px}
+.about-card h3{font-size:14px;font-weight:800;margin-bottom:10px}
+.about-ver{font-family:var(--mono);font-size:12.5px;color:var(--gold)}
+.about-acts{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.about-note{font-size:11.5px;color:var(--muted);line-height:1.55}
+
+/* ── catalog: offline state ── */
+.empty .btn{margin-top:12px}
 
 /* ── in-app screenshot viewer + editor ── */
 .viewer{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;
@@ -505,6 +574,10 @@ input[type=range]{width:100%;accent-color:var(--grass)}
 .vw-b.danger{color:var(--red);border-color:rgba(224,86,74,.35)}
 .vw-b.danger:hover{background:rgba(224,86,74,.16)}
 .vw-b.vw-close:hover{background:var(--red);color:#fff}
+.vw-b[hidden]{display:none}
+.vw-album{font:600 10.5px var(--mono);color:var(--grass);padding:3px 9px;border-radius:20px;flex-shrink:0;
+  background:rgba(107,191,59,.12);border:1px solid rgba(107,191,59,.3);max-width:200px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .vw-sep{width:1px;height:20px;background:var(--glass-line);margin:0 3px}
 .vw-zoom{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:42px;text-align:center}
 #vwColor{width:30px;height:30px;padding:0;border:1px solid var(--glass-line);border-radius:8px;background:none;cursor:pointer}
@@ -547,7 +620,7 @@ input[type=range]{width:100%;accent-color:var(--grass)}
   <aside class="sidebar glass">
     <div class="logo" id="logoDrag">
       <div class="logo-cube"></div>
-      <div><b>Block<span style="color:var(--grass)">ify</span></b><span id="verTag">v1.0.0 · glass</span></div>
+      <div><b>Block<span style="color:var(--grass)">ify</span></b><span id="verTag"></span></div>
     </div>
     <nav class="nav">
       <button class="active" data-s="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg><span>Главная</span></button>
@@ -562,7 +635,7 @@ input[type=range]{width:100%;accent-color:var(--grass)}
     <div class="account" id="accountCard">
       <div class="skin" id="accSkin"></div>
       <div><b id="curName">—</b><span id="curType">оффлайн</span></div>
-      <div class="dot"></div>
+      <div class="dot" id="accDot"></div>
     </div>
   </aside>
 
@@ -574,6 +647,7 @@ input[type=range]{width:100%;accent-color:var(--grass)}
         <p id="heroSub">Выбери версию и нажми «Играть».</p>
         <div class="launch-row">
           <button class="btn-play" id="playBtn">▶&nbsp; ИГРАТЬ</button>
+          <button class="btn-cont" id="contBtn" hidden title="Запустить то, во что играл в прошлый раз"></button>
           <div class="ver-select gdd" id="verSelect" tabindex="0">
             <span>Версия:</span><b id="verValue">—</b><span class="caret">▾</span>
             <div class="gdd-menu" id="verMenu"></div>
@@ -581,37 +655,21 @@ input[type=range]{width:100%;accent-color:var(--grass)}
         </div>
       </div>
 
+      <!-- first run: what's missing before «Играть» works (profile → version) -->
+      <div class="onboard glass" id="onboard" style="background:var(--glass2)" hidden>
+        <div class="ob-ic" id="obIcon">👤</div>
+        <div class="ob-txt"><b id="obTitle">Добавь профиль, чтобы играть</b><span id="obText">Оффлайн-профиль по нику или вход через Microsoft — это займёт полминуты.</span></div>
+        <div class="ob-act" id="obActs"></div>
+      </div>
+
       <div class="home-packs" id="homePacks" hidden>
         <div class="hp-head"><h3>Мои сборки</h3><button class="btn" id="hpAll">Все сборки →</button></div>
         <div class="hp-row" id="hpRow"></div>
       </div>
 
-      <div class="grid-2">
-        <div class="card glass" id="newsCard" style="background:var(--glass2)">
-          <h3>Новости <span class="tag">RU/UA</span></h3>
-          <div id="newsList"><div class="empty">Загрузка новостей…</div></div>
-        </div>
-
-        <div class="ad-server glass" style="background:var(--glass2)">
-          <span class="ad-mark">Реклама</span>
-          <div class="art"></div>
-          <div class="body">
-            <b>GIGACRAFT</b>
-            <p>Сервер выживания 1.21.4 · без вайпов · кланы и ивенты каждую неделю</p>
-            <div class="online">● онлайн: 1 247 игроков</div>
-            <button class="ad-cta">Играть → mc.gigacraft.ua</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="ad-banner glass" style="background:var(--glass2)">
-        <span class="ad-mark">Реклама</span>
-        <div class="hicon">🖥</div>
-        <div class="btxt">
-          <b>MineHost — свой сервер за 5 минут</b>
-          <span>NVMe-диски · защита от DDoS · панель на русском · от <span class="price">99 ₴/мес</span></span>
-        </div>
-        <button class="ad-cta">Создать сервер</button>
+      <div class="card glass" id="newsCard" style="background:var(--glass2)">
+        <h3>Новости</h3>
+        <div id="newsList"><div class="empty">Загрузка новостей…</div></div>
       </div>
     </section>
 
@@ -716,7 +774,7 @@ input[type=range]{width:100%;accent-color:var(--grass)}
     <!-- WORLDS & BACKUPS -->
     <section class="screen" id="s-worlds">
       <h1>Миры и бэкапы</h1>
-      <div class="sub">Миры из папки saves. Бэкап пакует мир в zip; перед восстановлением текущий мир сохраняется автоматически.</div>
+      <div class="sub">Миры основной игры и всех сборок. Бэкап пакует мир в zip; перед восстановлением текущий мир сохраняется автоматически.</div>
       <div style="display:flex;gap:10px;margin-bottom:16px">
         <button class="btn" id="worldsRefresh">Обновить</button>
         <button class="btn" id="savesFolder">Папка saves</button>
@@ -726,12 +784,13 @@ input[type=range]{width:100%;accent-color:var(--grass)}
 
     <!-- SCREENSHOTS -->
     <section class="screen" id="s-screens">
-      <h1>Скриншоты</h1>
-      <div class="sub">Всё, что снято по F2, из папки screenshots. Клик — открыть в просмотрщике.</div>
-      <div style="display:flex;gap:10px;margin-bottom:16px">
+      <h1>Скриншот-центр</h1>
+      <div class="sub">Всё, что снято по F2 — в основной игре и в каждой сборке. Клик — открыть в просмотрщике.</div>
+      <div style="display:flex;gap:10px;margin-bottom:14px">
         <button class="btn" id="screensRefresh">Обновить</button>
-        <button class="btn" id="screensFolder">Открыть папку</button>
+        <button class="btn" id="screensFolder" title="Папка выбранного альбома">Открыть папку</button>
       </div>
+      <div class="toolbar shot-albums" id="shotAlbums"></div>
       <div class="shots" id="shotsList"><div class="empty">Загрузка скриншотов…</div></div>
     </section>
 
@@ -750,18 +809,27 @@ input[type=range]{width:100%;accent-color:var(--grass)}
         </div>
         <div class="set-card glass" style="background:var(--glass2)">
           <h3>Лаунчер</h3>
-          <div class="field"><label>Язык (применится после перезапуска)</label><select id="langSel"><option value="ru-RU">Русский</option><option value="uk-UA">Українська</option><option value="en-US">English</option></select></div>
           <div class="field"><label>Любимый сервер</label><input type="text" id="favServer" placeholder="mc.example.net"></div>
           <div class="switch-row">Закрывать лаунчер после запуска игры <label class="sw"><input type="checkbox" id="swClose"><i></i></label></div>
           <div class="switch-row">Оптимизированные JVM-флаги <label class="sw"><input type="checkbox" id="swJvm"><i></i></label></div>
-          <div class="switch-row">Discord-статус <label class="sw"><input type="checkbox" id="swDiscord"><i></i></label></div>
+          <div class="switch-row" style="display:none">Discord-статус <label class="sw"><input type="checkbox" id="swDiscord"><i></i></label></div>
           <div class="switch-row">Показывать снапшоты <label class="sw"><input type="checkbox" id="swSnap"><i></i></label></div>
         </div>
       </div>
       <div class="set-actions">
         <span class="set-status" id="setStatus">Изменения сохраняются автоматически</span>
       </div>
-      <div class="footnote" id="footVer">// Blockify</div>
+      <div class="about-card glass" style="background:var(--glass2)" id="aboutCard">
+        <h3>О программе</h3>
+        <div>Blockify Launcher <span class="about-ver" id="aboutVer">—</span></div>
+        <div class="about-acts">
+          <button class="btn" id="aboutLogs" title="Папка с launcher.log — приложи файл к сообщению о проблеме">Открыть папку логов</button>
+          <button class="btn" id="aboutIssue" title="github.com/Blockify-Launcher/Blockify-Launcher/issues">Сообщить о проблеме</button>
+          <button class="btn" id="aboutLicenses" title="Лицензии сторонних компонентов">Лицензии</button>
+        </div>
+        <div class="about-note">Blockify не является официальным продуктом Minecraft и не связан с Mojang или Microsoft.</div>
+      </div>
+      <div class="footnote" id="footVer">Blockify</div>
     </section>
   </main>
 </div>
@@ -769,6 +837,7 @@ input[type=range]{width:100%;accent-color:var(--grass)}
 <!-- in-app screenshot viewer + editor -->
 <div class="viewer" id="viewer" hidden>
   <div class="vw-bar">
+    <span class="vw-album" id="vwAlbum">—</span>
     <span class="vw-name" id="vwName">—</span>
     <div class="vw-tools">
       <button class="vw-b" data-t="prev" title="Предыдущий (←)">‹</button>
@@ -787,8 +856,10 @@ input[type=range]{width:100%;accent-color:var(--grass)}
       <button class="vw-b" data-t="undo" title="Отменить">↶</button>
       <button class="vw-b" data-t="reset" title="Сбросить всё">Сброс</button>
       <span class="vw-sep"></span>
-      <button class="vw-b primary" data-t="save" title="Перезаписать">Сохранить</button>
-      <button class="vw-b" data-t="copy" title="Сохранить копию">Копия</button>
+      <button class="vw-b primary" data-t="copy" title="Сохранить правки копией рядом с оригиналом">Сохранить копию</button>
+      <button class="vw-b" data-t="save" title="Перезаписать исходный файл правками">Заменить оригинал</button>
+      <button class="vw-b" data-t="sign" title="Сохранить копию с плашкой Blockify · альбом · дата">С подписью</button>
+      <button class="vw-b" data-t="cover" title="Поставить кадр обложкой сборки на главной" hidden>Сделать обложкой сборки</button>
       <button class="vw-b danger" data-t="del" title="В корзину">Удалить</button>
       <button class="vw-b" data-t="ext" title="Открыть системно">↗</button>
       <button class="vw-b vw-close" data-t="close" title="Закрыть (Esc)">✕</button>
@@ -805,15 +876,18 @@ input[type=range]{width:100%;accent-color:var(--grass)}
 
 <!-- unified glass dialog (confirm / alert) -->
 <div class="dlg" id="dlg" hidden>
-  <div class="dlg-card glass">
+  <div class="dlg-card glass" role="dialog" aria-modal="true" aria-labelledby="dlgTitle" aria-describedby="dlgMsg">
     <b class="dlg-title" id="dlgTitle">Blockify</b>
     <p class="dlg-msg" id="dlgMsg"></p>
+    <details class="dlg-more" id="dlgMore" hidden><summary>Подробнее</summary><pre id="dlgDetails"></pre></details>
     <div class="dlg-actions">
       <button class="btn" id="dlgCancel">Отмена</button>
       <button class="btn primary" id="dlgOk">ОК</button>
     </div>
   </div>
 </div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <!-- background download / install panel -->
 <div class="dlpanel" id="dlPanel" hidden>
@@ -925,7 +999,12 @@ input[type=range]{width:100%;accent-color:var(--grass)}
 <script>
   // load app.js with the same cache-bust version as this page
   (function(){ var v = new URLSearchParams(location.search).get('v') || '';
-    var s = document.createElement('script'); s.src = 'app.js?v=' + v; document.body.appendChild(s); })();
+    // app.js first, then feature modules in order; a missing module is skipped
+    var files = ['app.js', 'features/share.js', 'features/vibe.js', 'features/stats.js'];
+    (function next(i){ if (i >= files.length) return;
+      var s = document.createElement('script'); s.src = files[i] + '?v=' + v;
+      s.onload = s.onerror = function(){ next(i + 1); };
+      document.body.appendChild(s); })(0); })();
 </script>
 </body>
 </html>

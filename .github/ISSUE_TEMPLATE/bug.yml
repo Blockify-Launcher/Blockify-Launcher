@@ -1,0 +1,94 @@
+name: Ошибка
+description: Лаунчер или игра работают не так, как должны
+title: "[Ошибка] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо, что сообщаете о проблеме! Чем точнее описание, тем быстрее получится исправить.
+        **Не публикуйте** пароли, токены, e-mail и другие личные данные — проверьте лог перед тем, как прикрепить его.
+
+  - type: input
+    id: version
+    attributes:
+      label: Версия Blockify
+      description: Видна в настройках лаунчера, в строке «===== … Blockify X.Y.Z» в launcher.log и на странице релиза, откуда вы скачивали.
+      placeholder: "0.2.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: windows
+    attributes:
+      label: Версия Windows
+      description: "Узнать: Win + R → winver"
+      options:
+        - Windows 11
+        - Windows 10
+        - Другая (укажу ниже)
+    validations:
+      required: true
+
+  - type: input
+    id: windows-build
+    attributes:
+      label: Сборка Windows (необязательно)
+      description: Из окна winver, например «23H2, сборка 22631».
+      placeholder: "22H2, сборка 19045"
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Где проблема
+      multiple: true
+      options:
+        - Запуск лаунчера
+        - Вход / аккаунты
+        - Запуск игры
+        - Установка или обновление сборки
+        - Моды / буст FPS
+        - Миры и бэкапы
+        - Машина времени (снимки)
+        - Коды BLK- и ссылки blockify://
+        - Скриншоты
+        - Другое
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Что произошло
+      description: Что вы делали, что ожидали и что получили вместо этого. Текст ошибки можно вставить сюда.
+      placeholder: |
+        1. Открыл «Сборки», нажал «Установить» у сборки …
+        2. На 40% появилась ошибка …
+        Ожидал: сборка установится и запустится.
+    validations:
+      required: true
+
+  - type: input
+    id: pack
+    attributes:
+      label: Версия Minecraft, загрузчик, сборка (если связано с игрой)
+      placeholder: "Fabric 1.21.1, сборка Fabulously Optimized 6.2"
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Лог лаунчера
+      description: |
+        Прикрепите файл `%APPDATA%\BlockifyLauncher\logs\launcher.log` (вставьте путь в адресную строку Проводника) — просто перетащите его в это поле.
+        Если упала игра, приложите также `crash-reports\…txt` или `logs\latest.log` из папки игры или сборки.
+      placeholder: Перетащите файлы сюда
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Проверка
+      options:
+        - label: Я скачал Blockify со страницы релизов GitHub или с официального сайта.
+          required: true
+        - label: Я поискал похожие issue и не нашёл такой же проблемы.
+          required: false

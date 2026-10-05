@@ -10,9 +10,11 @@
     <ApplicationIcon>Image\MainForm.ico</ApplicationIcon>
     <Platforms>AnyCPU;x86;x64</Platforms>
     <StartupObject></StartupObject>
-    <AssemblyVersion>0.0.1.0</AssemblyVersion>
-    <FileVersion>0.0.1.0</FileVersion>
-	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- the one place the version lives; CI overrides it with -p:Version=<tag> -->
+    <Version>0.2.0</Version>
+    <Company>Blockify Launcher</Company>
+    <Product>BlockifyLauncher</Product>
+	<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 	<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
 
@@ -94,6 +96,21 @@
   <!-- embedded brand fonts (Unbounded / Manrope / JetBrains Mono, SIL OFL) -->
   <ItemGroup>
     <Resource Include="Resources\Fonts\*.ttf" />
+  </ItemGroup>
+
+  <!-- license texts shipped with every build (MIT requires the notices to travel with the binaries) -->
+  <ItemGroup>
+    <Content Include="LICENSE;THIRD-PARTY-NOTICES.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\BlockifyLib\NOTICE.md">
+      <Link>BlockifyLib-NOTICE.md</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\OFL.txt">
+      <Link>Fonts-OFL.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <!-- WebView2 UI assets (html/css/js/fonts) shipped next to the exe -->

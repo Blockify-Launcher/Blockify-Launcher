@@ -1,121 +1,158 @@
 <div align="center">
-  <img src="https://github.com/Blockify-Launcher/.github/assets/84909252/5da2f5de-d890-427b-a25c-a57dbb53065b"/>
-  <h1>🟩 Blockify Launcher</h1>
-  <p><b>A liquid-glass Minecraft launcher.</b> Native WPF shell, a full HTML/CSS interface rendered inside the window, and a one-click modpack manager.</p>
+
+# Blockify Launcher
+
+**Бесплатный лаунчер для Minecraft: Java Edition на Windows.**
+Сборки Modrinth в один клик, моды, миры и краши под контролем — без соцсети и регистрации в лаунчере.
+
+[**⬇ Скачать для Windows**](https://github.com/Blockify-Launcher/Blockify-Launcher/releases) ·
+[Сайт](https://blockify-launcher.github.io/Blockify-Launcher/) ·
+[Что нового](CHANGELOG.md) ·
+[Сообщить о проблеме](https://github.com/Blockify-Launcher/Blockify-Launcher/issues/new/choose)
+
+[![Build](https://github.com/Blockify-Launcher/Blockify-Launcher/actions/workflows/build-and-deploy.yml/badge.svg)](https://github.com/Blockify-Launcher/Blockify-Launcher/actions/workflows/build-and-deploy.yml)
+[![Release](https://img.shields.io/github/v/release/Blockify-Launcher/Blockify-Launcher?style=flat-square&label=релиз)](https://github.com/Blockify-Launcher/Blockify-Launcher/releases)
+![Windows 10/11 x64](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-6BBF3B?style=flat-square)
+[![License: MIT](https://img.shields.io/badge/license-MIT-5EB8E6?style=flat-square)](LICENSE)
+
+<img src="site/og.png" alt="Главный экран Blockify Launcher: кнопка «Играть», выбор версии и сборки" width="820">
+
 </div>
 
-![Banner](https://github.com/Blockify-Launcher/.github/assets/84909252/47206b7a-edc5-4b4c-b368-9e8e6634ecce)
+> Blockify не является официальным продуктом Minecraft. Не одобрено и не связано с Mojang или Microsoft.
 
-<div align="center">
+## Что умеет
 
-[![Build and Deploy WPF Application](https://github.com/Blockify-Launcher/Blockify-Launcher/actions/workflows/build-and-deploy.yml/badge.svg)](https://github.com/Blockify-Launcher/Blockify-Launcher/actions/workflows/build-and-deploy.yml)
-![Platform](https://img.shields.io/badge/platform-Windows-6BBF3B?style=flat-square)
-![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square)
-![UI](https://img.shields.io/badge/UI-WebView2%20%C2%B7%20Liquid%20Glass-5EB8E6?style=flat-square)
-![Lang](https://img.shields.io/badge/i18n-RU%20%C2%B7%20UA%20%C2%B7%20EN-F2C14E?style=flat-square)
+**Сборки и моды**
+- Каталог сборок Modrinth: поиск, фильтры по версии и загрузчику, установка `.mrpack` в один клик.
+- Fabric, Quilt, Forge и NeoForge — Forge и NeoForge ставятся через официальный установщик без ручных действий.
+- Изолированные инстансы: у каждой сборки свои моды, конфиги и миры, основная игра не затрагивается.
+- Настройки на сборку: своя RAM, Java, JVM-аргументы и размер окна.
+- Менеджер модов: включение, выключение, обновление по хешу через Modrinth, установка модов, шейдеров
+  и ресурспаков прямо в сборку вместе с зависимостями.
+- Буст FPS в один клик — моды производительности под загрузчик сборки; выключается так же просто.
+- Импорт из Prism Launcher / MultiMC, CurseForge App и локальных `.mrpack`, экспорт сборки в `.mrpack`.
+- Коды `BLK-…` и ссылки `blockify://`: поделитесь сборкой — друг поставит такую же в пару кликов.
 
-</div>
+**Когда что-то сломалось**
+- Crash Doctor: читает краш-репорт и `latest.log`, называет мод-виновника и предлагает исправление в один клик.
+- Машина времени: снимки модов и конфигов сборки (сами — перед рискованными изменениями), откат в один клик,
+  именованные снимки как профили модов.
+- Бэкапы миров основной игры и сборок; восстановление с обязательным страховочным бэкапом текущего мира.
+
+**Остальное**
+- Интерфейс «жидкое стекло» на русском, живой фон, панель загрузок, которая не мешает работать.
+- Центр скриншотов с альбомами по сборкам и встроенным редактором.
+- Локальная статистика игры по каждой сборке — ничего не уходит в сеть.
+- Любые версии Minecraft: релизы, снапшоты, старые версии.
+- Вход через аккаунт Microsoft и локальные профили для игры без интернета и по локальной сети.
+
+Полный список изменений — в [CHANGELOG.md](CHANGELOG.md).
+
+## Скачать и запустить
+
+1. Откройте [страницу релизов](https://github.com/Blockify-Launcher/Blockify-Launcher/releases) и скачайте
+   **`Blockify-portable-win-x64.zip`** (не «Source code»).
+2. Распакуйте архив **целиком** в отдельную папку, например `C:\Games\Blockify`.
+   Прямо из архива лаунчер не запустится.
+3. Запустите `BlockifyLauncher.exe`. Устанавливать .NET не нужно — он уже внутри архива.
+
+**Windows защитила ваш компьютер?** Лаунчер пока не подписан цифровой подписью, поэтому SmartScreen его не узнаёт.
+Нажмите «Подробнее» → «Выполнить в любом случае». Скачивайте Blockify только отсюда или с
+[сайта](https://blockify-launcher.github.io/Blockify-Launcher/) и сверяйте архив с `SHA256SUMS.txt` из релиза:
+
+```powershell
+Get-FileHash .\Blockify-portable-win-x64.zip -Algorithm SHA256
+```
+
+### Системные требования
+
+| | Минимум | Рекомендуется |
+|---|---|---|
+| Система | Windows 10 версии 1607 или новее, Windows 11 — **только 64-бит** | Windows 10 22H2 / Windows 11 |
+| Компоненты | [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) (в Windows 11 уже есть) | — |
+| Память | 4 ГБ ОЗУ | 8 ГБ ОЗУ для сборок с модами |
+| Диск | 2 ГБ свободного места | больше — каждая сборка занимает от 0,5 до нескольких ГБ |
+| Видеокарта | с поддержкой OpenGL (3.2+ для Minecraft 1.17 и новее) и актуальным драйвером | дискретная |
+| Сеть | интернет для первой установки версий и сборок | — |
+
+Windows 7/8.1, 32-битные системы, Linux и macOS не поддерживаются (Linux и macOS — в планах).
+
+### Аккаунт и лицензия игры
+
+Регистрации в самом лаунчере нет. Для официальных серверов, скинов и Realms войдите через аккаунт Microsoft,
+на котором куплена Minecraft: Java Edition: страница входа Microsoft открывается во встроенном окне лаунчера,
+пароль лаунчер не сохраняет — на вашем ПК хранится только токен входа. Для игры без интернета и по локальной сети
+можно создать локальный профиль.
+
+Чтобы играть в Minecraft, игру нужно [купить](https://www.minecraft.net/) — этого требует
+[лицензионное соглашение Minecraft (EULA)](https://www.minecraft.net/eula). Blockify не продаёт и не распространяет
+саму игру.
+
+## Проблемы и вопросы
+
+- Журнал лаунчера: `%APPDATA%\BlockifyLauncher\logs\launcher.log` — приложите его к
+  [сообщению об ошибке](https://github.com/Blockify-Launcher/Blockify-Launcher/issues/new/choose).
+- Уязвимости — только приватно, см. [SECURITY.md](.github/SECURITY.md).
 
 ---
 
-## ⛏️ What is it
+## Для разработчиков
 
-Blockify is a Minecraft launcher with a twist: the entire interface is **real HTML/CSS** — the exact "liquid glass" mockup — rendered inside a native WPF window through **WebView2**, and wired to the launch engine over a thin C#↔JS bridge. You get pixel-perfect design (backdrop-blur, custom fonts, smooth dropdowns) *and* native window behavior, launching, and file management.
+Оболочка — .NET 8 WPF, весь интерфейс — HTML/CSS/JS в WebView2, связь через мост
+`WebMessageReceived` ↔ `PostWebMessageAsJson`. Запуск игры — движок [BlockifyLib](https://github.com/Blockify-Launcher/BlockifyLib)
+(сабмодуль `libs/BlockifyLib`, основан на коде CmlLib.Core — см. `libs/BlockifyLib/NOTICE.md`).
 
-> Windows only for now. Linux / macOS are on the roadmap.
+### Сборка из исходников
 
----
-
-## ✨ Features
-
-### 🎨 Interface
-- **Liquid-glass UI** — the mockup runs 1:1 (real `backdrop-filter`, Unbounded / Manrope / JetBrains Mono embedded).
-- Frameless window with a custom title bar — drag, min/max/close, edge-resize, themed scrollbars.
-- Unified **glass dialogs** (confirm / alert / errors) — no mismatched native popups.
-- A live **download panel** with per-step progress (files `N/Total`, %) that never blocks the launcher.
-
-### 📦 Modpacks (Modrinth)
-- **Search & install** modpacks from the Modrinth catalog — query, MC-version filter, sort, loader chips.
-- One-click **.mrpack install**: loader + Minecraft version + all mods + overrides.
-- Loaders: **Fabric · Quilt** (via meta APIs) and **Forge · NeoForge** (official headless installer).
-- **Isolated instances** — every pack lives in its own folder (`blockify-packs/<slug>`), with its own mods / config / saves, never touching your main game.
-- Resilient downloads: **SHA-1 verified**, retried, and **resumable** (re-install only fetches what's missing).
-- Manage installed packs: play, open folder, open mods, repair, remove.
-
-### 👤 Accounts
-- **Microsoft** sign-in (official servers, skins, Realms) — no password ever touches the launcher.
-- **Offline** profiles with proper offline UUIDs (`OfflinePlayer:` scheme) — mods like Essential just work.
-- Local **skin library** for offline profiles (upload PNG, assign, live face preview).
-
-### 🧰 Utilities
-- **Versions** — install any vanilla version (download-only), release/snapshot/old filters.
-- **Mod updates** — scan `mods/`, match on Modrinth by hash, update in place.
-- **Worlds & backups** — list saves, zip backups, one-click restore (auto-snapshot before overwrite).
-- **Screenshots** — in-app gallery with a built-in **editor**: crop, rotate, draw, zoom, save / copy / delete.
-- **News** — live Mojang + custom feed.
-- Settings: RAM, Java path, Aikar flags, Discord RPC, favorite server, "close launcher after game starts", and more.
-
----
-
-## 🧱 Tech stack
-
-| Layer | Tech |
-|------|------|
-| Shell | .NET 8 · WPF · WindowChrome |
-| UI | WebView2 (Chromium) · HTML / CSS / vanilla JS |
-| Bridge | `WebMessageReceived` ↔ `PostWebMessageAsJson` |
-| Launch engine | `BlockifyLib` (CmlLib-style, submodule) |
-| Services | Modrinth API · Mojang manifest · Fabric/Quilt/Forge/NeoForge installers |
-
----
-
-## 🚀 Build & run
+Нужны Windows, [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) и WebView2 Runtime.
 
 ```bash
-# Requirements: .NET 8 SDK, Windows, WebView2 Runtime (preinstalled on Win11)
 git clone --recurse-submodules https://github.com/Blockify-Launcher/Blockify-Launcher.git
 cd Blockify-Launcher
 
 dotnet build BlockifyLauncher.csproj -c Debug
-dotnet run  --project BlockifyLauncher.csproj
+dotnet run --project BlockifyLauncher.csproj
 ```
 
-> Already cloned without submodules? Run `git submodule update --init --recursive`.
+Уже клонировали без сабмодулей? `git submodule update --init --recursive`.
+
+Релизная сборка (так же собирает CI):
+
+```bash
+dotnet publish BlockifyLauncher.csproj -c Release -r win-x64 --self-contained true -p:DebugType=none -o publish
+```
+
+### Структура
+
+```
+WebUI/                     интерфейс: index.html, app.js, features/*.js, шрифты
+Core/                      Modrinth (каталог, установка .mrpack, обновления модов), новости, фон
+MVVM/Views/Window/         MainWindow.*.cs — мост C#↔JS и функции: сборки, моды, Crash Doctor,
+                           машина времени, миры, скриншоты, коды BLK-, статистика
+libs/BlockifyLib/          движок запуска (сабмодуль)
+site/                      лендинг (GitHub Pages)
+```
+
+### Релизы
+
+Версия задаётся в `<Version>` в `BlockifyLauncher.csproj`. Релиз — тег `vX.Y.Z` (или `vX.Y.Z-rc1`) на коммите
+из `master`: workflow [`release.yml`](.github/workflows/release.yml) проверяет, что версия тега совпадает с проектом,
+собирает self-contained `win-x64`, публикует `Blockify-portable-win-x64.zip`, `SHA256SUMS.txt` и подтверждение
+происхождения сборки и создаёт **черновик** релиза с описанием из раздела `CHANGELOG.md`.
+
+## Лицензии
+
+- Код Blockify Launcher — [MIT](LICENSE).
+- Сторонние компоненты (BlockifyLib/CmlLib.Core, MSAL, WebView2 SDK, Newtonsoft.Json, SharpZipLib, шрифты под SIL OFL
+  и другие) — [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt). Оба файла лежат и рядом с программой в архиве релиза.
+- Minecraft — товарный знак Mojang AB. Blockify не является официальным продуктом Minecraft.
+  Не одобрено и не связано с Mojang или Microsoft.
 
 ---
 
-## 🗂️ Project layout
-
-```
-WebUI/                     # the entire interface (index.html + app.js + fonts)
-Core/
-  Modrinth/                # catalog search, .mrpack installer, mod-update checks
-  News/                    # Mojang + custom news feed
-MVVM/Views/Window/
-  MainWindow.Web.cs        # C#↔JS bridge
-  MainWindow.Features.cs   # screenshots · worlds · skins
-  MainWindow.Packs.cs      # installed-pack registry + launch
-  MainWindow.Forge.cs      # headless Forge/NeoForge installer
-libs/BlockifyLib/          # launch engine (submodule)
-```
-
----
-
-## 🛣️ Roadmap
-
-- [x] Liquid-glass UI on WebView2
-- [x] Modpack manager — Fabric / Quilt / Forge / NeoForge, isolated instances
-- [x] Screenshot editor · worlds & backups · offline skins
-- [ ] Per-pack mod management (enable/disable/update inside an instance)
-- [ ] In-game skins for offline profiles (CustomSkinLoader)
-- [ ] Linux & macOS
-
----
-
-<div align="center">
-  <img src="https://github.com/Blockify-Launcher/.github/assets/84909252/8f2b49c8-20df-4fb5-9a3c-b98bb773860f"/>
-
-  🎵 Music for the soul — [listen](https://youtu.be/ESb3ad-1lJE?si=Q2SByRH-E4HANvkH)
-
-  <sub>Built on pure enthusiasm. If you like it, drop a ⭐</sub>
-</div>
+<sub>**English summary.** Blockify is a free, open-source (MIT) launcher for Minecraft: Java Edition on Windows 10/11 x64:
+one-click Modrinth modpacks in isolated instances (Fabric/Quilt/Forge/NeoForge), per-pack settings, mod manager,
+FPS boost, Crash Doctor, snapshots, world backups, share codes. The UI is Russian-only for now.
+Download `Blockify-portable-win-x64.zip` from [Releases](https://github.com/Blockify-Launcher/Blockify-Launcher/releases).
+Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</sub>

@@ -1,0 +1,44 @@
+Blockify Launcher — third-party notices
+=======================================
+
+Blockify Launcher is distributed under the MIT License (see LICENSE).
+It includes or depends on the components listed below; their own licenses apply.
+
+Launch engine
+-------------
+BlockifyLib (libs/BlockifyLib) — MIT, Copyright (c) 2025 Blockify.
+  Contains code adapted from CmlLib.Core and XboxAuthNet.Game
+  (MIT, Copyright (c) AlphaBs and contributors) — see libs/BlockifyLib/NOTICE.md.
+
+NuGet packages
+--------------
+AngleSharp ......................................... MIT (AngleSharp contributors)
+ConfigureAwait.Fody ................................ MIT (Fody contributors)
+dotenv.net ......................................... MIT (Bolorunduro Winner-Timothy)
+LZMA-SDK ........................................... Public domain (Igor Pavlov)
+Microsoft.Extensions.Logging.Abstractions ........... MIT (.NET Foundation)
+Microsoft.Identity.Client (+ Extensions.Msal) ...... MIT (Microsoft)
+Microsoft.Web.WebView2 ............................. Microsoft WebView2 SDK license (BSD-style, Microsoft)
+NETStandard.Library, System.Drawing.Common,
+System.Management, System.Text.Json ................. MIT (.NET Foundation)
+Newtonsoft.Json .................................... MIT (James Newton-King)
+SharpZipLib ........................................ MIT (ICSharpCode)
+WpfScreenHelper .................................... MIT (Michael Denny)
+XboxAuthNet ........................................ MIT (AlphaBs)
+
+Runtime
+-------
+.NET 8 runtime (bundled in the self-contained build) .. MIT (.NET Foundation and Contributors)
+
+Fonts (Resources/Fonts, WebUI)
+------------------------------
+Unbounded, Manrope, JetBrains Mono — SIL Open Font License 1.1
+  (https://openfontlicense.org). Copyright by their respective authors;
+  full license text and copyright lines: Fonts-OFL.txt next to this file.
+
+Other
+-----
+Discord Game SDK (SDK/Discord) — distributed under the Discord Developer Terms of Service.
+
+Minecraft is a trademark of Mojang AB / Microsoft. Blockify Launcher is not an official
+Minecraft product and is not approved by or associated with Mojang or Microsoft.

@@ -57,8 +57,10 @@ namespace BlockifyLauncher
         // ── init ──
         private async Task InitWebAsync()
         {
-            string dataFolder = Path.Combine(Path.GetTempPath(), "BlockifyWebView2");
-            var env = await CoreWebView2Environment.CreateAsync(null, dataFolder);
+            string dataFolder = BlockifyLauncher.Core.AppPaths.WebViewDataDir;   // not %TEMP%: cleaners wipe it
+            // Russian UI for the built-in context menu (Вырезать / Копировать / Вставить) and form validation
+            var envOptions = new CoreWebView2EnvironmentOptions { Language = "ru-RU" };
+            var env = await CoreWebView2Environment.CreateAsync(null, dataFolder, envOptions);
             await Web.EnsureCoreWebView2Async(env);
 
             string webRoot = Path.Combine(AppContext.BaseDirectory, "WebUI");
@@ -81,10 +83,60 @@ namespace BlockifyLauncher
             }
             catch { }
 
-            Web.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+            // right-click works only where it is useful: text fields and selected text get
+            // cut / copy / paste / select all; everywhere else (buttons, cards, images) no menu at all
+            Web.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
+            Web.CoreWebView2.ContextMenuRequested += OnContextMenuRequested;
             Web.CoreWebView2.Settings.IsStatusBarEnabled = false;
             Web.CoreWebView2.Settings.AreDevToolsEnabled = false;
             Web.DefaultBackgroundColor = System.Drawing.Color.FromArgb(0xFF, 0x0B, 0x0E, 0x10);
+
+            // the window only ever shows our own UI: anything else (a dropped file/link, a stray
+            // redirect) must not end up as a document that can talk to the C# bridge
+            Web.CoreWebView2.NavigationStarting += (_, e) =>
+            {
+                if (IsAppUrl(e.Uri)) return;
+                e.Cancel = true;
+                OpenUrl(e.Uri);
+            };
+            Web.CoreWebView2.NewWindowRequested += (_, e) => { e.Handled = true; OpenUrl(e.Uri); };
+            Web.CoreWebView2.PermissionRequested += (_, e) => e.State = CoreWebView2PermissionState.Deny;
+            // a file dropped on the window would replace the launcher page; browser hotkeys
+            // (F5, Ctrl+P, Ctrl+F, Alt+←) make no sense here and F5 used to wipe job state
+            Web.AllowExternalDrop = false;
+            Web.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
+
+            // the page's renderer can crash or hang (GPU driver, out of memory): reload it instead of
+            // leaving a blank window without buttons; the page re-sends "ready" and gets a fresh init
+            Web.CoreWebView2.ProcessFailed += (_, e) =>
+            {
+                LogDiag($"WebView2 process failed: {e.ProcessFailedKind} reason={e.Reason} exit={e.ExitCode}");
+                Dispatcher.BeginInvoke(() =>
+                {
+                    if (e.ProcessFailedKind == CoreWebView2ProcessFailedKind.BrowserProcessExited)
+                    {
+                        // the whole WebView2 runtime is gone — only a restart brings the UI back
+                        new MessageBox("Интерфейс лаунчера неожиданно закрылся. Blockify перезапустится.",
+                            MessageBox.TypeMessage.Error).ShowDialog();
+                        try { Process.Start(new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = true }); } catch { }
+                        Application.Current.Shutdown();
+                        return;
+                    }
+                    _webReady = false;
+                    try { Web.CoreWebView2?.Reload(); } catch { }
+                });
+            };
+
+            // mc.assets maps the whole .minecraft folder — serve images only (screenshots, covers,
+            // world icons); account/token files and other data stay unreachable from the page
+            Web.CoreWebView2.AddWebResourceRequestedFilter("https://mc.assets/*", CoreWebView2WebResourceContext.All);
+            Web.CoreWebView2.WebResourceRequested += (_, e) =>
+            {
+                if (!Uri.TryCreate(e.Request.Uri, UriKind.Absolute, out var u) || u.Host != "mc.assets") return;
+                string ext = Path.GetExtension(Uri.UnescapeDataString(u.AbsolutePath)).ToLowerInvariant();
+                if (ext is ".png" or ".jpg" or ".jpeg" or ".webp" or ".gif") return;
+                e.Response = Web.CoreWebView2.Environment.CreateWebResourceResponse(null, 403, "Forbidden", "");
+            };
 
             Web.CoreWebView2.WebMessageReceived += OnWebMessage;
 
@@ -111,12 +163,65 @@ namespace BlockifyLauncher
 
         private void OnLaunchStateWeb(bool busy) => Post(new { type = "launchState", busy });
 
+        // only the clipboard / editing commands survive in the default menu (names are WebView2's stable ids)
+        private static readonly HashSet<string> ContextMenuKeep = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "undo", "redo", "cut", "copy", "paste", "pasteAndMatchStyle", "selectAll"
+        };
+
+        private static void OnContextMenuRequested(object? sender, CoreWebView2ContextMenuRequestedEventArgs e)
+        {
+            try
+            {
+                var target = e.ContextMenuTarget;
+                if (target == null || (!target.IsEditable && !target.HasSelection))
+                {
+                    e.Handled = true;   // no menu on buttons, cards, images, empty space
+                    return;
+                }
+                var items = e.MenuItems;
+                for (int i = items.Count - 1; i >= 0; i--)
+                {
+                    var it = items[i];
+                    if (it.Kind == CoreWebView2ContextMenuItemKind.Separator) continue;
+                    if (!ContextMenuKeep.Contains(it.Name ?? "")) items.RemoveAt(i);
+                }
+                // tidy separators: none at the edges, never two in a row
+                for (int i = items.Count - 1; i >= 0; i--)
+                {
+                    bool sep = items[i].Kind == CoreWebView2ContextMenuItemKind.Separator;
+                    bool edge = i == 0 || i == items.Count - 1;
+                    bool doubled = i > 0 && items[i - 1].Kind == CoreWebView2ContextMenuItemKind.Separator;
+                    if (sep && (edge || doubled)) items.RemoveAt(i);
+                }
+                if (items.Count == 0) e.Handled = true;
+            }
+            catch { e.Handled = true; }
+        }
+
+        // «О программе»: folder with launcher.log (created on demand so the button never does nothing)
+        private void OpenLogsFolder()
+        {
+            try { Directory.CreateDirectory(LogDir); } catch { }
+            OpenPath(LogDir);
+        }
+
+        // «Лицензии»: third-party notices shipped next to the exe
+        private void OpenLicenses()
+        {
+            string path = Path.Combine(AppContext.BaseDirectory, "THIRD-PARTY-NOTICES.txt");
+            if (File.Exists(path)) OpenPath(path);
+            else Post(new { type = "error", message = "Файл с лицензиями (THIRD-PARTY-NOTICES.txt) не найден рядом с программой. Переустанови Blockify или посмотри лицензии на GitHub." });
+        }
+
         // ── inbound messages from JS ──
         private void OnWebMessage(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
+            if (!IsAppUrl(e.Source)) return;   // only our own page may drive the launcher
             JObject m;
             try { m = JObject.Parse(e.WebMessageAsJson); } catch { return; }
-            switch (m.Value<string>("type") ?? "")
+            string msgType = m.Value<string>("type") ?? "";
+            switch (msgType)
             {
                 case "ready": _webReady = true; TryPushInit(); break;
 
@@ -139,7 +244,7 @@ namespace BlockifyLauncher
                     _packMc = m.Value<string>("gameVersion") ?? "";
                     _packSort = m.Value<string>("sort") ?? "";
                     _packType = m.Value<string>("ptype") is string pt && pt is "mod" or "shader" or "resourcepack" ? pt : "modpack";
-                    _ = PushPacksAsync();
+                    _ = PushPacksAsync(m.Value<int?>("seq") ?? 0);
                     break;
                 case "openPack":
                 {
@@ -152,6 +257,8 @@ namespace BlockifyLauncher
                         m.Value<string>("ptype") ?? "mod", m.Value<string>("packSlug") ?? "");
                     break;
                 case "openLink": OpenUrl(m.Value<string>("url") ?? ""); break;
+                case "openLogs": OpenLogsFolder(); break;
+                case "openLicenses": OpenLicenses(); break;
 
                 case "addOffline": AddOfflineAccount(m.Value<string>("nick") ?? ""); break;
                 case "msLogin": _ = MicrosoftLoginAsync(); break;
@@ -209,6 +316,14 @@ namespace BlockifyLauncher
                 case "updatePackMod": _ = UpdatePackModAsync(m.Value<string>("slug") ?? "", m.Value<string>("file") ?? "", m.Value<string>("hash") ?? ""); break;
                 case "deletePackMod": _ = DeletePackModAsync(m.Value<string>("slug") ?? "", m.Value<string>("file") ?? ""); break;
                 case "installVersion": _ = InstallVersionAsync(m.Value<string>("name") ?? ""); break;
+
+                // feature modules (each lives in its own partial file and owns its message types)
+                default:
+                    if (TryHandleShareMessage(msgType, m)) break;
+                    if (TryHandleVibeMessage(msgType, m)) break;
+                    if (TryHandleShotsMessage(msgType, m)) break;
+                    if (TryHandleStatsMessage(msgType, m)) break;
+                    break;
             }
         }
 
@@ -218,15 +333,16 @@ namespace BlockifyLauncher
 
         private void PushInit()
         {
-            string ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0";
+            string ver = BlockifyLauncher.Core.AppInfo.Version;
             var s = new Properties.Settings();
             int ramGb = s.GetMemoryRAM() >= 64 ? s.GetMemoryRAM() / 1024 : s.GetMemoryRAM();
 
             Post(new
             {
                 type = "init",
-                verTag = $"v{ver} · glass",
-                footVer = $"// Blockify {ver}",
+                verTag = $"v{ver}",
+                footVer = $"Blockify {ver}",
+                version = ver,
                 versionNames = GetVersionNames(),
                 selectedVersion = MinecraftVerisonComboBox.SelectedItem?.ToString() ?? "",
                 versions = BuildVersionRows(),
@@ -251,6 +367,12 @@ namespace BlockifyLauncher
             _ = PushPacksAsync();
             _ = PushMojangVersionsAsync();
             PushInstalledPacks();
+
+            // feature modules push their own initial data
+            InitShareFeature();
+            InitVibeFeature();
+            InitShotsFeature();
+            InitStatsFeature();
         }
 
         // ── versions ──
@@ -311,9 +433,10 @@ namespace BlockifyLauncher
             var arr = AllAccounts();
             string lastId = setting.GetLastUser() ?? "";
             var cur = arr.FirstOrDefault(a => a != null && a.Id == lastId) ?? arr.FirstOrDefault(a => a != null);
+            // none = no profile yet: the page shows onboarding instead of a fake "online" account
             if (cur?.Username == null)
-                return new { name = ResxLocalizationProvider.Instance["none_account"], type = "off" };
-            return new { name = cur.Username, type = cur.UserType == "msa" ? "lic" : "off" };
+                return new { name = "Нет профиля", type = "none", none = true };
+            return new { name = cur.Username, type = cur.UserType == "msa" ? "lic" : "off", none = false };
         }
 
         private List<object> AccountObjs()
@@ -345,7 +468,12 @@ namespace BlockifyLauncher
         private void AddOfflineAccount(string nick)
         {
             nick = (nick ?? "").Trim();
-            if (string.IsNullOrWhiteSpace(nick)) return;
+            // the nick ends up on the java command line and in the game profile: 3–16 of [A-Za-z0-9_] only
+            if (!System.Text.RegularExpressions.Regex.IsMatch(nick, "^[A-Za-z0-9_]{3,16}$"))
+            {
+                HandleException(new ArgumentException("Ник должен быть от 3 до 16 символов: латинские буквы, цифры и «_»."));
+                return;
+            }
             (account ??= new Account()).CreateUser(nick);
             SyncAccountsToCombo();
         }
@@ -386,7 +514,7 @@ namespace BlockifyLauncher
             foreach (var a in arr)
             {
                 if (a == null) continue;
-                MinecraftAccountComboBox.Items.Add(a.Username);
+                MinecraftAccountComboBox.Items.Add(a.Username ?? "");
                 if (a.Id == lastId) sel = MinecraftAccountComboBox.Items.Count - 1;
             }
             if (MinecraftAccountComboBox.Items.Count > 0)
@@ -403,7 +531,18 @@ namespace BlockifyLauncher
             {
                 case "ram": s.SetMemoryRAM(Math.Max(1, val.Value<int>()) * 1024); break;
                 case "favServer": s.SetFavoriteServer(val.Value<string>() ?? ""); break;
-                case "mcDir": s.SetMinecraftDir(val.Value<string>() ?? ""); break;
+                case "mcDir":
+                {
+                    string dir = val.Value<string>() ?? "";
+                    // empty = default .minecraft; anything else must be a usable, writable folder
+                    if (dir.Trim().Length > 0 && !BlockifyLauncher.Core.AppPaths.TryValidateMinecraftDir(dir, out var dirErr))
+                    {
+                        Post(new { type = "error", message = "Папка Minecraft недоступна: " + dirErr });
+                        break;
+                    }
+                    s.SetMinecraftDir(dir);
+                    break;
+                }
                 case "swJvm": s.SetJvmAikar(val.Value<bool>()); break;
                 case "swDiscord": s.SetDiscordRpc(val.Value<bool>()); break;
                 case "swSnap": s.SetShowSnapshots(val.Value<bool>()); break;
@@ -459,9 +598,11 @@ namespace BlockifyLauncher
             Post(new { type = "news", items });
         }
 
-        private async Task PushPacksAsync()
+        // seq: echo of the page's request number, so a slow old answer can't overwrite a newer search
+        private async Task PushPacksAsync(int seq = 0)
         {
             List<ModpackInfo> packs;
+            string ptype = _packType;
             try
             {
                 packs = await ModrinthService.SearchAsync(
@@ -469,13 +610,19 @@ namespace BlockifyLauncher
                     query: string.IsNullOrWhiteSpace(_packQuery) ? null : _packQuery,
                     gameVersion: string.IsNullOrWhiteSpace(_packMc) ? null : _packMc.Trim(),
                     sortIndex: string.IsNullOrEmpty(_packSort) ? null : _packSort,
-                    limit: 30, projectType: _packType);
+                    limit: 30, projectType: ptype);
             }
-            catch { packs = new List<ModpackInfo>(); }
-
-            var items = packs.Select(p => new
+            catch (Exception ex)
             {
-                ptype = _packType,
+                // a failed request is not "nothing found": the page shows «нет соединения» + «Повторить»
+                LogDiag("Modrinth search failed: " + ex.Message);
+                Post(new { type = "packs", items = Array.Empty<object>(), error = "offline", seq });
+                return;
+            }
+
+            var items = (packs ?? new List<ModpackInfo>()).Select(p => new
+            {
+                ptype,
                 slug = p.Slug,
                 title = p.Title,
                 description = p.Description,
@@ -485,13 +632,17 @@ namespace BlockifyLauncher
                 banner = p.BannerUrl ?? "",
                 icon = p.IconUrl ?? ""
             }).ToList();
-            Post(new { type = "packs", items });
+            Post(new { type = "packs", items, seq });
         }
 
+        private static bool IsAppUrl(string? url)
+            => url != null && url.StartsWith("https://app.blockify/", StringComparison.OrdinalIgnoreCase);
+
+        // web links only: a shell-executed string could otherwise be a local exe, file:// or a custom protocol
         private static void OpenUrl(string url)
         {
-            if (string.IsNullOrWhiteSpace(url)) return;
-            try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); } catch { }
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var u) || (u.Scheme != Uri.UriSchemeHttps && u.Scheme != Uri.UriSchemeHttp)) return;
+            try { Process.Start(new ProcessStartInfo(u.AbsoluteUri) { UseShellExecute = true }); } catch { }
         }
     }
 }

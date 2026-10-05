@@ -1,0 +1,32 @@
+# Weekly dependency updates. Actions are pinned by commit SHA; Dependabot bumps the SHA and the "# vX.Y.Z" comment together.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ['*']
+
+  # NuGet for BlockifyLauncher.csproj. The BlockifyLib submodule has its own repository and is updated there.
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: deps
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # stay on the .NET 8 line until the planned move to .NET 10 (v0.2.1)
+      - dependency-name: 'Microsoft.Extensions.*'
+        update-types: [version-update:semver-major]
+      - dependency-name: 'System.*'
+        update-types: [version-update:semver-major]

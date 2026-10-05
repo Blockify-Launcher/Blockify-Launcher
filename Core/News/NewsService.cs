@@ -1,7 +1,7 @@
+using BlockifyLauncher.Core.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
-using System.Net.Http;
 
 namespace BlockifyLauncher.Core.News
 {
@@ -28,15 +28,6 @@ namespace BlockifyLauncher.Core.News
         private const string MojangFeed = "https://launchercontent.mojang.com/v2/news.json";
         private const string MojangBase = "https://launchercontent.mojang.com";
         private const string BlockifyFeed = "https://raw.githubusercontent.com/Blockify-Launcher/Blockify-News/main/news.json";
-
-        private static readonly HttpClient Http = CreateClient();
-
-        private static HttpClient CreateClient()
-        {
-            var http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-            http.DefaultRequestHeaders.UserAgent.ParseAdd("BlockifyLauncher/0.2");
-            return http;
-        }
 
         private static string CacheDir => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -85,7 +76,13 @@ namespace BlockifyLauncher.Core.News
             foreach (var item in items)
                 item.LocalImagePath = await CacheImageAsync(item.ImageUrl);
 
-            try { File.WriteAllText(FeedCachePath, JsonConvert.SerializeObject(items, Formatting.Indented)); }
+            try
+            {
+                // tmp + move: a crash mid-write must not leave a corrupt cache
+                string tmp = FeedCachePath + ".tmp";
+                File.WriteAllText(tmp, JsonConvert.SerializeObject(items, Formatting.Indented));
+                File.Move(tmp, FeedCachePath, overwrite: true);
+            }
             catch { /* cache write is best-effort */ }
 
             return items;
@@ -94,7 +91,7 @@ namespace BlockifyLauncher.Core.News
         private static async Task<List<NewsItem>> FetchMojangAsync()
         {
             var result = new List<NewsItem>();
-            var json = JObject.Parse(await Http.GetStringAsync(MojangFeed));
+            var json = JObject.Parse(await BlockifyHttp.GetStringAsync(MojangFeed));
 
             foreach (var e in (JArray?)json["entries"] ?? new JArray())
             {
@@ -126,7 +123,7 @@ namespace BlockifyLauncher.Core.News
         private static async Task<List<NewsItem>> FetchBlockifyAsync()
         {
             var result = new List<NewsItem>();
-            var arr = JArray.Parse(await Http.GetStringAsync(BlockifyFeed));
+            var arr = JArray.Parse(await BlockifyHttp.GetStringAsync(BlockifyFeed));
 
             foreach (var e in arr)
             {
@@ -155,11 +152,9 @@ namespace BlockifyLauncher.Core.News
                 string file = Path.Combine(CacheDir,
                     (uint)url.GetHashCode() + ext);
 
+                // shared gzip-enabled client; written via .part so a cut download never leaves a broken image
                 if (!File.Exists(file))
-                {
-                    byte[] bytes = await Http.GetByteArrayAsync(url);
-                    await File.WriteAllBytesAsync(file, bytes);
-                }
+                    await BlockifyHttp.DownloadToFileAsync(url, file);
                 return file;
             }
             catch { return null; }

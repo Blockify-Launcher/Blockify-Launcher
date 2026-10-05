@@ -1,51 +1,274 @@
+# Release pipeline: tag vX.Y.Z (or vX.Y.Z-rc1) on a commit that is already on master
+#   → build job (read-only token): verify, publish self-contained win-x64, zip, SHA256SUMS, provenance
+#   → release job (write token): create a DRAFT GitHub release; the owner reviews and publishes it by hand.
+#
+# Asset names are a contract with the landing page (site/main.js) and README — do not rename:
+#   Blockify-portable-win-x64.zip, SHA256SUMS.txt
 name: Release
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
 
-permissions:
-  contents: write
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  ASSET_ZIP: Blockify-portable-win-x64.zip
 
 jobs:
-  release:
+  build:
     runs-on: windows-latest
-
+    timeout-minutes: 45
+    permissions:
+      contents: read        # checkout only — build-time code (NuGet targets, Fody) never sees a write token
+      id-token: write       # build provenance (Sigstore)
+      attestations: write   # build provenance
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      prerelease: ${{ steps.meta.outputs.prerelease }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: true
+          submodules: recursive
+          fetch-depth: 0          # full history: needed for the merge-base check against master
+          persist-credentials: false
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.101'
-
-      - name: Get version from tag
-        id: version
+      - name: Validate tag and derive version
+        id: meta
         shell: bash
-        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          re='^v([0-9]+\.[0-9]+\.[0-9]+)(-[0-9A-Za-z.]+)?$'
+          if [[ "$TAG" =~ $re ]]; then
+            base="${BASH_REMATCH[1]}"
+          else
+            echo "::error::Tag '$TAG' is not a release tag (expected vX.Y.Z or vX.Y.Z-suffix)."
+            exit 1
+          fi
+          version="${TAG#v}"
+          prerelease=false
+          if [[ "$version" == *-* ]]; then prerelease=true; fi
+          {
+            echo "version=$version"
+            echo "base=$base"
+            echo "prerelease=$prerelease"
+          } >> "$GITHUB_OUTPUT"
+          echo "Release $version (prerelease: $prerelease)"
 
-      - name: Publish (self-contained win-x64)
-        run: >
-          dotnet publish BlockifyLauncher.csproj
-          -c Release
-          -r win-x64
-          --self-contained true
-          -p:Version=${{ steps.version.outputs.version }}
-          -p:AssemblyVersion=${{ steps.version.outputs.version }}
-          -p:FileVersion=${{ steps.version.outputs.version }}
-          -o ./publish
+      - name: Require the tagged commit to be on master
+        shell: bash
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin +refs/heads/master:refs/remotes/origin/master
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/master; then
+            echo "::error::Tag $TAG points to $GITHUB_SHA, which is not on master. Merge to master first, then tag the merge commit."
+            exit 1
+          fi
 
-      - name: Create archive
-        shell: pwsh
-        run: Compress-Archive -Path ./publish/* -DestinationPath "BlockifyLauncher-${{ github.ref_name }}-win-x64.zip"
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: Setup .NET (global.json)
+        if: hashFiles('global.json') != ''
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
-          files: BlockifyLauncher-${{ github.ref_name }}-win-x64.zip
-          generate_release_notes: true
-          draft: false
+          global-json-file: global.json
+
+      - name: Setup .NET 8
+        if: hashFiles('global.json') == ''
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: '8.0.x'   # latest 8.0 SDK → the self-contained build ships the latest 8.0 runtime patch
+
+      - name: Tag must match the project version
+        shell: pwsh
+        env:
+          BASE_VERSION: ${{ steps.meta.outputs.base }}
+        run: |
+          $projectVersion = (dotnet msbuild BlockifyLauncher.csproj -getProperty:Version).Trim()
+          $projectBase = ($projectVersion -split '[-+]')[0]
+          Write-Host "Project <Version>: $projectVersion, tag base: $env:BASE_VERSION"
+          if ($projectBase -ne $env:BASE_VERSION) {
+            Write-Host "::error::Tag version $env:BASE_VERSION does not match <Version> $projectVersion in the project. Bump the version, commit to master, then tag."
+            exit 1
+          }
+
+      - name: Publish (self-contained win-x64, no symbols)
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          # locked restore once lock files exist for both projects (RestorePackagesWithLockFile)
+          $restoreArgs = @()
+          if ((Test-Path packages.lock.json) -and (Test-Path libs/BlockifyLib/packages.lock.json)) {
+            $restoreArgs += '-p:RestoreLockedMode=true'
+          }
+          dotnet publish BlockifyLauncher.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            "-p:Version=$env:VERSION" `
+            -p:DebugType=none `
+            -p:DebugSymbols=false `
+            -p:ContinuousIntegrationBuild=true `
+            @restoreArgs `
+            -o publish
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Prune files users do not need
+        shell: pwsh
+        run: |
+          # debug symbols (belt and braces: package-supplied .pdb files are not covered by DebugType=none)
+          Get-ChildItem publish -Recurse -File -Include *.pdb | Remove-Item -Force
+          # Discord SDK binaries for other OSes and the import library — never loaded on Windows
+          Get-ChildItem publish/SDK -Recurse -File -Include *.so, *.dylib, *.bundle, *.lib -ErrorAction SilentlyContinue | Remove-Item -Force
+          if (-not (Test-Path publish/BlockifyLauncher.exe)) { throw 'publish/BlockifyLauncher.exe is missing' }
+          if (-not (Test-Path publish/WebUI/index.html)) { throw 'publish/WebUI/index.html is missing' }
+          foreach ($f in 'LICENSE', 'THIRD-PARTY-NOTICES.txt') {
+            if (-not (Test-Path "publish/$f")) { throw "publish/$f is missing (license texts must ship with the binaries)" }
+          }
+
+      - name: Add README.txt for the portable archive
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          $text = @"
+          Blockify Launcher $env:VERSION — portable-версия для Windows 10 (1607+) и Windows 11, только 64-бит.
+
+          1. Распакуйте архив ЦЕЛИКОМ в отдельную папку, например C:\Games\Blockify.
+             Не запускайте лаунчер прямо из архива: без соседних файлов и папки WebUI он не заработает.
+          2. Запустите BlockifyLauncher.exe.
+          3. Если Windows покажет «Система Windows защитила ваш компьютер» — нажмите «Подробнее» →
+             «Выполнить в любом случае». Лаунчер пока не подписан цифровой подписью.
+          4. Нужен Microsoft Edge WebView2 Runtime (в Windows 11 уже установлен):
+             https://developer.microsoft.com/microsoft-edge/webview2/
+
+          Проверка подлинности: сравните SHA256 архива со строкой из SHA256SUMS.txt на странице релиза.
+             PowerShell: Get-FileHash .\Blockify-portable-win-x64.zip -Algorithm SHA256
+
+          Журнал лаунчера: %APPDATA%\BlockifyLauncher\logs\launcher.log
+          Сообщить о проблеме: https://github.com/Blockify-Launcher/Blockify-Launcher/issues
+
+          Blockify не является официальным продуктом Minecraft. Не одобрено и не связано с Mojang или Microsoft.
+          Лицензия: MIT (файл LICENSE). Сторонние компоненты: THIRD-PARTY-NOTICES.txt.
+          "@
+          # CRLF + UTF-8 with BOM, so Notepad on older Windows 10 builds shows Cyrillic correctly
+          $text = ($text -split "`r?`n") -join "`r`n"
+          [System.IO.File]::WriteAllText("$PWD/publish/README.txt", $text, [System.Text.UTF8Encoding]::new($true))
+
+      - name: Create archive and checksums
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist, stage | Out-Null
+          # one top-level folder, so "Extract here" does not spill hundreds of files
+          Move-Item publish stage/BlockifyLauncher
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::CreateFromDirectory(
+            "$PWD/stage", "$PWD/dist/$env:ASSET_ZIP",
+            [System.IO.Compression.CompressionLevel]::Optimal, $false)
+          $lines = Get-ChildItem dist -File | Sort-Object Name | ForEach-Object {
+            '{0}  {1}' -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $_.Name
+          }
+          [System.IO.File]::WriteAllText("$PWD/dist/SHA256SUMS.txt", (($lines -join "`n") + "`n"), [System.Text.UTF8Encoding]::new($false))
+          Get-Content dist/SHA256SUMS.txt
+          Get-ChildItem dist | Format-Table Name, Length
+
+      - name: Release notes from CHANGELOG.md
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          BASE_VERSION: ${{ steps.meta.outputs.base }}
+        run: |
+          $section = $null
+          if (Test-Path CHANGELOG.md) {
+            $md = Get-Content CHANGELOG.md -Raw -Encoding utf8
+            foreach ($v in @($env:VERSION, $env:BASE_VERSION) | Select-Object -Unique) {
+              $m = [regex]::Match($md, "(?ms)^## \[$([regex]::Escape($v))\][^\n]*\n(.*?)(?=^## \[|^\[[^\]]+\]:\s|\z)")
+              if ($m.Success) { $section = $m.Groups[1].Value.Trim(); break }
+            }
+          }
+          if (-not $section) {
+            Write-Host "::warning::No '## [$env:BASE_VERSION]' section in CHANGELOG.md — the draft gets a placeholder; edit it before publishing."
+            $section = '_Описание изменений не найдено в CHANGELOG.md — заполните перед публикацией._'
+          }
+          $sums = (Get-Content dist/SHA256SUMS.txt -Raw).Trim()
+          $notes = @"
+          $section
+
+          ---
+
+          ### Как скачать и запустить
+          1. Скачайте **$env:ASSET_ZIP** ниже (не «Source code»).
+          2. Распакуйте архив **целиком** в отдельную папку и запустите ``BlockifyLauncher.exe``.
+          3. Если Windows покажет «Система Windows защитила ваш компьютер» — «Подробнее» → «Выполнить в любом случае». Лаунчер пока не подписан цифровой подписью.
+
+          **Требования:** Windows 10 (1607+) или 11, только 64-бит · [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) (в Windows 11 уже есть) · ОЗУ от 4 ГБ, для сборок с модами — 8 ГБ · от 2 ГБ на диске · видеокарта с OpenGL 3.2+ для Minecraft 1.17+ · интернет для первой установки.
+
+          ### SHA256
+          ``````
+          $sums
+          ``````
+          Проверка в PowerShell: ``Get-FileHash .\$env:ASSET_ZIP -Algorithm SHA256``. Происхождение сборки подтверждено [GitHub Attestations](https://github.com/$env:GITHUB_REPOSITORY/attestations).
+          "@
+          $disclaimer = 'Blockify не является официальным продуктом Minecraft. Не одобрено и не связано с Mojang или Microsoft.'
+          if (-not $section.Contains($disclaimer)) { $notes += "`n`n_$($disclaimer)_" }
+          $notes = ($notes -split "`r?`n") -join "`n"
+          [System.IO.File]::WriteAllText("$PWD/release-notes.md", $notes, [System.Text.UTF8Encoding]::new($false))
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: dist/${{ env.ASSET_ZIP }}
+
+      - name: Upload release files
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release
+          path: |
+            dist/
+            release-notes.md
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write       # create the draft release — the only job holding a write token, and it runs no project code
+    steps:
+      - name: Download release files
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release
+          path: out
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ needs.build.outputs.version }}
+          PRERELEASE: ${{ needs.build.outputs.prerelease }}
+        run: |
+          set -euo pipefail
+          files=("out/dist/$ASSET_ZIP" "out/dist/SHA256SUMS.txt")
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists — re-uploading assets."
+            gh release upload "$TAG" "${files[@]}" --clobber
+            exit 0
+          fi
+          args=(--draft --verify-tag --title "Blockify Launcher $VERSION" --notes-file out/release-notes.md)
+          if [ "$PRERELEASE" = "true" ]; then args+=(--prerelease); fi
+          gh release create "$TAG" "${args[@]}" "${files[@]}"
+          echo "Draft release created. Review it on GitHub and press «Publish release»." >> "$GITHUB_STEP_SUMMARY"
