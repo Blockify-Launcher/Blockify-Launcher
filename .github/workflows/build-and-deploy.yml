@@ -1,47 +1,70 @@
-name: Build and Deploy WPF Application
+# CI build for pushes and pull requests to master. Releases are built by release.yml from tags.
+# (File name kept so the README badge URL keeps working.)
+name: Build
 
 on:
   push:
     branches:
-      - master  
+      - master
   pull_request:
     branches:
-      - master  
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
 
 jobs:
   build:
-    runs-on: windows-latest  
+    runs-on: windows-latest
+    timeout-minutes: 30
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: true  
+          submodules: recursive
+          persist-credentials: false
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - name: Setup .NET (global.json)
+        if: hashFiles('global.json') != ''
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
-          dotnet-version: '9.0.101'
+          global-json-file: global.json
 
-      - name: Restore dependencies
-        run: dotnet restore BlockifyLauncher.csproj
-
-      - name: Build project
-        run: dotnet build BlockifyLauncher.csproj -c Release  
-
-      - name: Publish project
-        run: dotnet publish BlockifyLauncher.csproj -c Release -o ./publish  
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - name: Setup .NET 8
+        if: hashFiles('global.json') == ''
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
-          name: Blockify-archive
-          path: ./publish
+          dotnet-version: '8.0.x'
 
-      - name: Store Discord Bot Token
+      - name: Build (Release)
+        shell: pwsh
         run: |
-          echo "Token is securely stored"
-        env:
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-        shell:
-          bash
+          $restoreArgs = @()
+          if ((Test-Path packages.lock.json) -and (Test-Path libs/BlockifyLib/packages.lock.json)) {
+            $restoreArgs += '-p:RestoreLockedMode=true'
+          }
+          dotnet build BlockifyLauncher.csproj -c Release -p:ContinuousIntegrationBuild=true @restoreArgs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # A test build for people who want to try master between releases (framework-dependent, needs .NET 8 Desktop Runtime).
+      - name: Publish test build
+        if: github.event_name != 'pull_request'
+        run: dotnet publish BlockifyLauncher.csproj -c Release -r win-x64 --self-contained false -p:DebugType=none -o publish
+
+      - name: Upload test build
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: Blockify-test-build
+          path: publish
+          retention-days: 14

@@ -1,0 +1,441 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="start_game" xml:space="preserve">
+    <value>Запустити</value>
+  </data>
+  <data name="version" xml:space="preserve">
+    <value>Minecraft версія : </value>
+  </data>
+  <data name="account" xml:space="preserve">
+    <value>Акаунт :</value>
+  </data>
+  <data name="apply_button" xml:space="preserve">
+    <value>Застосувати</value>
+  </data>
+  <data name="display_height" xml:space="preserve">
+    <value>висота</value>
+  </data>
+  <data name="display_width" xml:space="preserve">
+    <value>ширина</value>
+  </data>
+  <data name="account_setting" xml:space="preserve">
+    <value>Налаштування акаунта</value>
+  </data>
+  <data name="none_account" xml:space="preserve">
+    <value>Немає...</value>
+  </data>
+  <data name="error_no_version" xml:space="preserve">
+    <value>Спочатку виберіть версію Minecraft.</value>
+  </data>
+  <data name="error_no_account" xml:space="preserve">
+    <value>Спочатку виберіть акаунт.</value>
+  </data>
+  <data name="error_start_failed" xml:space="preserve">
+    <value>Не вдалося створити процес гри.</value>
+  </data>
+  <data name="display_section" xml:space="preserve">
+    <value>Дисплей</value>
+  </data>
+  <data name="fullscreen" xml:space="preserve">
+    <value>Повний екран</value>
+  </data>
+  <data name="system_section" xml:space="preserve">
+    <value>Система</value>
+  </data>
+  <data name="ram_utilization" xml:space="preserve">
+    <value>Виділення пам'яті (RAM)</value>
+  </data>
+  <data name="minecraft_path" xml:space="preserve">
+    <value>Тека Minecraft</value>
+  </data>
+  <data name="path_button" xml:space="preserve">
+    <value>Огляд</value>
+  </data>
+  <data name="java_version" xml:space="preserve">
+    <value>Версія Java</value>
+  </data>
+  <data name="edit_button" xml:space="preserve">
+    <value>Змінити</value>
+  </data>
+  <data name="launcher_setting_section" xml:space="preserve">
+    <value>Налаштування лаунчера</value>
+  </data>
+  <data name="hide_launcher" xml:space="preserve">
+    <value>Приховувати лаунчер</value>
+  </data>
+  <data name="hide" xml:space="preserve">
+    <value>приховувати</value>
+  </data>
+  <data name="show" xml:space="preserve">
+    <value>показувати</value>
+  </data>
+  <data name="launcher_language" xml:space="preserve">
+    <value>Мова лаунчера</value>
+  </data>
+  <data name="version_list" xml:space="preserve">
+    <value>Список версій : </value>
+  </data>
+  <data name="save_account" xml:space="preserve">
+    <value>Зберегти акаунт</value>
+  </data>
+  <data name="username" xml:space="preserve">
+    <value>Ім'я користувача</value>
+  </data>
+  <data name="login_without_password" xml:space="preserve">
+    <value>Вхід без пароля</value>
+  </data>
+  <data name="login_microsoft" xml:space="preserve">
+    <value>Вхід через Microsoft</value>
+  </data>
+  <data name="add_account" xml:space="preserve">
+    <value>+ Додати акаунт</value>
+  </data>
+  <data name="delete_account" xml:space="preserve">
+    <value>Видалити акаунт</value>
+  </data>
+  <data name="error_title" xml:space="preserve">
+    <value>Помилка</value>
+  </data>
+  <data name="notif_create_account" xml:space="preserve">
+    <value>Новий акаунт</value>
+  </data>
+  <data name="notif_create_account_body" xml:space="preserve">
+    <value>Створено новий акаунт «{0}».</value>
+  </data>
+  <data name="notif_edit_account" xml:space="preserve">
+    <value>Зміна акаунта</value>
+  </data>
+  <data name="notif_edit_account_body" xml:space="preserve">
+    <value>Встановлено нове ім'я «{0}».</value>
+  </data>
+  <data name="error_microsoft_login" xml:space="preserve">
+    <value>Вхід через Microsoft не вдався. Переконайтеся, що на акаунті придбано Minecraft: Java Edition.</value>
+  </data>
+  <data name="error_empty_username" xml:space="preserve">
+    <value>Спочатку введіть ім'я користувача.</value>
+  </data>
+  <data name="cap_account" xml:space="preserve">
+    <value>АКАУНТ</value>
+  </data>
+  <data name="cap_version" xml:space="preserve">
+    <value>ВЕРСІЯ</value>
+  </data>
+  <data name="nav_home" xml:space="preserve">
+    <value>Головна</value>
+  </data>
+  <data name="nav_settings" xml:space="preserve">
+    <value>Налаштування</value>
+  </data>
+  <data name="vibe_label" xml:space="preserve">
+    <value>Вайб фону</value>
+  </data>
+  <data name="vibe_auto" xml:space="preserve">
+    <value>Авто (час доби)</value>
+  </data>
+  <data name="vibe_ocean" xml:space="preserve">
+    <value>Океан</value>
+  </data>
+  <data name="vibe_sunset" xml:space="preserve">
+    <value>Захід сонця</value>
+  </data>
+  <data name="vibe_nether" xml:space="preserve">
+    <value>Незер</value>
+  </data>
+  <data name="vibe_cherry" xml:space="preserve">
+    <value>Сакура</value>
+  </data>
+  <data name="vibe_end" xml:space="preserve">
+    <value>Енд</value>
+  </data>
+  <data name="nav_packs" xml:space="preserve">
+    <value>Збірки</value>
+  </data>
+  <data name="packs_all" xml:space="preserve">
+    <value>Усі</value>
+  </data>
+  <data name="packs_open" xml:space="preserve">
+    <value>Відкрити сторінку</value>
+  </data>
+  <data name="packs_offline" xml:space="preserve">
+    <value>Modrinth недоступний. Перевір підключення.</value>
+  </data>
+  <data name="news_caption" xml:space="preserve">
+    <value>НОВИНИ</value>
+  </data>
+  <data name="quick_continue" xml:space="preserve">
+    <value>ПРОДОВЖИТИ</value>
+  </data>
+  <data name="quick_stats" xml:space="preserve">
+    <value>СТАТИСТИКА</value>
+  </data>
+  <data name="quick_server" xml:space="preserve">
+    <value>УЛЮБЛЕНИЙ СЕРВЕР</value>
+  </data>
+  <data name="quick_launches" xml:space="preserve">
+    <value>запусків</value>
+  </data>
+  <data name="quick_no_launches" xml:space="preserve">
+    <value>ще не було запусків</value>
+  </data>
+  <data name="quick_last" xml:space="preserve">
+    <value>останній:</value>
+  </data>
+  <data name="server_online" xml:space="preserve">
+    <value>у мережі · {0} мс</value>
+  </data>
+  <data name="server_offline" xml:space="preserve">
+    <value>не в мережі</value>
+  </data>
+  <data name="show_versions_prefix" xml:space="preserve">
+    <value>Показувати</value>
+  </data>
+  <data name="display_size" xml:space="preserve">
+    <value>Розмір вікна гри</value>
+  </data>
+  <data name="restart_required" xml:space="preserve">
+    <value>Набуде чинності після перезапуску лаунчера.</value>
+  </data>
+  <data name="favorite_server_label" xml:space="preserve">
+    <value>Улюблений сервер</value>
+  </data>
+  <data name="show_snapshots" xml:space="preserve">
+    <value>Снапшоти</value>
+  </data>
+  <data name="show_betas" xml:space="preserve">
+    <value>Старі бети</value>
+  </data>
+  <data name="show_alphas" xml:space="preserve">
+    <value>Старі альфи</value>
+  </data>
+  <data name="releases_always" xml:space="preserve">
+    <value>Релізи показуються завжди</value>
+  </data>
+  <data name="mb" xml:space="preserve">
+    <value>МБ</value>
+  </data>
+  <data name="saved" xml:space="preserve">
+    <value>Збережено</value>
+  </data>
+  <data name="packs_search" xml:space="preserve">
+    <value>Пошук збірок…</value>
+  </data>
+  <data name="cat_all" xml:space="preserve">
+    <value>Усі категорії</value>
+  </data>
+  <data name="cat_optimization" xml:space="preserve">
+    <value>Оптимізація</value>
+  </data>
+  <data name="cat_adventure" xml:space="preserve">
+    <value>Пригоди</value>
+  </data>
+  <data name="cat_magic" xml:space="preserve">
+    <value>Магія</value>
+  </data>
+  <data name="cat_technology" xml:space="preserve">
+    <value>Техніка</value>
+  </data>
+  <data name="cat_quests" xml:space="preserve">
+    <value>Квести</value>
+  </data>
+  <data name="cat_combat" xml:space="preserve">
+    <value>Битви</value>
+  </data>
+  <data name="sort_downloads" xml:space="preserve">
+    <value>За завантаженнями</value>
+  </data>
+  <data name="sort_newest" xml:space="preserve">
+    <value>Нові</value>
+  </data>
+  <data name="sort_updated" xml:space="preserve">
+    <value>Оновлені</value>
+  </data>
+  <data name="sort_follows" xml:space="preserve">
+    <value>За підписниками</value>
+  </data>
+  <data name="versions_any" xml:space="preserve">
+    <value>Будь-яка версія</value>
+  </data>
+  <data name="sec_game" xml:space="preserve">
+    <value>Гра</value>
+  </data>
+  <data name="sec_java" xml:space="preserve">
+    <value>Java і файли</value>
+  </data>
+  <data name="sec_launcher" xml:space="preserve">
+    <value>Лаунчер</value>
+  </data>
+  <data name="sec_versions" xml:space="preserve">
+    <value>Версії</value>
+  </data>
+  <data name="sec_data" xml:space="preserve">
+    <value>Дані</value>
+  </data>
+  <data name="screen_section" xml:space="preserve">
+    <value>Екран</value>
+  </data>
+  <data name="perf_section" xml:space="preserve">
+    <value>Продуктивність</value>
+  </data>
+  <data name="behavior_section" xml:space="preserve">
+    <value>Поведінка</value>
+  </data>
+  <data name="jvm_aikar" xml:space="preserve">
+    <value>Оптимізовані JVM-прапори</value>
+  </data>
+  <data name="jvm_aikar_hint" xml:space="preserve">
+    <value>Прапори Aikar — плавніша гра, менше фризів</value>
+  </data>
+  <data name="ram_hint" xml:space="preserve">
+    <value>рекомендуємо 4–8 ГБ</value>
+  </data>
+  <data name="parade_label" xml:space="preserve">
+    <value>Парад мобів</value>
+  </data>
+  <data name="discord_label" xml:space="preserve">
+    <value>Discord-статус</value>
+  </data>
+  <data name="cache_label" xml:space="preserve">
+    <value>Кеш новин і артів</value>
+  </data>
+  <data name="clear_cache" xml:space="preserve">
+    <value>Очистити кеш</value>
+  </data>
+  <data name="open_data" xml:space="preserve">
+    <value>Відкрити теку даних</value>
+  </data>
+  <data name="check_updates" xml:space="preserve">
+    <value>Перевірити оновлення</value>
+  </data>
+  <data name="up_to_date" xml:space="preserve">
+    <value>У вас остання версія</value>
+  </data>
+  <data name="update_available" xml:space="preserve">
+    <value>Доступне оновлення {0} — відкриваю сторінку релізу</value>
+  </data>
+  <data name="no_releases" xml:space="preserve">
+    <value>Релізів поки не опубліковано</value>
+  </data>
+  <data name="hero_ready" xml:space="preserve">
+    <value>Готовий до запуску</value>
+  </data>
+  <data name="quick_continue_btn" xml:space="preserve">
+    <value>Продовжити</value>
+  </data>
+</root>

@@ -25,7 +25,20 @@ namespace BlockifyLauncher
             WindowFormBlur.SetIsEnabled(this, true);
 
             __typeMessage = typeMessage;
-            this.MessageContent.Content = Message;
+            // long messages wrap instead of running off the 400 px window
+            this.MessageContent.Content = new TextBlock { Text = Message, TextWrapping = TextWrapping.Wrap, MaxWidth = 290 };
+
+            // centred over the launcher window when it is on screen (only a shown window can be an owner)
+            try
+            {
+                var main = Application.Current?.MainWindow;
+                if (main != null && !ReferenceEquals(main, this) && main.IsLoaded && main.IsVisible)
+                {
+                    Owner = main;
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                }
+            }
+            catch { }
         }
 
         private void MessageBobLoading(object sender, RoutedEventArgs e)
@@ -33,17 +46,17 @@ namespace BlockifyLauncher
             switch (__typeMessage)
             {
                 case TypeMessage.Info:
-                    this.Title = "Info";
+                    this.Title = "Информация";
                     this.TitleContent.Content = Title;
                     this.ImageMessage.Source = (ImageSource)FindResource("InfoDrawingImage");
                     break;
                 case TypeMessage.Warning:
-                    this.Title = "Warning";
+                    this.Title = "Внимание";
                     this.TitleContent.Content = Title;
                     this.ImageMessage.Source = (ImageSource)FindResource("DangerDrawingImage");
                     break;
                 case TypeMessage.Error:
-                    this.Title = "Error";
+                    this.Title = "Ошибка";
                     this.TitleContent.Content = Title;
                     this.ImageMessage.Source = (ImageSource)FindResource("ErrorDrawingImage");
                     break;

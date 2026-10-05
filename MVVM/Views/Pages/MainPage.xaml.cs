@@ -1,105 +1,151 @@
-﻿using BlockifyLauncher.MVVM.Views.Components;
-using BlockifyLauncher.MVVM.Views.Pages.Func.Main;
-using System.Runtime.CompilerServices;
+using BlockifyLauncher.Core.News;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace BlockifyLauncher.MVVM.Views.Pages
 {
     /// <summary>
-    /// Логика взаимодействия для MainPage.xaml
+    /// Home page (Liquid Glass): hero with Play + version selector, a live
+    /// news list and a side card (continue / stats / favorite server).
+    /// The window owns launch/version/account state; this page drives it.
     /// </summary>
     public partial class MainPage : Page
     {
-        private NewsStr[] _news;
-
-        private const int ItemWidth = 250;
-        private const int ItemMargin = 10;
+        private MainWindow Win => (MainWindow)Application.Current.MainWindow;
+        private bool _syncing;
 
         public MainPage()
         {
             InitializeComponent();
-            
-            SetBlurContainer();
         }
 
-
-        private void SetBlurContainer()
+        private async void LoadingMainPage(object sender, RoutedEventArgs e)
         {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            Blur_WindowBlur.BlurContainer = mainWindow.MainBorder;
-            Blur_WindowBlur_Two.BlurContainer = mainWindow.MainBorder;
-        }
-        
+            RefreshVersions();
+            Win.ShellReady += RefreshVersions;
+            Win.LaunchStateChanged += OnLaunchState;
 
-        /*private async void UpdateStackPanelNews()
-        {
-            var news = new News();
-            _news = news.getAllNews();
-
-            int maxItems = (int)this.ActualWidth / (ItemWidth + ItemMargin);
-            StackPanelNews.Children.Clear();
-            
-            for (int i = 0; i < maxItems && i < _news.Length; i++)
-                StackPanelNews.Children.Add(CreateNewsItem(_news[i]));
-        }*/
-
-        private NewsComponent CreateNewsItem(NewsStr __news)
-        {
-            var newsItem = new NewsComponent(__news);
-            newsItem.Width = ItemWidth;
-            return newsItem;
+            await InitializeNewsAsync();
         }
 
-        private void LoadingMainPage(object sender, RoutedEventArgs e)
+        private void OnLaunchState(bool busy) => Dispatcher.Invoke(() =>
         {
-            InitializeNews();
+            PlayButton.IsEnabled = !busy;
+            PlayButton.Content = busy ? "ЗАПУСК…" : "▶  ИГРАТЬ";
+        });
+
+        #region versions
+        private void RefreshVersions()
+        {
+            _syncing = true;
+            VersionCombo.Items.Clear();
+            foreach (var name in Win.GetVersionNames())
+                VersionCombo.Items.Add(name);
+            VersionCombo.SelectedIndex = Win.SelectedVersionIndex >= 0 ? Win.SelectedVersionIndex : 0;
+            _syncing = false;
+
+            var lang = BlockifyLauncher.Resources.ResxLocalizationProvider.Instance;
+            HeroTitle.Text = lang["hero_ready"];
+            HeroSub.Text = VersionCombo.SelectedItem is string v
+                ? $"Minecraft {v}"
+                : lang["quick_no_launches"];
         }
 
-        // Initialize news list.
-        private void InitializeNews()
+        private void VersionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var news = new News();
-            _news = news.getAllNews();
+            if (_syncing || VersionCombo.SelectedItem is not string v) return;
+            Win.SelectVersion(v);
+            HeroSub.Text = $"Minecraft {v}";
+        }
+        #endregion
 
-            StackPanelNews.Children.Clear();
+        private void PlayClick(object sender, RoutedEventArgs e) => Win.LaunchSelected();
 
-            for (int i = 0; i < _news.Length; i++)
-                StackPanelNews.Children.Add(CreateNewsItem(_news[i]));
+        #region news
+        private async System.Threading.Tasks.Task InitializeNewsAsync()
+        {
+            // cached feed paints instantly; the live fetch refreshes it in the background
+            RenderNews(NewsService.GetCached(4));
 
-            UpdateStackPanelNews(); // Update visual element.
+            List<NewsItem> news;
+            try { news = await NewsService.GetAsync(4); }
+            catch { news = new List<NewsItem>(); }
+
+            if (news.Count > 0)
+                RenderNews(news);
         }
 
-        // Count visible panel element.
-        private static int GetVisibleElementCount(StackPanel panel)
+        private void RenderNews(List<NewsItem> news)
         {
-            int visibleElementCount = 0;
-
-            foreach (UIElement element in panel.Children)
-                if (element.Visibility == Visibility.Visible)
-                    visibleElementCount++;
-
-            return visibleElementCount;
+            if (news.Count == 0) return;
+            NewsList.Children.Clear();
+            foreach (var item in news)
+                NewsList.Children.Add(BuildNewsItem(item));
         }
 
-        // Resize static panel.
-        private async void ResizeStackPanelNew(object sender, SizeChangedEventArgs e)
+        private UIElement BuildNewsItem(NewsItem item)
         {
-            if ((int)this.ActualWidth / (ItemWidth + ItemMargin) != GetVisibleElementCount(StackPanelNews))
-                if (e.WidthChanged)
+            var row = new Border
+            {
+                Padding = new Thickness(0, 11, 0, 11),
+                BorderBrush = (Brush)FindResource("G.Line"),
+                BorderThickness = new Thickness(0, 1, 0, 0),
+                Cursor = System.Windows.Input.Cursors.Hand
+            };
+
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(64) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(12) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            var thumb = new Border { Width = 64, Height = 44, CornerRadius = new CornerRadius(9) };
+            if (!string.IsNullOrEmpty(item.LocalImagePath) && File.Exists(item.LocalImagePath))
+            {
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.UriSource = new Uri(item.LocalImagePath);
+                bmp.CacheOption = BitmapCacheOption.OnLoad;
+                bmp.DecodePixelWidth = 160;
+                bmp.EndInit(); bmp.Freeze();
+                thumb.Background = new ImageBrush(bmp) { Stretch = Stretch.UniformToFill };
+            }
+            else thumb.Background = new SolidColorBrush(Color.FromRgb(0x2C, 0x4A, 0x1D));
+            Grid.SetColumn(thumb, 0);
+
+            var text = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+            text.Children.Add(new TextBlock
+            {
+                Text = item.Title,
+                Foreground = (Brush)FindResource("G.Text"),
+                FontSize = 13, FontWeight = FontWeights.Bold,
+                TextTrimming = TextTrimming.CharacterEllipsis
+            });
+            text.Children.Add(new TextBlock
+            {
+                Text = item.Date == default ? item.Subtitle : item.Date.ToString("d MMM yyyy"),
+                Foreground = (Brush)FindResource("G.Muted"),
+                FontSize = 11, Margin = new Thickness(0, 2, 0, 0)
+            });
+            Grid.SetColumn(text, 2);
+
+            grid.Children.Add(thumb);
+            grid.Children.Add(text);
+            row.Child = grid;
+
+            if (!string.IsNullOrEmpty(item.Link))
+                row.MouseLeftButtonUp += (_, _) =>
                 {
-                    UpdateStackPanelNews();
-                }
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(item.Link) { UseShellExecute = true });
+                    }
+                    catch { }
+                };
+            return row;
         }
-
-        // Update resize.
-        private async void UpdateStackPanelNews()
-        {
-            int maxElement = (int)this.ActualWidth / (ItemWidth + ItemMargin);
-            for (int i = 0; i < StackPanelNews.Children.Count; i++)
-                StackPanelNews.Children[i].Visibility =
-                    i < maxElement ? Visibility.Visible : Visibility.Collapsed;
-        }
-
+        #endregion
     }
 }

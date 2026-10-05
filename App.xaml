@@ -4,8 +4,7 @@
              xmlns:local="clr-namespace:BlockifyLauncher"
              xmlns:view_Pages="clr-namespace:BlockifyLauncher.MVVM.Views.Pages"
              xmlns:viewModel_Pages="clr-namespace:BlockifyLauncher.MVVM.ViewModel.Pages"
-             xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel"
-             StartupUri="MVVM/Views/Window/MainWindow.xaml">
+             xmlns:viewModel="clr-namespace:BlockifyLauncher.MVVM.ViewModel">
     <Application.Resources>
         <ResourceDictionary>
             
@@ -13,6 +12,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="MVVM/Views/Style/ApplicationStyle.xaml"/>
                 <ResourceDictionary Source="MVVM/Views/Style/CustomElement.xaml"/>
+                <ResourceDictionary Source="MVVM/Views/Style/BlockifyTheme.xaml"/>
+                <ResourceDictionary Source="MVVM/Views/Style/GlassTheme.xaml"/>
                 <ResourceDictionary Source="MVVM/Views/Style/Effect/Generic/Generic.xaml"/>
                 
                 <ResourceDictionary Source="Image/MessageBox/ImagePack.xaml"/>
@@ -28,6 +29,15 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewModel_Pages:SettingModel}">
                 <view_Pages:SettingPage/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModel_Pages:PacksModel}">
+                <view_Pages:PacksPage/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModel_Pages:VersionsModel}">
+                <view_Pages:VersionsPage/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModel_Pages:BuilderModel}">
+                <view_Pages:BuilderPage/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewModel_Pages:AccountModel}">
                 <view_Pages:AccountPages/>
