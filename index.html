@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blockify Launcher — лаунчер для Minecraft: Java Edition с модами и сборками Modrinth</title>
+<meta name="description" content="Бесплатный лаунчер для Minecraft: Java Edition на Windows с открытым кодом: сборки Modrinth (.mrpack) в один клик, моды, Crash Doctor, бэкапы миров. Без регистрации в лаунчере.">
+<link rel="canonical" href="https://blockify-launcher.github.io/Blockify-Launcher/">
+<meta name="theme-color" content="#0B0E10">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Blockify Launcher">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:url" content="https://blockify-launcher.github.io/Blockify-Launcher/">
+<meta property="og:title" content="Blockify Launcher — лаунчер для Minecraft, который просто запускает">
+<meta property="og:description" content="Сборки Modrinth в один клик, Crash Doctor, машина времени, бэкапы миров. Бесплатно, с открытым кодом, без регистрации.">
+<meta property="og:image" content="https://blockify-launcher.github.io/Blockify-Launcher/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Интерфейс Blockify Launcher: главный экран с кнопкой «Играть» и сборками">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Blockify Launcher — лаунчер для Minecraft, который просто запускает">
+<meta name="twitter:description" content="Сборки Modrinth в один клик, Crash Doctor, машина времени, бэкапы миров.">
+<meta name="twitter:image" content="https://blockify-launcher.github.io/Blockify-Launcher/og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='5' fill='%236BBF3B'/%3E%3Crect y='5' width='16' height='4' fill='%238a6a3f'/%3E%3Crect y='9' width='16' height='7' fill='%236e4f2c'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preload" href="fonts/Unbounded-Black.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="fonts/Manrope-Regular.woff" as="font" type="font/woff" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Blockify Launcher","url":"https://blockify-launcher.github.io/Blockify-Launcher/","description":"Бесплатный лаунчер для Minecraft: Java Edition на Windows: сборки Modrinth в один клик, Fabric/Quilt/Forge/NeoForge, Crash Doctor, машина времени, бэкапы миров.","inLanguage":"ru","image":"https://blockify-launcher.github.io/Blockify-Launcher/og.png","operatingSystem":"Windows 10 (1607+), Windows 11 — только 64-бит","applicationCategory":"GameApplication","softwareRequirements":"Windows 10 1607+ или Windows 11 (64-бит), Microsoft Edge WebView2 Runtime, видеокарта с OpenGL 3.2+","memoryRequirements":"4 ГБ ОЗУ (рекомендуется 8 ГБ)","storageRequirements":"от 2 ГБ свободного места","isAccessibleForFree":true,"license":"https://github.com/Blockify-Launcher/Blockify-Launcher/blob/master/LICENSE","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"downloadUrl":"https://github.com/Blockify-Launcher/Blockify-Launcher/releases","author":{"@type":"Organization","name":"Blockify Launcher","url":"https://github.com/Blockify-Launcher"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Это бесплатно?","acceptedAnswer":{"@type":"Answer","text":"Да. Лаунчер бесплатный, код открыт на GitHub под лицензией MIT. Сама игра Minecraft: Java Edition продаётся отдельно на minecraft.net."}},
+{"@type":"Question","name":"Нужен ли вход в аккаунт?","acceptedAnswer":{"@type":"Answer","text":"Регистрации в самом лаунчере нет. Для официальных серверов, скинов и Realms войдите через аккаунт Microsoft, на котором куплена Minecraft: Java Edition. Для игры без интернета и по локальной сети можно создать локальный профиль. Играть в Minecraft можно только купив игру — этого требует лицензионное соглашение (EULA) Mojang."}},
+{"@type":"Question","name":"Как устроен вход через Microsoft?","acceptedAnswer":{"@type":"Answer","text":"Страница входа Microsoft открывается во встроенном окне лаунчера. Лаунчер не сохраняет пароль: после входа на вашем компьютере хранится только токен входа. Скачивайте Blockify только с GitHub или с этого сайта."}},
+{"@type":"Question","name":"Windows пишет «Система Windows защитила ваш компьютер». Что делать?","acceptedAnswer":{"@type":"Answer","text":"Лаунчер пока не подписан цифровой подписью, поэтому SmartScreen его не узнаёт. Нажмите «Подробнее» → «Выполнить в любом случае». Подлинность архива можно проверить по SHA256 из файла SHA256SUMS.txt на странице релиза."}},
+{"@type":"Question","name":"Пишет, что нужен WebView2","acceptedAnswer":{"@type":"Answer","text":"Интерфейс лаунчера работает на Microsoft Edge WebView2. В Windows 11 он уже установлен, в Windows 10 обычно приходит с обновлениями. Если его нет — скачайте «Evergreen Bootstrapper» на сайте Microsoft."}},
+{"@type":"Question","name":"А Linux и macOS?","acceptedAnswer":{"@type":"Answer","text":"Сейчас только Windows 10 и 11 (64-бит). Linux и macOS — в дорожной карте."}}
+]}
+</script>
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+<a class="skip" href="#main">К содержимому</a>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="brand" href="#surface" aria-label="Blockify — наверх"><span class="cube" aria-hidden="true"></span><b>Block<span>ify</span></b></a>
+    <nav aria-label="Разделы">
+      <a href="#packs">Сборки</a>
+      <a href="#rescue">Спасение</a>
+      <a href="#tools">Инструменты</a>
+      <a href="#faq">Вопросы</a>
+    </nav>
+    <a class="btn btn-play" href="#download">Скачать</a>
+  </div>
+</header>
+
+<!-- F3-оверлей: живая координата Y по прокрутке -->
+<div class="hud" aria-hidden="true">
+  <p>Blockify Launcher (vanilla)</p>
+  <p class="opt">XYZ: 8.500 / <span class="hl" id="hudY">64.000</span> / -3.500</p>
+  <p>Слой: <span id="hudLayer">Поверхность</span></p>
+  <p class="opt opt2">Биом: <span id="hudBiome">minecraft:plains</span></p>
+  <p class="opt opt2">Взгляд: вниз (к Y−)</p>
+  <p class="ores" id="hudOres" hidden>Добыто руды: <span id="oreCount">0</span>/5</p>
+</div>
+
+<nav class="depth" aria-label="Глубина">
+  <a href="#surface" data-layer="surface"><span>Y 64 · Поверхность</span><i data-tex="grass"></i></a>
+  <a href="#packs" data-layer="packs"><span>Y 40 · Земля</span><i data-tex="dirt"></i></a>
+  <a href="#rescue" data-layer="rescue"><span>Y 0 · Камень</span><i data-tex="stone"></i></a>
+  <a href="#tools" data-layer="tools"><span>Y −40 · Сланец</span><i data-tex="deep"></i></a>
+  <a href="#download" data-layer="download"><span>Y −64 · Бедрок</span><i data-tex="bedrock"></i></a>
+</nav>
+
+<main id="main">
+
+<!-- ═════════ Y 64 · ПОВЕРХНОСТЬ ═════════ -->
+<section class="hero" id="surface" data-y="64" data-name="Поверхность" data-biome="minecraft:plains">
+  <div class="sun" aria-hidden="true"></div>
+  <div class="cloud" data-x="36" data-v=".12" style="top:104px" aria-hidden="true"></div>
+  <div class="cloud" data-x="88" data-v="-.08" style="top:330px;scale:.7" aria-hidden="true"></div>
+  <div class="cloud" data-x="62" data-v=".2" style="top:78px;scale:1.3" aria-hidden="true"></div>
+
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow"><i aria-hidden="true"></i>Бесплатно · Open source · Windows</span>
+      <h1>Лаунчер для Minecraft, который <em>просто запускает</em></h1>
+      <p class="hero-sub">Сборки, моды, миры и краши под контролем. Никакой соцсети, никакой экосистемы. Только вы и ваш Minecraft: Java Edition.</p>
+      <div class="cta">
+        <a class="btn btn-play" data-dl href="https://github.com/Blockify-Launcher/Blockify-Launcher/releases">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/></svg>
+          Скачать для Windows
+        </a>
+        <a class="btn" href="#packs">Копнуть глубже ↓</a>
+      </div>
+      <p class="meta-line">Windows 10 / 11 · только 64-бит · portable .zip · <a href="#download">требования и SmartScreen ↓</a></p>
+    </div>
+
+    <!-- макет — тот же liquid-glass, что внутри лаунчера -->
+    <figure class="mock" aria-label="Интерфейс Blockify: главный экран">
+      <div class="bgfx" aria-hidden="true">
+        <div class="blob" style="width:300px;height:300px;left:-80px;top:-90px;background:#2f5c17"></div>
+        <div class="blob" style="width:260px;height:260px;right:-60px;top:30%;background:#14424f"></div>
+        <div class="blob" style="width:280px;height:280px;left:35%;bottom:-140px;background:#5a4514"></div>
+      </div>
+      <div class="tb"><span><b>Block<span>ify</span></b> Launcher</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+      <div class="win">
+        <div class="side glass" aria-hidden="true">
+          <div class="lg"><span class="cube"></span><b>Block<span>ify</span></b></div>
+          <span class="it on"><i></i>Главная</span>
+          <span class="it"><i></i>Сборки</span>
+          <span class="it"><i></i>Версии</span>
+          <span class="it"><i></i>Аккаунты</span>
+          <span class="it"><i></i>Миры</span>
+          <span class="it"><i></i>Скриншоты</span>
+          <span class="it"><i></i>Настройки</span>
+        </div>
+        <div class="main glass">
+          <div>
+            <div class="ready" id="mockTitle">Готов к запуску</div>
+            <div class="muted" id="mockSub">Выбери версию и нажми «Играть».</div>
+          </div>
+          <div class="row">
+            <button class="play" id="mockPlay" type="button"><span aria-hidden="true">▶&nbsp;</span>ИГРАТЬ</button>
+            <span class="ver">Версия: <b>Fabric 1.21.1</b> ▾</span>
+          </div>
+          <div class="xp" id="mockXp" aria-hidden="true"><i></i></div>
+          <div class="packs">
+            <div class="pk"><canvas width="8" height="8" data-icon="grass"></canvas><div><b>Выживание+</b><small>Fabric · 1.21.1</small></div></div>
+            <div class="pk"><canvas width="8" height="8" data-icon="diamond"></canvas><div><b>Техно с друзьями</b><small>NeoForge · 1.21.1</small></div></div>
+            <div class="pk"><canvas width="8" height="8" data-icon="amethyst"></canvas><div><b>Шейдеры</b><small>Quilt · 1.20.4</small></div></div>
+          </div>
+          <div class="news">
+            <p class="h">Новости</p>
+            <p><canvas width="8" height="8" data-icon="cherry"></canvas>Свежий снапшот уже в списке версий</p>
+            <p><canvas width="8" height="8" data-icon="gold"></canvas>Обзор обновления от Mojang</p>
+            <p><canvas width="8" height="8" data-icon="emerald"></canvas>Лента проекта Blockify на GitHub</p>
+          </div>
+        </div>
+      </div>
+      <div class="toast" id="mockToast" role="status"><span aria-hidden="true">✔</span> Игра запущена — приятной игры!</div>
+    </figure>
+  </div>
+  <div class="ground" aria-hidden="true"></div>
+</section>
+
+<!-- ═════════ Y 40 · ЗЕМЛЯ — сборки ═════════ -->
+<section class="layer l-dirt" id="packs" data-y="40" data-name="Земля" data-biome="minecraft:dirt_layer" data-tex="dirt">
+  <div class="seam" data-seam="dirt" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="layer-head rise">
+      <span class="ylabel">Y 40</span>
+      <h2>Сборки Modrinth без возни</h2>
+      <p class="lead">Нашли сборку на Modrinth, нажали — играете. Остальное лаунчер берёт на себя.</p>
+    </div>
+
+    <div class="split">
+      <div class="dl glass rise">
+        <div class="dl-top">
+          <canvas width="8" height="8" data-icon="grass"></canvas>
+          <div>
+            <b>Установка .mrpack</b>
+            <div class="chips" role="group" aria-label="Загрузчик">
+              <button class="chip" type="button" aria-pressed="true" data-loader="Fabric">Fabric</button>
+              <button class="chip" type="button" aria-pressed="false" data-loader="Quilt">Quilt</button>
+              <button class="chip" type="button" aria-pressed="false" data-loader="Forge">Forge</button>
+              <button class="chip" type="button" aria-pressed="false" data-loader="NeoForge">NeoForge</button>
+            </div>
+          </div>
+        </div>
+        <ol class="steps" id="steps">
+          <li><span class="st"></span><span>Minecraft 1.21.1</span><em>—</em></li>
+          <li><span class="st"></span><span id="stLoader">Загрузчик Fabric</span><em>—</em></li>
+          <li><span class="st"></span><span>Моды · SHA-1</span><em id="stMods">0/86</em></li>
+          <li><span class="st"></span><span>overrides · конфиги</span><em>—</em></li>
+          <li><span class="st"></span><span>Изолированный инстанс</span><em>—</em></li>
+        </ol>
+        <div class="dl-actions">
+          <small id="dlNote" role="status">blockify-packs/&lt;slug&gt;/</small>
+          <button class="mini-btn green" type="button" id="dlRun">Установить</button>
+        </div>
+      </div>
+
+      <div class="stack">
+        <article class="feat glass mineable rise"><canvas class="ic" width="8" height="8" data-icon="emerald"></canvas><h3>Каталог Modrinth</h3><p>Сборки, моды, шейдеры и ресурспаки. Поиск, фильтр по версии, чипы загрузчиков — в одном окне.</p></article>
+        <article class="feat glass mineable rise"><canvas class="ic" width="8" height="8" data-icon="chest"></canvas><h3>Изолированные инстансы</h3><p>У каждой сборки свои моды, конфиги и сохранения. Основная игра не пострадает.</p></article>
+      </div>
+    </div>
+
+    <div class="features" style="margin-top:14px">
+      <article class="feat glass mineable rise"><canvas class="ic" width="8" height="8" data-icon="anvil"></canvas><h3>Fabric · Quilt · Forge · NeoForge</h3><p>Forge и NeoForge — через официальный headless-установщик, без ручных танцев.</p></article>
+      <article class="feat glass mineable rise"><canvas class="ic" width="8" height="8" data-icon="redstone"></canvas><h3>Надёжные загрузки</h3><p>Проверка SHA-1, повторы при сбоях и докачка. Живая панель показывает каждый шаг.</p></article>
+      <article class="feat glass mineable rise"><canvas class="ic" width="8" height="8" data-icon="map"></canvas><h3>Импорт и экспорт</h3><p>.mrpack, Prism/MultiMC и CurseForge App. Переезд на другой ПК без потерь.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ Y 0 · КАМЕНЬ — Crash Doctor и машина времени ═════════ -->
+<section class="layer l-stone" id="rescue" data-y="0" data-name="Камень" data-biome="minecraft:stone_layer" data-tex="stone">
+  <div class="seam" data-seam="stone" aria-hidden="true"></div>
+  <div class="ores-field" id="ores" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="layer-head rise">
+      <span class="ylabel">Y 0</span>
+      <h2>Когда всё упало</h2>
+      <p class="lead">Крашнулось? Бывает. Здесь это вопрос минуты, а не вечера.</p>
+    </div>
+
+    <div class="split">
+      <div class="term glass rise">
+        <div class="term-bar"><span>latest.log</span><button class="mini-btn" type="button" id="crashRun">Смоделировать краш</button></div>
+        <pre id="log" aria-live="polite"><span class="dim">[12:04:31] [main/INFO]: Loading Minecraft 1.21.1 with Fabric Loader
+[12:04:32] [main/INFO]: Loading 86 mods</span></pre>
+        <div class="diag" id="diag" hidden>
+          <b>🩺 Crash Doctor: конфликт модов</b>
+          <p>Два мода правят один и тот же класс рендера. Оставьте один из них — второй отключим, снимок сделаем заранее.</p>
+          <div class="row"><button class="mini-btn green" type="button" id="crashFix">Применить фикс</button><small id="crashFixed" hidden>✔ Снимок «перед фиксом» сохранён · мод отключён</small></div>
+        </div>
+      </div>
+
+      <div class="tm glass rise">
+        <h3>⏳ Машина времени</h3>
+        <p>Снимок — моды с вкл/выкл и конфиги. Делается сам перед обновлением, бустом FPS и фиксами.</p>
+        <div class="track" id="track" role="group" aria-label="Снимки сборки"></div>
+        <div class="tm-state" id="tmState" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="features" style="margin-top:14px">
+      <article class="feat glass mineable rise"><canvas class="ic" width="8" height="8" data-icon="book"></canvas><h3>Профили модов</h3><p>Наборы модов поверх снимков: «с шейдерами», «для сервера». Переключение в один клик.</p></article>
+      <article class="feat glass mineable rise"><canvas class="ic" width="8" height="8" data-icon="compass"></canvas><h3>Обновление модов</h3><p>Сканирует mods/, находит совпадения на Modrinth по хешу и обновляет на месте.</p></article>
+      <article class="feat glass mineable rise"><canvas class="ic" width="8" height="8" data-icon="lapis"></canvas><h3>Настройки на сборку</h3><p>Своя RAM, Java и аргументы у каждой сборки. Флаги Aikar уже внутри.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ Y −40 · ГЛУБИННЫЙ СЛАНЕЦ — инструменты ═════════ -->
+<section class="layer l-deep" id="tools" data-y="-40" data-name="Глубинный сланец" data-biome="minecraft:deep_dark" data-tex="deep">
+  <div class="seam" data-seam="deep" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="layer-head rise">
+      <span class="ylabel">Y −40</span>
+      <h2>Глубокие инструменты</h2>
+      <p class="lead">То, что обычно ищут по трём сайтам, лежит здесь, под рукой.</p>
+    </div>
+
+    <div class="bento">
+      <article class="feat glass mineable rise">
+        <canvas class="ic" width="8" height="8" data-icon="chest"></canvas>
+        <h3>Миры и бэкапы</h3>
+        <p>Zip-бэкап и восстановление в один клик. Перед перезаписью текущий мир сохраняется сам.</p>
+        <div class="backups" aria-hidden="true">
+          <div><b>Новый мир</b><span>backup · zip</span></div>
+          <div><b>Хардкор #3</b><span>авто-снимок перед restore</span></div>
+        </div>
+      </article>
+      <article class="feat glass mineable rise">
+        <canvas class="ic" width="8" height="8" data-icon="painting"></canvas>
+        <h3>Галерея скриншотов</h3>
+        <p>Всё, что снято по F2. Встроенный редактор: обрезка, поворот, рисование.</p>
+        <div class="shot" aria-hidden="true"><div class="crop"></div><div class="pen"></div></div>
+      </article>
+      <article class="feat glass mineable rise"><canvas class="ic" width="8" height="8" data-icon="redstone"></canvas><h3>FPS-буст</h3><p>Один клик ставит моды производительности. Кадры ценнее нервов.</p></article>
+      <article class="feat glass mineable rise"><canvas class="ic" width="8" height="8" data-icon="clock"></canvas><h3>Любая версия</h3><p>Релизы, снапшоты и старые версии. Новости Mojang прямо в лаунчере.</p></article>
+      <article class="feat glass mineable rise"><canvas class="ic" width="8" height="8" data-icon="amethyst"></canvas><h3>Liquid glass</h3><p>Безрамочное окно, стеклянные диалоги, живая панель загрузок.</p></article>
+    </div>
+
+    <div class="sub-head rise">
+      <h3>Ваш аккаунт остаётся вашим</h3>
+      <p>Без регистрации в лаунчере и без облака.</p>
+    </div>
+    <div class="acc">
+      <article class="feat glass rise"><canvas class="ic" width="8" height="8" data-icon="key"></canvas><div><h4>Вход через Microsoft</h4><p>Официальные серверы, скины и Realms. Страница входа Microsoft открывается в окне лаунчера; пароль лаунчер не сохраняет — только токен входа на вашем ПК.</p></div></article>
+      <article class="feat glass rise"><canvas class="ic" width="8" height="8" data-icon="steve"></canvas><div><h4>Локальные профили</h4><p>Для игры без интернета и по локальной сети: корректные офлайн-UUID и библиотека скинов PNG 64×64.</p></div></article>
+      <article class="feat glass rise"><canvas class="ic" width="8" height="8" data-icon="sign"></canvas><div><h4>Всё хранится у вас</h4><p>Сборки, снимки, бэкапы и статистика игры — локально на ПК. Интерфейс на русском.</p></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ Y −64 · БЕДРОК — скачать ═════════ -->
+<section class="layer l-bedrock" id="download" data-y="-64" data-name="Бедрок" data-biome="minecraft:bedrock" data-tex="bedrock">
+  <div class="seam" data-seam="bedrock" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="final rise">
+      <span class="ylabel">Y −64</span>
+      <h2>Дно. Дальше копать некуда</h2>
+      <p class="lead">Дальше только скачать. Бесплатно, с открытым кодом, без регистрации в лаунчере.</p>
+      <div class="cta">
+        <a class="btn btn-play" data-dl href="https://github.com/Blockify-Launcher/Blockify-Launcher/releases">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/></svg>
+          Скачать для Windows
+        </a>
+        <a class="btn" href="https://github.com/Blockify-Launcher/Blockify-Launcher">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>
+          Исходники на GitHub
+        </a>
+      </div>
+      <p class="dl-meta" id="dlMeta">Portable-архив <code>Blockify-portable-win-x64.zip</code> на странице релизов GitHub. Установка не нужна.</p>
+      <p class="dl-hash" id="dlHash" hidden>SHA256: <code id="dlHashValue"></code></p>
+      <p class="os-note" id="osNote" role="status" hidden></p>
+
+      <h3 class="req-title">Системные требования</h3>
+      <ul class="sysreq" aria-label="Системные требования">
+        <li class="chip">Windows 10 (1607+) или Windows 11</li>
+        <li class="chip">Только 64-бит</li>
+        <li class="chip"><a href="https://developer.microsoft.com/microsoft-edge/webview2/" rel="noopener">WebView2 Runtime</a> (в Windows 11 уже есть)</li>
+        <li class="chip">ОЗУ: от 4 ГБ, для сборок с модами — 8 ГБ</li>
+        <li class="chip">Диск: от 2 ГБ, сборкам нужно больше</li>
+        <li class="chip">Видеокарта с OpenGL 3.2+ (для 1.17+)</li>
+        <li class="chip">Интернет для первой установки</li>
+        <li class="chip">Linux и macOS — в планах</li>
+      </ul>
+
+      <div class="notice glass">
+        <p><b>Windows может показать «Система Windows защитила ваш компьютер».</b> Лаунчер пока не подписан цифровой подписью, поэтому SmartScreen его не узнаёт. Нажмите «Подробнее» → «Выполнить в любом случае».</p>
+        <p><b>Распакуйте архив целиком</b> в отдельную папку (например, <code>C:\Games\Blockify</code>) и запустите <code>BlockifyLauncher.exe</code>. Прямо из архива лаунчер не запустится.</p>
+        <p>Скачивайте только с GitHub или с этого сайта. Сверить файл можно по SHA256 из <code>SHA256SUMS.txt</code> на странице релиза: <code>Get-FileHash .\Blockify-portable-win-x64.zip</code> в PowerShell.</p>
+      </div>
+    </div>
+
+    <div class="faq" id="faq">
+      <h3>Вопросы</h3>
+      <details><summary>Это бесплатно?</summary><p>Да. Лаунчер бесплатный, код открыт на GitHub под лицензией MIT. Сама игра Minecraft: Java Edition продаётся отдельно на <a href="https://www.minecraft.net/" rel="noopener">minecraft.net</a>.</p></details>
+      <details><summary>Нужен ли вход в аккаунт?</summary><p>Регистрации в самом лаунчере нет. Для официальных серверов, скинов и Realms войдите через аккаунт Microsoft, на котором куплена Minecraft: Java Edition. Для игры без интернета и по локальной сети можно создать локальный профиль. Играть в Minecraft можно только купив игру — этого требует <a href="https://www.minecraft.net/eula" rel="noopener">лицензионное соглашение (EULA) Mojang</a>.</p></details>
+      <details><summary>Как устроен вход через Microsoft?</summary><p>Страница входа Microsoft открывается во встроенном окне лаунчера. Лаунчер не сохраняет пароль: после входа на вашем компьютере хранится только токен входа. Скачивайте Blockify только с GitHub или с этого сайта.</p></details>
+      <details><summary>Windows пишет «Система Windows защитила ваш компьютер». Что делать?</summary><p>Лаунчер пока не подписан цифровой подписью, поэтому SmartScreen его не узнаёт. Нажмите «Подробнее» → «Выполнить в любом случае». Подлинность архива можно проверить по SHA256 из файла <code>SHA256SUMS.txt</code> на странице релиза.</p></details>
+      <details><summary>Пишет, что нужен WebView2</summary><p>Интерфейс лаунчера работает на Microsoft Edge WebView2. В Windows 11 он уже установлен, в Windows 10 обычно приходит с обновлениями. Если его нет — скачайте «Evergreen Bootstrapper» на <a href="https://developer.microsoft.com/microsoft-edge/webview2/" rel="noopener">сайте Microsoft</a>.</p></details>
+      <details><summary>А Linux и macOS?</summary><p>Сейчас только Windows 10 и 11 (64-бит). Linux и macOS — в дорожной карте.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><b style="color:var(--text)">Blockify Launcher.</b> Копайте глубже, а не шире.</span>
+    <nav aria-label="Ссылки">
+      <a href="https://github.com/Blockify-Launcher/Blockify-Launcher">GitHub</a>
+      <a href="https://github.com/Blockify-Launcher/Blockify-Launcher/releases">Релизы</a>
+      <a href="https://github.com/Blockify-Launcher/Blockify-Launcher/blob/master/LICENSE">Лицензия</a>
+      <a href="https://github.com/Blockify-Launcher/Blockify-Launcher/issues">Сообщить о проблеме</a>
+      <a href="https://www.minecraft.net/eula" rel="noopener">EULA Minecraft</a>
+    </nav>
+    <small class="disclaimer">Blockify не является официальным продуктом Minecraft. Не одобрено и не связано с Mojang или Microsoft. Minecraft — товарный знак Mojang AB.</small>
+  </div>
+</footer>
+
+<div class="adv" id="adv" aria-hidden="true"><canvas width="8" height="8" id="advIcon"></canvas><div><b>Достижение получено!</b><span id="advText"></span></div></div>
+
+<script src="main.js" defer></script>
+</body>
+</html>
